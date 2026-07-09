@@ -1,13 +1,14 @@
 import datetime
 
+from src.broker.mt5_connector import MT5Connector
 
 APP_NAME = "Trading Assistant AI"
-VERSION = "0.0.1"
+VERSION = "0.0.3"
 
 
 def print_banner():
     print("=" * 50)
-    print(f"{APP_NAME}")
+    print(APP_NAME)
     print(f"Version {VERSION}")
     print("=" * 50)
 
@@ -21,13 +22,42 @@ def initialize():
 
 
 def main():
+
     print_banner()
+
     initialize()
 
     print(f"\nStart Time : {datetime.datetime.now():%Y-%m-%d %H:%M:%S}")
 
-    print("\nSystem Ready.")
-    print("Waiting for next development step...")
+    connector = MT5Connector()
+
+    print("\nConnecting MetaTrader 5...")
+
+    try:
+
+        if not connector.connect():
+            print("[ERROR] Cannot connect to MetaTrader 5")
+            return
+
+        print("[OK] MT5 Connected")
+
+        terminal = connector.terminal_info()
+
+        if terminal:
+            print(f"Terminal : {terminal.name}")
+
+        account = connector.account_info()
+
+        if account:
+            print(f"Account  : {account.login}")
+
+        print("\nSystem Ready.")
+
+    finally:
+
+        connector.disconnect()
+
+        print("Disconnected.")
 
 
 if __name__ == "__main__":
