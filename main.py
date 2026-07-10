@@ -1,6 +1,7 @@
 import datetime
 
 from src.broker.mt5_connector import MT5Connector
+from src.services.data_service import get_candles
 
 APP_NAME = "Trading Assistant AI"
 VERSION = "0.0.3"
@@ -52,6 +53,18 @@ def main():
             print(f"Account  : {account.login}")
 
         print("\nSystem Ready.")
+
+        print("\nLoading candle data...")
+
+        candles = get_candles(
+            symbol="XAUUSD",
+            count=10
+        )
+
+        if candles is not None:
+            print(candles.tail())
+        else:
+            print("[ERROR] Cannot get candle data")
 
     finally:
 
