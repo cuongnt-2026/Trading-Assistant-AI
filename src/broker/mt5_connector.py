@@ -9,7 +9,10 @@ class MT5Connector:
     def __init__(self):
         self.connected = False
 
-    def connect(self):
+    def connect(self) -> bool:
+        """
+        Connect to MetaTrader 5 terminal.
+        """
 
         if self.connected:
             return True
@@ -27,7 +30,7 @@ class MT5Connector:
 
         return True
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         """
         Disconnect from MetaTrader 5 terminal.
         """
@@ -35,8 +38,8 @@ class MT5Connector:
         if self.connected:
             print("Disconnecting MT5...")
             mt5.shutdown()
-            print("[OK] Disconnected")
             self.connected = False
+            print("[OK] Disconnected")
 
     def is_connected(self) -> bool:
         """
@@ -52,10 +55,8 @@ class MT5Connector:
 
         if not self.connected:
             return None
+
         return mt5.terminal_info()
-        
-    def connect(self) -> bool:
-    def disconnect(self) -> None:
 
     def account_info(self):
         """
@@ -74,4 +75,5 @@ class MT5Connector:
 
         if not self.connected:
             return None
+
         return mt5.version()

@@ -1,7 +1,7 @@
 import datetime
 
 from src.broker.mt5_connector import MT5Connector
-from src.services.data_service import get_candles
+from src.data.data_service import DataService
 
 APP_NAME = "Trading Assistant AI"
 VERSION = "0.0.3"
@@ -56,21 +56,40 @@ def main():
 
         print("\nLoading candle data...")
 
-        candles = get_candles(
+        candles = DataService.get_candles(
             symbol="XAUUSD",
-            count=10
+            timeframe="M15",
+            count=10,
         )
 
-        if candles is not None:
-            print(candles.tail())
-        else:
+        if candles is None:
             print("[ERROR] Cannot get candle data")
+            return
+
+        print(f"[OK] Loaded {len(candles)} candles.\n")
+
+        print("=" * 50)
+        print("Last 5 Candles")
+        print("=" * 50)
+
+        for candle in candles[-5:]:
+            print(
+                f"{candle.time} | "
+                f"O:{candle.open:.2f} "
+                f"H:{candle.high:.2f} "
+                f"L:{candle.low:.2f} "
+                f"C:{candle.close:.2f} "
+                f"V:{candle.volume}"
+            )
+
+    except Exception as e:
+        print(f"[ERROR] {e}")
 
     finally:
 
         connector.disconnect()
 
-        print("Disconnected.")
+        print("\nDisconnected.")
 
 
 if __name__ == "__main__":
