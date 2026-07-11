@@ -2,6 +2,7 @@ import datetime
 
 from src.broker.mt5_connector import MT5Connector
 from src.data.data_service import DataService
+from src.indicators.indicator_service import IndicatorService
 
 APP_NAME = "Trading Assistant AI"
 VERSION = "0.0.3"
@@ -59,7 +60,7 @@ def main():
         candles = DataService.get_candles(
             symbol="XAUUSD",
             timeframe="M15",
-            count=10,
+            count=250,
         )
 
         if candles is None:
@@ -81,6 +82,19 @@ def main():
                 f"C:{candle.close:.2f} "
                 f"V:{candle.volume}"
             )
+
+        ema20 = IndicatorService.ema(candles, 20)
+        ema50 = IndicatorService.ema(candles, 50)
+        ema200 = IndicatorService.ema(candles, 200)
+        adx = IndicatorService.adx(candles)
+
+        print("\n" + "=" * 50)
+        print("Indicators")
+        print("=" * 50)
+        print(f"EMA20 : {ema20:.2f}")
+        print(f"EMA50 : {ema50:.2f}")
+        print(f"EMA200: {ema200:.2f}")
+        print(f"ADX   : {adx:.2f}")
 
     except Exception as e:
         print(f"[ERROR] {e}")
