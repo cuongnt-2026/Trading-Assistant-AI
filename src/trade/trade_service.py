@@ -1,0 +1,89 @@
+from src.signal.constants import BUY, SELL, NO_TRADE
+from src.trade.trade_plan import TradePlan
+from src.trade.risk_manager import RiskManager
+from src.trade.constants import (RISK_MIN_PERCENT, RISK_MAX_PERCENT, ATR_SL_BUFFER,
+                                 SWING_LOOKBACK, ENTRY_PULLBACK_ATR)
+
+
+class TradeService:
+    """Build Trade Plan (SL/TP dong) tu Trading Signal."""
+
+    @staticmethod
+    def _decimals(price):
+        return 2 if price >= 10 else 5
+
+    @staticmethod
+    def create(signal, candles, symbol="", balance=None, confidence=0.0,
+               risk_min=RISK_MIN_PERCENT, risk_max=RISK_MAX_PERCENT, strategy="trend",
+               entry_mode="market"):
+        """
+        Dung TradePlan. SL/TP dong theo cau truc + ATR; sizing theo confidence.
+        """
+        if signal.action not in (BUY, SELL):
+            return TradePlan(
+                action=NO_TRADE, entry_price=0.0, stop_loss=0.0,
+                take_profit=0.0, risk_reward="-", reason=signal.reason,
+            )
+
+        last = candles[-1]
+        nd = TradeService._decimals(last.close)
+        close = round(last.close, nd)
+        atr = getattr(signal, "atr", 0.0) or abs(close) * 0.001
+
+        # Trend + lenh cho: lui gia ve phia EMA de vao dep hon
+        if strategy == "trend" and entry_mode == "limit":
+            if signal.action == BUY:
+                entry = round(close - ENTRY_PULLBACK_ATR * atr, nd)
+            else:
+                entry = round(close + ENTRY_PULLBACK_ATR * atr, nd)
+            entry_type = "limit"
+        else:
+            entry = close
+            entry_type = "market"
+
+        if strategy == "meanrev":
+            # SL vuot qua diem cuc doan gan nhat, TP nham ve EMA20 (trung binh)
+            recent = candles[-SWING_LOOKBACK:]
+            if signal.action == BUY:
+                sl_raw = min(c.low for c in recent) - ATR_SL_BUFFER * atr
+                tp_raw = signal.ema20
+            else:
+                sl_raw = max(c.high for c in recent) + ATR_SL_BUFFER * atr
+                tp_raw = signal.ema20
+            lv = {"stop_loss": sl_raw, "take_profit": tp_raw,
+                  "sl_source": "swing-ATR", "tp_source": "mean-EMA20",
+                  "trail_distance": 1.5 * atr}
+        else:
+            lv = RiskManager.dynamic_levels(signal.action, entry, candles, atr)
+
+        sl = round(lv["stop_loss"], nd)
+        tp = round(lv["take_profit"], nd)
+        trail = round(lv["trail_distance"], nd)
+
+        risk_points = round(abs(entry - sl), nd)
+        reward_points = round(abs(tp - entry), nd)
+        rr_ratio = round(reward_points / risk_points, 2) if risk_points else 0.0
+
+        risk_percent, risk_amount, lot_size, expected_profit = RiskManager.sizing(
+            symbol, risk_points, rr_ratio, balance, confidence, risk_min, risk_max,
+        )
+
+        return TradePlan(
+            action=signal.action,
+            entry_type=entry_type,
+            entry_price=entry,
+            stop_loss=sl,
+            take_profit=tp,
+            risk_reward="1 : {:g}".format(rr_ratio),
+            reason=signal.reason,
+            rr_ratio=rr_ratio,
+            risk_points=risk_points,
+            reward_points=reward_points,
+            risk_percent=risk_percent,
+            sl_source=lv["sl_source"],
+            tp_source=lv["tp_source"],
+            trail_distance=trail,
+            risk_amount=risk_amount,
+            lot_size=lot_size,
+            expected_profit=expected_profit,
+        )

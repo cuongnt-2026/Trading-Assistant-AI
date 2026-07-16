@@ -41,6 +41,23 @@ class MT5Connector:
             self.connected = False
             print("[OK] Disconnected")
 
+    def reconnect(self) -> bool:
+        """Ngat han roi ket noi lai (chua lanh khi feed bi dut)."""
+        try:
+            mt5.shutdown()
+        except Exception:
+            pass
+        self.connected = False
+        return self.connect()
+
+    def feed_alive(self) -> bool:
+        """True neu terminal dang ket noi server broker (co luong gia)."""
+        try:
+            ti = mt5.terminal_info()
+            return bool(ti and getattr(ti, "connected", False))
+        except Exception:
+            return False
+
     def is_connected(self) -> bool:
         """
         Check connection status.

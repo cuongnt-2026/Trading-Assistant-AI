@@ -2,107 +2,71 @@ import datetime
 
 from src.broker.mt5_connector import MT5Connector
 from src.data.data_service import DataService
-from src.indicators.indicator_service import IndicatorService
+from src.signal.signal_service import SignalService
+from src.signal.trend import TrendService, higher_tf
+from src.ai_review.recommender import Recommender
+from src.trade.trade_service import TradeService
 
 APP_NAME = "Trading Assistant AI"
-VERSION = "0.0.3"
-
-
-def print_banner():
-    print("=" * 50)
-    print(APP_NAME)
-    print(f"Version {VERSION}")
-    print("=" * 50)
-
-
-def initialize():
-    print("\nInitializing...\n")
-
-    print("[OK] Configuration")
-    print("[OK] Environment")
-    print("[OK] Logger")
+VERSION = "0.0.5"
 
 
 def main():
-
-    print_banner()
-
-    initialize()
-
-    print(f"\nStart Time : {datetime.datetime.now():%Y-%m-%d %H:%M:%S}")
+    print("=" * 50)
+    print(APP_NAME)
+    print("Version {}".format(VERSION))
+    print("=" * 50)
+    print("\nStart Time : {:%Y-%m-%d %H:%M:%S}".format(datetime.datetime.now()))
 
     connector = MT5Connector()
-
     print("\nConnecting MetaTrader 5...")
-
     try:
-
         if not connector.connect():
             print("[ERROR] Cannot connect to MetaTrader 5")
             return
-
         print("[OK] MT5 Connected")
 
-        terminal = connector.terminal_info()
-
-        if terminal:
-            print(f"Terminal : {terminal.name}")
-
-        account = connector.account_info()
-
-        if account:
-            print(f"Account  : {account.login}")
-
-        print("\nSystem Ready.")
-
-        print("\nLoading candle data...")
-
-        candles = DataService.get_candles(
-            symbol="XAUUSD",
-            timeframe="M15",
-            count=250,
-        )
-
+        symbol, tf = "XAUUSD", "M15"
+        candles = DataService.get_candles(symbol=symbol, timeframe=tf, count=250)
         if candles is None:
             print("[ERROR] Cannot get candle data")
             return
+        print("[OK] Loaded {} candles.".format(len(candles)))
 
-        print(f"[OK] Loaded {len(candles)} candles.\n")
+        # Trend khung lon (da khung)
+        htf = higher_tf(tf)
+        htf_candles = DataService.get_candles(symbol=symbol, timeframe=htf, count=250)
+        htf_trend = TrendService.direction(htf_candles) if htf_candles else None
+        print("HTF {} trend: {}".format(htf, htf_trend))
 
-        print("=" * 50)
-        print("Last 5 Candles")
-        print("=" * 50)
+        signal = SignalService.analyze(candles, htf_trend=htf_trend)
+        rec = Recommender.evaluate(signal, candles)
+        plan = TradeService.create(signal, candles, symbol=symbol,
+                                   confidence=rec.confidence)
 
-        for candle in candles[-5:]:
-            print(
-                f"{candle.time} | "
-                f"O:{candle.open:.2f} "
-                f"H:{candle.high:.2f} "
-                f"L:{candle.low:.2f} "
-                f"C:{candle.close:.2f} "
-                f"V:{candle.volume}"
-            )
+        print("\nTrading Signal")
+        print("Action    : {}".format(signal.action))
+        print("Trend     : {}".format(signal.trend))
+        print("Pattern   : {}".format(signal.pattern or "-"))
+        print("Reason    : {}".format(signal.reason))
+        print("Advice    : {} | Confidence {:.0f}% ({})".format(
+            rec.action, rec.confidence, rec.label))
 
-        ema20 = IndicatorService.ema(candles, 20)
-        ema50 = IndicatorService.ema(candles, 50)
-        ema200 = IndicatorService.ema(candles, 200)
-        adx = IndicatorService.adx(candles)
+        if plan.action in ("BUY", "SELL"):
+            print("\nTrade Plan (SL/TP dong)")
+            print("Entry     : {}".format(plan.entry_price))
+            print("SL        : {}  ({})".format(plan.stop_loss, plan.sl_source))
+            print("TP        : {}  ({})".format(plan.take_profit, plan.tp_source))
+            print("R:R       : {}".format(plan.risk_reward))
+            print("Trailing  : ~{}".format(plan.trail_distance))
+            print("Risk      : {:g}%".format(plan.risk_percent))
 
-        print("\n" + "=" * 50)
-        print("Indicators")
-        print("=" * 50)
-        print(f"EMA20 : {ema20:.2f}")
-        print(f"EMA50 : {ema50:.2f}")
-        print(f"EMA200: {ema200:.2f}")
-        print(f"ADX   : {adx:.2f}")
-
+        print("\nIndicators: EMA {:.2f}/{:.2f}/{:.2f} ADX {:.2f} ATR {:.2f} RSI {:.2f}".format(
+            signal.ema20, signal.ema50, signal.ema200, signal.adx, signal.atr, signal.rsi))
     except Exception as e:
-        print(f"[ERROR] {e}")
-
+        print("[ERROR] {}".format(e))
     finally:
-
         connector.disconnect()
-
         print("\nDisconnected.")
 
 

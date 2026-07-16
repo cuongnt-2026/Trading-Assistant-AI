@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Trading Assistant AI — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0b0f17; --panel:#131a26; --panel2:#0f1622; --line:#1f2a3a;
+    --txt:#e6edf6; --muted:#8b98ad; --accent:#4f8cff;
+    --buy:#22c55e; --sell:#ef4444; --neutral:#eab308;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
+  body{background:var(--bg);color:var(--txt);}
+  .app{display:flex;min-height:100vh;}
+  a{cursor:pointer;}
+
+  /* Sidebar */
+  .sidebar{width:230px;background:var(--panel2);border-right:1px solid var(--line);
+    padding:22px 16px;position:sticky;top:0;height:100vh;}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;margin-bottom:28px;}
+  .brand .logo{width:34px;height:34px;border-radius:9px;
+    background:linear-gradient(135deg,#4f8cff,#22c55e);display:grid;place-items:center;font-size:18px;}
+  .nav a{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:9px;
+    color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;margin-bottom:4px;}
+  .nav a.active,.nav a:hover{background:#1a2434;color:var(--txt);}
+  .nav .ic{width:20px;text-align:center;}
+  .disclaimer{margin-top:24px;font-size:11px;color:var(--muted);line-height:1.6;
+    border-top:1px solid var(--line);padding-top:14px;}
+
+  /* Content */
+  .main{flex:1;padding:28px 34px;max-width:1500px;}
+  .head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+  .head h1{font-size:26px;font-weight:800;}
+  .head p{color:var(--muted);font-size:14px;margin-top:4px;}
+  .updated{color:var(--muted);font-size:13px;text-align:right;}
+  .updated b{color:var(--txt);}
+  .btn{background:#1a2434;border:1px solid var(--line);color:var(--txt);
+    padding:8px 14px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;}
+  .btn:hover{border-color:var(--accent);}
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .toolbar label{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center;}
+  select,input[type=text]{background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    padding:7px 10px;border-radius:8px;font-size:13px;}
+
+  /* Cards */
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:14px;margin-bottom:22px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .card .k{color:var(--muted);font-size:12.5px;font-weight:500;display:flex;align-items:center;gap:7px;}
+  .card .v{font-size:26px;font-weight:800;margin-top:8px;}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .v.buy{color:var(--buy);} .v.sell{color:var(--sell);} .v.neutral{color:var(--neutral);}
+  @media(max-width:1200px){.grid{grid-template-columns:repeat(3,1fr);}}
+  @media(max-width:640px){.grid{grid-template-columns:repeat(2,1fr);}}
+
+  .row{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:22px;}
+  @media(max-width:1050px){.row{grid-template-columns:1fr;}}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:22px;}
+  .panel h3{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+  .panel h3 span.sub{color:var(--muted);font-weight:500;font-size:12px;}
+
+  /* Trade plan */
+  .tp{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .tp .cell{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:12px 14px;}
+  .tp .cell .lbl{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+  .tp .cell .val{font-size:19px;font-weight:800;margin-top:5px;}
+  .tp .entry{color:var(--accent);} .tp .sl{color:var(--sell);} .tp .tpv{color:var(--buy);}
+  @media(max-width:760px){.tp{grid-template-columns:repeat(2,1fr);}}
+
+  /* Confidence bar */
+  .conf{display:flex;align-items:center;gap:8px;min-width:120px;}
+  .conf .track{flex:1;height:7px;border-radius:6px;background:#22304a;overflow:hidden;}
+  .conf .fill{height:100%;border-radius:6px;}
+  .conf .pct{font-size:12px;font-weight:700;width:34px;text-align:right;}
+
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{text-align:left;padding:10px 9px;border-bottom:1px solid var(--line);white-space:nowrap;}
+  th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;cursor:default;}
+  td.sym{font-weight:700;}
+  .badge{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;}
+  .badge.BUY{background:rgba(34,197,94,.15);color:var(--buy);}
+  .badge.SELL{background:rgba(239,68,68,.15);color:var(--sell);}
+  .badge.NO_TRADE,.badge.WAIT{background:rgba(234,179,8,.13);color:var(--neutral);}
+  .tag{font-size:11px;color:var(--muted);}
+  .badge.WIN{background:rgba(34,197,94,.15);color:var(--buy);}.badge.LOSS{background:rgba(239,68,68,.15);color:var(--sell);}.badge.OPEN{background:rgba(139,152,173,.15);color:var(--muted);}
+  .mail-yes{color:var(--buy);} .mail-no{color:var(--muted);}
+  .muted{color:var(--muted);}
+  .empty{color:var(--muted);text-align:center;padding:30px;}
+  canvas{max-height:260px;}
+  .tabpage{display:none;}
+  .tabpage.active{display:block;}
+  .foot{color:var(--muted);font-size:12px;margin-top:26px;text-align:center;line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">🤖</span> Trading AI</div>
+    <nav class="nav" id="nav">
+      <a data-tab="dashboard" class="active"><span class="ic">📊</span> Dashboard</a>
+      <a data-tab="signals"><span class="ic">🔔</span> Tín hiệu</a>
+      <a data-tab="symbols"><span class="ic">💹</span> Cặp tiền</a>
+      <a data-tab="stats"><span class="ic">📈</span> Thống kê</a>
+    </nav>
+    <div class="disclaimer">
+      Dữ liệu đọc từ <code>data.js</code> (bot ghi khi chạy).<br>
+      Tín hiệu chỉ mang tính tham khảo, không phải lời khuyên đầu tư.
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="head">
+      <div>
+        <h1 id="greeting">Xin chào 👋</h1>
+        <p id="subtitle">Trading Assistant AI — bảng theo dõi tín hiệu &amp; thống kê</p>
+      </div>
+      <div class="toolbar">
+        <label><input type="checkbox" id="autorefresh" checked> Tự động 15 phút</label>
+        <button class="btn" onclick="location.reload()">⟳ Làm mới</button>
+        <div class="updated">Cập nhật<br><b id="updated">—</b></div>
+      </div>
+    </div>
+
+    <!-- ===== DASHBOARD ===== -->
+    <section class="tabpage active" data-page="dashboard">
+      <div class="grid">
+        <div class="card"><div class="k">📡 Tổng tín hiệu</div><div class="v" id="kpiTotal">0</div></div>
+        <div class="card"><div class="k"><span class="dot" style="background:var(--buy)"></span> BUY</div><div class="v buy" id="kpiBuy">0</div></div>
+        <div class="card"><div class="k"><span class="dot" style="background:var(--sell)"></span> SELL</div><div class="v sell" id="kpiSell">0</div></div>
+        <div class="card"><div class="k"><span class="dot" style="background:var(--neutral)"></span> WAIT</div><div class="v neutral" id="kpiWait">0</div></div>
+        <div class="card"><div class="k">🎯 Tin cậy TB</div><div class="v" id="kpiConf">—</div></div>
+        <div class="card"><div class="k">✉️ Đã gửi mail</div><div class="v" id="kpiMail">0</div></div>
+        <div class="card"><div class="k">🏆 Tỷ lệ thắng</div><div class="v" id="kpiWin">—</div></div>
+      </div>
+
+      <div class="panel" id="tpPanel">
+        <h3>Kế hoạch vào lệnh mới nhất <span class="sub" id="tpMeta"></span></h3>
+        <div id="tpBody"></div>
+      </div>
+
+      <div class="row">
+        <div class="panel">
+          <h3>Tín hiệu gần đây</h3>
+          <div id="recentTable"></div>
+        </div>
+        <div class="panel">
+          <h3>Phân bổ tín hiệu</h3>
+          <canvas id="pie"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SIGNALS ===== -->
+    <section class="tabpage" data-page="signals">
+      <div class="panel">
+        <h3>Bộ lọc</h3>
+        <div class="toolbar">
+          <label>Cặp tiền <select id="fSymbol"><option value="">Tất cả</option></select></label>
+          <label>Khung <select id="fTf"><option value="">Tất cả</option></select></label>
+          <label>Tín hiệu <select id="fAction">
+            <option value="">Tất cả</option><option>BUY</option><option>SELL</option><option>NO_TRADE</option>
+          </select></label>
+          <label>Tìm <input type="text" id="fSearch" placeholder="symbol / lý do..."></label>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Lịch sử tín hiệu <span class="sub" id="sigCount"></span></h3>
+        <div id="fullTable"></div>
+      </div>
+    </section>
+
+    <!-- ===== SYMBOLS ===== -->
+    <section class="tabpage" data-page="symbols">
+      <div class="panel">
+        <h3>Tín hiệu theo cặp tiền <span class="sub">BUY / SELL / NO_TRADE</span></h3>
+        <canvas id="bar"></canvas>
+      </div>
+      <div class="panel">
+        <h3>Tổng hợp theo cặp tiền</h3>
+        <div id="symTable"></div>
+      </div>
+    </section>
+
+    <!-- ===== STATS ===== -->
+    <section class="tabpage" data-page="stats">
+      <div class="row">
+        <div class="panel">
+          <h3>Độ tin cậy theo thời gian <span class="sub">chỉ BUY/SELL</span></h3>
+          <canvas id="confLine"></canvas>
+        </div>
+        <div class="panel">
+          <h3>Phân nhóm độ tin cậy</h3>
+          <canvas id="confBar"></canvas>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Chỉ số nhanh</h3>
+        <div id="statTable"></div>
+      </div>
+    </section>
+
+    <div class="foot">
+      Trading Assistant AI — Dashboard v1.0. Nhấn ⟳ hoặc F5 để làm mới.
+    </div>
+  </main>
+</div>
+
+<script src="data.sample.js"></script>
+<script>
+(function(){
+  const D = (window.TA_DATA)||{signals:[],updated:"—"};
+  const S = (D.signals||[]).slice();
+
+  const num=(x,d=2)=> (x===null||x===undefined||isNaN(x))?"—":Number(x).toFixed(d);
+  const g=(o,k,def="—")=> (o && o[k]!==undefined && o[k]!==null)?o[k]:def;
+  const confColor=(c)=> c>=75?"var(--buy)": c>=55?"var(--neutral)":"var(--muted)";
+
+  // Header
+  const hr=new Date().getHours();
+  const greet=hr<11?"Chào buổi sáng":hr<18?"Chào buổi chiều":"Chào buổi tối";
+  document.getElementById('greeting').textContent = greet+", Cường 👋";
+  document.getElementById('updated').textContent = D.updated||"—";
+
+  // ---- KPIs ----
+  const cnt=(a)=>S.filter(s=>s.action===a).length;
+  const buy=cnt('BUY'), sell=cnt('SELL'), wait=cnt('NO_TRADE');
+  const mail=S.filter(s=>s.notified).length;
+  const confs=S.filter(s=>typeof s.confidence==='number'&&(s.action==='BUY'||s.action==='SELL'))
+               .map(s=>s.confidence);
+  const avgConf=confs.length? (confs.reduce((a,b)=>a+b,0)/confs.length):null;
+  document.getElementById('kpiTotal').textContent=S.length;
+  document.getElementById('kpiBuy').textContent=buy;
+  document.getElementById('kpiSell').textContent=sell;
+  document.getElementById('kpiWait').textContent=wait;
+  document.getElementById('kpiConf').textContent=avgConf!==null? Math.round(avgConf)+"%":"—";
+  document.getElementById('kpiMail').textContent=mail;
+
+  // ---- Win/Loss theo thi truong chay ----
+  const wins=S.filter(s=>s.outcome==='WIN').length;
+  const losses=S.filter(s=>s.outcome==='LOSS').length;
+  const openCnt=S.filter(s=>s.outcome==='OPEN').length;
+  const closed=wins+losses;
+  const winrate=closed? Math.round(wins/closed*100):null;
+  const outcomeBadge=(s)=> s.outcome? `<span class="badge ${s.outcome}">${s.outcome}</span>`:'<span class="muted">—</span>';
+
+  var kw=document.getElementById('kpiWin');
+  if(kw) kw.textContent = winrate!==null? (winrate+'% ('+wins+'/'+closed+')') : '—';
+
+  // ---- Latest trade plan ----
+  const actionable=[...S].reverse().find(s=>(s.action==='BUY'||s.action==='SELL')&&s.trade_plan);
+  const tpBody=document.getElementById('tpBody');
+  const tpMeta=document.getElementById('tpMeta');
+  if(!actionable){
+    tpBody.innerHTML='<div class="empty">Chưa có lệnh BUY/SELL nào. Khi có setup, kế hoạch sẽ hiện ở đây.</div>';
+  } else {
+    const p=actionable.trade_plan;
+    const c=actionable.confidence;
+    tpMeta.innerHTML=`${actionable.symbol} ${actionable.timeframe} • <span class="badge ${actionable.action}">${actionable.action}</span>`;
+    const money = (p.lot_size!==null&&p.lot_size!==undefined)
+      ? `<div class="cell"><div class="lbl">Lot (ước tính)</div><div class="val">${num(p.lot_size)}</div></div>
+         <div class="cell"><div class="lbl">Lợi nhuận KV</div><div class="val tpv">$${num(p.expected_profit)}</div></div>`
+      : `<div class="cell"><div class="lbl">Lot</div><div class="val muted">cần balance</div></div>
+         <div class="cell"><div class="lbl">Lợi nhuận KV</div><div class="val muted">—</div></div>`;
+    tpBody.innerHTML=`
+      <div class="tp">
+        <div class="cell"><div class="lbl">Entry</div><div class="val entry">${num(p.entry)}</div></div>
+        <div class="cell"><div class="lbl">Stop Loss</div><div class="val sl">${num(p.stop_loss)}</div></div>
+        <div class="cell"><div class="lbl">Take Profit</div><div class="val tpv">${num(p.take_profit)}</div></div>
+        <div class="cell"><div class="lbl">R : R</div><div class="val">${g(p,'risk_reward')}</div></div>
+        <div class="cell"><div class="lbl">Risk</div><div class="val">${num(p.risk_percent,0)}%</div></div>
+        ${money}
+        <div class="cell"><div class="lbl">Độ tin cậy</div>
+          <div class="val" style="color:${confColor(c)}">${c!==undefined?Math.round(c)+'%':'—'}</div></div>
+      </div>`;
+  }
+
+  // ---- Confidence cell renderer ----
+  function confCell(s){
+    if(typeof s.confidence!=='number') return '<span class="muted">—</span>';
+    const c=s.confidence;
+    return `<div class="conf"><div class="track"><div class="fill" style="width:${c}%;background:${confColor(c)}"></div></div>
+            <div class="pct" style="color:${confColor(c)}">${Math.round(c)}%</div></div>`;
+  }
+
+  // ---- Table renderer ----
+  function renderTable(list, full){
+    if(!list.length) return '<div class="empty">Không có tín hiệu.</div>';
+    const rows=list.map(s=>`
+      <tr title="${(s.reason||'').replace(/"/g,'')}">
+        <td class="muted">${s.time||''}</td>
+        <td class="sym">${s.symbol||''}</td>
+        <td class="tag">${s.timeframe||''}</td>
+        <td><span class="badge ${s.action}">${s.action}</span></td>
+        <td>${confCell(s)}</td>
+        <td>${g(s,'price')}</td>
+        ${full?`<td class="tag">${g(s,'trend')}</td>
+        <td>${num(s.rsi,0)}</td>
+        <td>${num(s.adx,1)}</td>
+        <td>${num(s.atr)}</td>
+        <td class="tag">${g(s,'pattern','')}</td>`:''}
+        <td>${outcomeBadge(s)}</td>
+        <td class="${s.notified?'mail-yes':'mail-no'}">${s.notified?'✓':'—'}</td>
+      </tr>`).join('');
+    const head=`<tr><th>Thời gian</th><th>Symbol</th><th>TF</th><th>Tín hiệu</th>
+      <th>Tin cậy</th><th>Giá</th>${full?'<th>Trend</th><th>RSI</th><th>ADX</th><th>ATR</th><th>Nến</th>':''}<th>KQ</th><th>Mail</th></tr>`;
+    return `<table><thead>${head}</thead><tbody>${rows}</tbody></table>`;
+  }
+
+  document.getElementById('recentTable').innerHTML=renderTable([...S].reverse().slice(0,8),false);
+
+  // ---- Signals tab: filters ----
+  const fSymbol=document.getElementById('fSymbol'), fTf=document.getElementById('fTf'),
+        fAction=document.getElementById('fAction'), fSearch=document.getElementById('fSearch');
+  [...new Set(S.map(s=>s.symbol))].filter(Boolean).sort().forEach(x=>{
+    const o=document.createElement('option');o.value=x;o.textContent=x;fSymbol.appendChild(o);});
+  [...new Set(S.map(s=>s.timeframe))].filter(Boolean).sort().forEach(x=>{
+    const o=document.createElement('option');o.value=x;o.textContent=x;fTf.appendChild(o);});
+  function applyFilter(){
+    let list=[...S].reverse();
+    if(fSymbol.value) list=list.filter(s=>s.symbol===fSymbol.value);
+    if(fTf.value) list=list.filter(s=>s.timeframe===fTf.value);
+    if(fAction.value) list=list.filter(s=>s.action===fAction.value);
+    const q=fSearch.value.trim().toLowerCase();
+    if(q) list=list.filter(s=>((s.symbol||'')+' '+(s.reason||'')).toLowerCase().includes(q));
+    document.getElementById('fullTable').innerHTML=renderTable(list,true);
+    document.getElementById('sigCount').textContent=`${list.length} / ${S.length}`;
+  }
+  [fSymbol,fTf,fAction].forEach(e=>e.addEventListener('change',applyFilter));
+  fSearch.addEventListener('input',applyFilter);
+  applyFilter();
+
+  // ---- Symbols tab: summary ----
+  const syms=[...new Set(S.map(s=>s.symbol))].filter(Boolean);
+  const symRows=syms.map(sym=>{
+    const sub=S.filter(s=>s.symbol===sym);
+    const b=sub.filter(s=>s.action==='BUY').length, se=sub.filter(s=>s.action==='SELL').length;
+    return `<tr><td class="sym">${sym}</td><td>${sub.length}</td>
+      <td style="color:var(--buy)">${b}</td><td style="color:var(--sell)">${se}</td>
+      <td class="muted">${sub.length-b-se}</td></tr>`;}).join('');
+  document.getElementById('symTable').innerHTML= syms.length?
+    `<table><thead><tr><th>Symbol</th><th>Tổng</th><th>BUY</th><th>SELL</th><th>WAIT</th></tr></thead><tbody>${symRows}</tbody></table>`
+    :'<div class="empty">Chưa có dữ liệu.</div>';
+
+  // ---- Stats tab ----
+  const strong=confs.filter(c=>c>=75).length, mod=confs.filter(c=>c>=55&&c<75).length, low=confs.filter(c=>c<55).length;
+  document.getElementById('statTable').innerHTML=`<table><tbody>
+    <tr><td class="muted">Tổng tín hiệu</td><td><b>${S.length}</b></td></tr>
+    <tr><td class="muted">BUY / SELL / WAIT</td><td><b>${buy} / ${sell} / ${wait}</b></td></tr>
+    <tr><td class="muted">Độ tin cậy trung bình (BUY/SELL)</td><td><b>${avgConf!==null?Math.round(avgConf)+'%':'—'}</b></td></tr>
+    <tr><td class="muted">Đã gửi mail</td><td><b>${mail}</b></td></tr>
+    <tr><td class="muted">Lệnh đã đóng (Win+Loss)</td><td><b>${closed}</b> (OPEN: ${openCnt})</td></tr>
+    <tr><td class="muted">Thắng / Thua</td><td><b style="color:var(--buy)">${wins}</b> / <b style="color:var(--sell)">${losses}</b></td></tr>
+    <tr><td class="muted">Tỷ lệ thắng (Win rate)</td><td><b>${winrate!==null? winrate+'%':'—'}</b></td></tr>
+  </tbody></table>`;
+
+  // ---- Charts ----
+  const gridColor='#1f2a3a', tickColor='#8b98ad';
+  if(window.Chart){
+    new Chart(document.getElementById('pie'),{type:'doughnut',
+      data:{labels:['BUY','SELL','NO_TRADE'],datasets:[{data:[buy,sell,wait],
+        backgroundColor:['#22c55e','#ef4444','#eab308'],borderColor:'#131a26',borderWidth:3}]},
+      options:{plugins:{legend:{labels:{color:tickColor}}},cutout:'62%'}});
+
+    const cnt2=(sym,a)=>S.filter(s=>s.symbol===sym&&s.action===a).length;
+    new Chart(document.getElementById('bar'),{type:'bar',
+      data:{labels:syms,datasets:[
+        {label:'BUY',data:syms.map(x=>cnt2(x,'BUY')),backgroundColor:'#22c55e'},
+        {label:'SELL',data:syms.map(x=>cnt2(x,'SELL')),backgroundColor:'#ef4444'},
+        {label:'NO_TRADE',data:syms.map(x=>cnt2(x,'NO_TRADE')),backgroundColor:'#eab308'}]},
+      options:{responsive:true,scales:{x:{stacked:true,grid:{color:gridColor},ticks:{color:tickColor}},
+        y:{stacked:true,grid:{color:gridColor},ticks:{color:tickColor}}},plugins:{legend:{labels:{color:tickColor}}}}});
+
+    const cline=S.filter(s=>(s.action==='BUY'||s.action==='SELL')&&typeof s.confidence==='number');
+    new Chart(document.getElementById('confLine'),{type:'line',
+      data:{labels:cline.map(s=>s.symbol+' '+(s.timeframe||'')),
+        datasets:[{label:'Confidence %',data:cline.map(s=>s.confidence),
+          borderColor:'#4f8cff',backgroundColor:'rgba(79,140,255,.15)',fill:true,tension:.3,pointRadius:3}]},
+      options:{scales:{y:{min:0,max:100,grid:{color:gridColor},ticks:{color:tickColor}},
+        x:{grid:{color:gridColor},ticks:{color:tickColor}}},plugins:{legend:{labels:{color:tickColor}}}}});
+
+    new Chart(document.getElementById('confBar'),{type:'bar',
+      data:{labels:['STRONG ≥75','MODERATE 55-74','LOW <55'],datasets:[{label:'Số tín hiệu',
+        data:[strong,mod,low],backgroundColor:['#22c55e','#eab308','#8b98ad']}]},
+      options:{scales:{y:{grid:{color:gridColor},ticks:{color:tickColor}},
+        x:{grid:{color:gridColor},ticks:{color:tickColor}}},plugins:{legend:{display:false}}}});
+  }
+
+  // ---- Tabs ----
+  document.querySelectorAll('#nav a').forEach(a=>{
+    a.addEventListener('click',()=>{
+      document.querySelectorAll('#nav a').forEach(x=>x.classList.remove('active'));
+      a.classList.add('active');
+      const t=a.dataset.tab;
+      document.querySelectorAll('.tabpage').forEach(p=>p.classList.toggle('active',p.dataset.page===t));
+    });
+  });
+
+  // ---- Auto refresh ----
+  let timer=null;
+  const arEl=document.getElementById('autorefresh');
+  function startAuto(){ clearInterval(timer); timer=setInterval(()=>location.reload(),900000); }
+  arEl.addEventListener('change',e=>{ if(e.target.checked) startAuto(); else clearInterval(timer); });
+  if(arEl.checked) startAuto();   // bat tu dong ngay khi mo trang
+})();
+</script>
+</body>
+</html>
