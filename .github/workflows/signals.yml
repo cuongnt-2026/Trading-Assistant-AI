@@ -2,7 +2,9 @@ name: Trading signals (cloud)
 
 on:
   schedule:
-    - cron: "0 * * * *"      # moi gio (UTC). Doi thanh "*/30 * * * *" neu muon 30 phut/lan
+    # Gio UTC (VN = UTC+7). Chi chay 09:00 -> 00:00 gio VN cho tiet kiem API.
+    - cron: "*/30 2-16 * * *"   # 09:00 - 23:30 VN, moi 30 phut
+    - cron: "0 17 * * *"        # 00:00 VN (nen dong cuoi trong ngay)
   workflow_dispatch: {}       # cho phep bam "Run workflow" de chay thu
 
 permissions:
