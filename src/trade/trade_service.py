@@ -2,7 +2,7 @@ from src.signal.constants import BUY, SELL, NO_TRADE
 from src.trade.trade_plan import TradePlan
 from src.trade.risk_manager import RiskManager
 from src.trade.constants import (RISK_MIN_PERCENT, RISK_MAX_PERCENT, ATR_SL_BUFFER,
-                                 SWING_LOOKBACK, ENTRY_PULLBACK_ATR)
+                                 SWING_LOOKBACK, ENTRY_PULLBACK_ATR, BO_RR, TRAIL_ATR_MULT)
 
 
 class TradeService:
@@ -53,6 +53,20 @@ class TradeService:
             lv = {"stop_loss": sl_raw, "take_profit": tp_raw,
                   "sl_source": "swing-ATR", "tp_source": "mean-EMA20",
                   "trail_distance": 1.5 * atr}
+        elif strategy == "breakout":
+            # SL theo cau truc gan nhat + ATR; TP = BO_RR lan rui ro (tha loi chay)
+            recent = candles[-SWING_LOOKBACK:]
+            if signal.action == BUY:
+                sl_raw = min(c.low for c in recent) - ATR_SL_BUFFER * atr
+                risk = abs(entry - sl_raw) or (atr)
+                tp_raw = entry + BO_RR * risk
+            else:
+                sl_raw = max(c.high for c in recent) + ATR_SL_BUFFER * atr
+                risk = abs(sl_raw - entry) or (atr)
+                tp_raw = entry - BO_RR * risk
+            lv = {"stop_loss": sl_raw, "take_profit": tp_raw,
+                  "sl_source": "breakout-swing", "tp_source": "RR {:g}x".format(BO_RR),
+                  "trail_distance": TRAIL_ATR_MULT * atr}
         else:
             lv = RiskManager.dynamic_levels(signal.action, entry, candles, atr)
 

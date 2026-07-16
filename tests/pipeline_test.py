@@ -26,6 +26,7 @@ import src.signal.signal_engine as _SE
 _SE.REQUIRE_PATTERN = False
 _SE.ADX_MIN = 20.0
 _SE.PULLBACK_ATR_MULT = 1.0
+_SE.FX_SESSION_ONLY = False
 import src.trade.risk_manager as _RM
 _RM.TP_RR_TARGET = 0.0  # test trend TP theo cau truc (doc lap .env)
 
@@ -210,6 +211,29 @@ def main():
     check(plan_mr.tp_source == "mean-EMA20", "meanrev TP nham ve EMA20 (got {})".format(plan_mr.tp_source))
     check(abs(plan_mr.take_profit - 100.0) < 0.05, "meanrev TP ~ EMA20 (got {})".format(plan_mr.take_profit))
     check(plan_mr.stop_loss < min(c.low for c in mrc[-5:]), "meanrev SL duoi day gan nhat")
+
+    print("== 5e. Breakout (XAU + BTC) ==")
+    from src.signal.breakout_engine import BreakoutEngine
+    from src.signal.strategy import strategy_for
+    import src.signal.breakout_engine as _BE
+    _BE.BO_SESSION_ONLY = False   # khoa test doc lap voi gio
+    _BE.BO_STRONG_CLOSE = 0.6
+    _BE.BO_ADX_MIN = 18.0
+    _BE.BO_LOOKBACK = 20
+    check(strategy_for("XAUUSD") == "breakout", "XAUUSD -> breakout")
+    check(strategy_for("BTCUSD") == "breakout", "BTCUSD -> breakout")
+    check(strategy_for("EURUSD") == "trend", "EURUSD -> trend")
+    boc = [_c(100 + i * 0.3, 100 + i * 0.3 + 0.2, 100 + i * 0.3 - 0.2, 100 + i * 0.3 + 0.1, i)
+           for i in range(24)]
+    boc.append(_c(107.0, 108.5, 106.8, 108.3, 24))   # pha vo dinh
+    s_bo = BreakoutEngine.analyze(boc, 106.0, 105.0, 100.0, 30.0, 0.5, 60.0, htf_trend="UPTREND")
+    check(s_bo.action == "BUY", "breakout: pha dinh + trend tang + ADX30 -> BUY (got {})".format(s_bo.action))
+    s_bo2 = BreakoutEngine.analyze(boc, 106.0, 105.0, 100.0, 10.0, 0.5, 60.0, htf_trend="UPTREND")
+    check(s_bo2.action == "NO_TRADE", "breakout: ADX10 yeu -> NO_TRADE")
+    plan_bo = TradeService.create(s_bo, boc, symbol="XAUUSD", balance=10000, confidence=70, strategy="breakout")
+    check(plan_bo.tp_source.startswith("RR"), "breakout TP theo RR (got {})".format(plan_bo.tp_source))
+    check(plan_bo.take_profit > plan_bo.entry_price, "breakout BUY: TP tren entry")
+    check(plan_bo.stop_loss < plan_bo.entry_price, "breakout BUY: SL duoi entry")
 
     print("== 6. Sinh data.sample.js ==")
     rec_b = Recommender.evaluate(s_buy, bc)

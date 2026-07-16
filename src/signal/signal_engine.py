@@ -1,6 +1,7 @@
 from src.signal.constants import (
     BUY, SELL, NO_TRADE, UPTREND, DOWNTREND, SIDEWAYS, STRONG, WEAK,
     ADX_MIN, PULLBACK_ATR_MULT, REQUIRE_PATTERN,
+    FX_SESSION_ONLY, FX_SESS_START, FX_SESS_END,
 )
 from src.signal.signal import Signal
 from src.signal import patterns
@@ -69,8 +70,11 @@ class SignalEngine:
         buy_conf = bool(bull) if REQUIRE_PATTERN else True
         sell_conf = bool(bear) if REQUIRE_PATTERN else True
 
+        _hr = getattr(candles[-1].time, "hour", None)
+        in_session = (not FX_SESSION_ONLY) or (_hr is None) or (FX_SESS_START <= _hr < FX_SESS_END)
+
         # ---------- BUY ----------
-        if buy_trend and strong and pullback and buy_conf:
+        if buy_trend and strong and pullback and buy_conf and in_session:
             note = bull if bull else "no-pattern"
             return SignalEngine._make(
                 BUY, UPTREND, STRONG,
@@ -79,7 +83,7 @@ class SignalEngine:
             )
 
         # ---------- SELL ----------
-        if sell_trend and strong and pullback and sell_conf:
+        if sell_trend and strong and pullback and sell_conf and in_session:
             note = bear if bear else "no-pattern"
             return SignalEngine._make(
                 SELL, DOWNTREND, STRONG,

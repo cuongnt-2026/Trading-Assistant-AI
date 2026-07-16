@@ -1,8 +1,8 @@
 """
 Chon chien luoc theo symbol.
-  - Nhom XAU (vang & cac cap cheo vang): mean-reversion (danh nguoc ve trung binh)
-  - Con lai: trend-following (thuan xu huong)
-Co the ep bang .env: GOLD_STRATEGY=trend|meanrev
+  - Nhom XAU (vang) + BTC (crypto): breakout theo trend (danh thuan xu huong).
+  - Con lai (forex): trend-following pullback.
+Co the ep bang .env: GOLD_STRATEGY / CRYPTO_STRATEGY (trend|meanrev|breakout).
 """
 import os
 
@@ -10,5 +10,7 @@ import os
 def strategy_for(symbol):
     s = (symbol or "").upper()
     if s.startswith("XAU"):
-        return os.getenv("GOLD_STRATEGY", "meanrev").strip().lower()
+        return os.getenv("GOLD_STRATEGY", "breakout").strip().lower()
+    if s.startswith("BTC"):
+        return os.getenv("CRYPTO_STRATEGY", "breakout").strip().lower()
     return "trend"

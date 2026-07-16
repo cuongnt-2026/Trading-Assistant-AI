@@ -50,3 +50,6 @@ TP_RR_TARGET = float(os.getenv("TP_RR_TARGET", "0"))
 
 # Vao lenh CHO (limit): lui ve phia EMA bao nhieu ATR de co gia tot hon
 ENTRY_PULLBACK_ATR = float(os.getenv("ENTRY_PULLBACK_ATR", "0.5"))
+
+# Breakout: chot loi = BO_RR lan rui ro (tha loi chay, bu win rate thap)
+BO_RR = float(os.getenv("BO_RR", "2.5"))

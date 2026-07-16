@@ -38,3 +38,16 @@ MR_RSI_OB = float(os.getenv("MR_RSI_OB", "70"))             # RSI qua mua -> SEL
 MR_ADX_MAX = float(os.getenv("MR_ADX_MAX", "25"))  # CHI danh khi ADX < muc nay (KHONG fade trend manh)
 
 MR_CONFIRM = os.getenv("MR_CONFIRM", "1").strip() not in ("0", "false", "")  # yeu cau nen dao chieu
+
+# ----- Breakout theo trend (nhom XAU + BTC) -----
+BO_LOOKBACK = int(os.getenv("BO_LOOKBACK", "20"))   # pha vo dinh/day cua N nen
+BO_ADX_MIN = float(os.getenv("BO_ADX_MIN", "18"))   # chi danh khi co xu huong
+# Loc chat luong breakout:
+BO_STRONG_CLOSE = float(os.getenv("BO_STRONG_CLOSE", "0.6"))  # nen breakout phai dong manh (>=60% bien do theo huong)
+BO_SESSION_ONLY = os.getenv("BO_SESSION_ONLY", "1").strip() not in ("0","false","")  # chi danh phien London+NY
+BO_SESS_START = int(os.getenv("BO_SESS_START", "7"))   # gio UTC bat dau
+BO_SESS_END = int(os.getenv("BO_SESS_END", "20"))     # gio UTC ket thuc
+# Loc phien cho FX (trend): chi danh gio London+NY
+FX_SESSION_ONLY = os.getenv("FX_SESSION_ONLY", "1").strip() not in ("0","false","")
+FX_SESS_START = int(os.getenv("FX_SESS_START", "7"))
+FX_SESS_END = int(os.getenv("FX_SESS_END", "20"))

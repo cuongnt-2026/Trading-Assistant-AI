@@ -5,10 +5,15 @@ on:
     # Gio UTC (VN = UTC+7). Chi chay 09:00 -> 00:00 gio VN cho tiet kiem API.
     - cron: "*/30 2-16 * * *"   # 09:00 - 23:30 VN, moi 30 phut
     - cron: "0 17 * * *"        # 00:00 VN (nen dong cuoi trong ngay)
-  workflow_dispatch: {}       # cho phep bam "Run workflow" de chay thu
+  workflow_dispatch:
+    inputs:
+      test_mail:
+        description: "Gui 1 mail THU de kiem tra (khong quet tin hieu)"
+        type: boolean
+        default: false
 
 permissions:
-  contents: write             # de commit cloud_state.json (chong gui trung)
+  contents: write
 
 concurrency:
   group: trading-signals
@@ -23,10 +28,12 @@ jobs:
       GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
       MAIL_TO: ${{ secrets.MAIL_TO }}
       NOTIFIER_CHANNEL: email
-      SYMBOLS_FOREX: EURUSD,GBPUSD,USDCHF,AUDUSD,NZDUSD
-      TIMEFRAMES_FOREX: M30,H1
-      SYMBOLS_GOLD_CRYPTO: ""
-      TIMEFRAMES_GOLD_CRYPTO: ""
+      FORCE_TEST_MAIL: ${{ inputs.test_mail }}
+      # Danh sach da chot: XAU (breakout, M30+H1) + FX trend (M30)
+      SYMBOLS_GOLD_CRYPTO: XAUUSD
+      TIMEFRAMES_GOLD_CRYPTO: M30,H1
+      SYMBOLS_FOREX: EURUSD,USDJPY,NZDUSD
+      TIMEFRAMES_FOREX: M30
       MIN_CONFIDENCE: "60"
       ENTRY_MODE: limit
       USE_MTF: "1"
