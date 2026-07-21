@@ -3,7 +3,7 @@ name: Trading signals (cloud)
 on:
   schedule:
     # Gio UTC (VN = UTC+7). Chi chay 09:00 -> 00:00 gio VN cho tiet kiem API.
-    - cron: "*/30 2-16 * * *"   # 09:00 - 23:30 VN, moi 30 phut
+    - cron: "*/15 2-16 * * *"   # 09:00 - 23:45 VN, moi 15 phut (phuc vu M15)
     - cron: "0 17 * * *"        # 00:00 VN (nen dong cuoi trong ngay)
   workflow_dispatch:
     inputs:
@@ -31,7 +31,7 @@ jobs:
       FORCE_TEST_MAIL: ${{ inputs.test_mail }}
       # Danh sach da chot: XAU (breakout, M30+H1) + FX trend (M30)
       SYMBOLS_GOLD_CRYPTO: XAUUSD
-      TIMEFRAMES_GOLD_CRYPTO: M30,H1
+      TIMEFRAMES_GOLD_CRYPTO: M15,M30,H1
       SYMBOLS_FOREX: EURUSD,USDJPY,NZDUSD
       TIMEFRAMES_FOREX: M30
       MIN_CONFIDENCE: "60"

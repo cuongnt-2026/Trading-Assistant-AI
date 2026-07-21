@@ -51,3 +51,13 @@ BO_SESS_END = int(os.getenv("BO_SESS_END", "20"))     # gio UTC ket thuc
 FX_SESSION_ONLY = os.getenv("FX_SESSION_ONLY", "1").strip() not in ("0","false","")
 FX_SESS_START = int(os.getenv("FX_SESS_START", "7"))
 FX_SESS_END = int(os.getenv("FX_SESS_END", "20"))
+# ----- Hai dinh / hai day (double top/bottom) -----
+DBL_PIVOT = int(os.getenv("DBL_PIVOT", "3"))        # so nen 2 ben de xac dinh dinh/day swing
+DBL_LOOKBACK = int(os.getenv("DBL_LOOKBACK", "60")) # cua so tim mo hinh
+DBL_TOL_ATR = float(os.getenv("DBL_TOL_ATR", "0.6"))# 2 dinh/day lech nhau <= x*ATR moi tinh la bang nhau
+DBL_MIN_SEP = int(os.getenv("DBL_MIN_SEP", "4"))    # 2 dinh/day cach nhau it nhat may nen
+# ----- La co / co duoi nheo (flag / pennant) - tiep dien -----
+FLAG_POLE_BARS = int(os.getenv("FLAG_POLE_BARS", "5"))     # so nen cua "can co" (cu tang/giam manh)
+FLAG_POLE_ATR = float(os.getenv("FLAG_POLE_ATR", "3.0"))   # can co phai di >= x*ATR
+FLAG_CONS_BARS = int(os.getenv("FLAG_CONS_BARS", "6"))     # so nen di ngang co lai
+FLAG_CONS_MAX = float(os.getenv("FLAG_CONS_MAX", "0.6"))   # bien do di ngang <= x lan do dai can co

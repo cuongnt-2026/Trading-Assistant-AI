@@ -235,6 +235,35 @@ def main():
     check(plan_bo.take_profit > plan_bo.entry_price, "breakout BUY: TP tren entry")
     check(plan_bo.stop_loss < plan_bo.entry_price, "breakout BUY: SL duoi entry")
 
+    print("== 5f. Hai dinh / hai day ==")
+    from src.signal.double_engine import DoubleEngine
+    from src.signal.strategy import strategy_for as _sf
+    # Double BOTTOM: 2 day ~ bang nhau, giua co 1 dinh (neckline), nen cuoi pha len tren neckline
+    db = []
+    seq = [100,99,98,97,96,96,97,98,99,100,101,101,100,99,98,97,96,96,97,98,99,100,101,103]
+    for i, base in enumerate(seq):
+        db.append(_c(base, base + 0.5, base - 0.5, base, i))
+    s_db = DoubleEngine.analyze(db, 99.0, 99.0, 99.0, 20.0, 1.0, 45.0)
+    check(s_db.action == "BUY", "double bottom -> BUY (got {})".format(s_db.action))
+    plan_db = TradeService.create(s_db, db, symbol="XAUUSD", balance=10000, confidence=60, strategy="double")
+    check(plan_db.tp_source.startswith("RR"), "double TP theo RR (got {})".format(plan_db.tp_source))
+    check(plan_db.take_profit > plan_db.entry_price, "double BUY: TP tren entry")
+    check(plan_db.stop_loss < plan_db.entry_price, "double BUY: SL duoi entry")
+
+    print("== 5g. La co / co duoi nheo ==")
+    from src.signal.flag_engine import FlagEngine
+    fl = []
+    for i, b in enumerate([100,102,104,106,108,110,110]):
+        fl.append(_c(b, b + 0.3, b - 0.3, b, i))
+    for j, b in enumerate([110,109.6,110,109.7,110]):
+        fl.append(_c(b, b + 0.2, b - 0.2, b, 7 + j))
+    fl.append(_c(110, 111.5, 109.9, 111.2, 12))   # breakout tiep dien
+    s_fl = FlagEngine.analyze(fl, 108.0, 106.0, 104.0, 25.0, 1.0, 55.0)
+    check(s_fl.action == "BUY", "flag tang: can co + di ngang + pha len -> BUY (got {})".format(s_fl.action))
+    plan_fl = TradeService.create(s_fl, fl, symbol="XAUUSD", balance=10000, confidence=60, strategy="flag")
+    check(plan_fl.tp_source.startswith("RR"), "flag TP theo RR (got {})".format(plan_fl.tp_source))
+    check(plan_fl.take_profit > plan_fl.entry_price, "flag BUY: TP tren entry")
+
     print("== 6. Sinh data.sample.js ==")
     rec_b = Recommender.evaluate(s_buy, bc)
     rec_s = Recommender.evaluate(s_sell, sc)

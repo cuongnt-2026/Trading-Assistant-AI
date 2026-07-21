@@ -2,6 +2,8 @@ from src.indicators.indicator_service import IndicatorService
 from src.signal.signal_engine import SignalEngine
 from src.signal.meanrev_engine import MeanRevEngine
 from src.signal.breakout_engine import BreakoutEngine
+from src.signal.double_engine import DoubleEngine
+from src.signal.flag_engine import FlagEngine
 
 
 class SignalService:
@@ -20,5 +22,9 @@ class SignalService:
             return MeanRevEngine.analyze(candles, ema20, ema50, ema200, adx, atr, rsi)
         if strategy == "breakout":
             return BreakoutEngine.analyze(candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)
+        if strategy == "double":
+            return DoubleEngine.analyze(candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)
+        if strategy == "flag":
+            return FlagEngine.analyze(candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)
         return SignalEngine.analyze(
             candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)

@@ -53,3 +53,9 @@ ENTRY_PULLBACK_ATR = float(os.getenv("ENTRY_PULLBACK_ATR", "0.5"))
 
 # Breakout: chot loi = BO_RR lan rui ro (tha loi chay, bu win rate thap)
 BO_RR = float(os.getenv("BO_RR", "2.5"))
+
+# Hai dinh/hai day: chot loi = DBL_RR lan rui ro
+DBL_RR = float(os.getenv("DBL_RR", "1.5"))
+
+# La co / co duoi nheo: chot loi = FLAG_RR lan rui ro
+FLAG_RR = float(os.getenv("FLAG_RR", "2.0"))

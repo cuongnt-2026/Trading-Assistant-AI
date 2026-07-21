@@ -55,6 +55,18 @@ def main():
             only_symbol = args[args.index("--symbol") + 1].upper()
         except Exception:
             pass
+    strategy_override = None
+    if "--strategy" in args:
+        try:
+            strategy_override = args[args.index("--strategy") + 1].strip().lower()
+        except Exception:
+            pass
+    tf_override = None
+    if "--tf" in args:
+        try:
+            tf_override = [x.strip() for x in args[args.index("--tf") + 1].split(",") if x.strip()]
+        except Exception:
+            pass
 
     from src.core.config import Config
     try:
@@ -96,8 +108,13 @@ def main():
     agg_trades = agg_R = 0.0
     agg_wins = agg_losses = 0
 
+    if tf_override:
+        scan_list = [(sym, tf) for sym in config.symbols for tf in tf_override]
+    else:
+        scan_list = list(config.watchlist)
+
     try:
-        for symbol, tf in config.watchlist:
+        for symbol, tf in scan_list:
             if only_symbol and only_symbol not in symbol.upper():
                 continue
             try:
@@ -113,7 +130,7 @@ def main():
                                  risk_min=config.risk_min_percent,
                                  risk_max=config.risk_max_percent,
                                  min_confidence=config.min_confidence,
-                                 strategy=strategy_for(symbol),
+                                 strategy=(strategy_override or strategy_for(symbol)),
                                  entry_mode=config.entry_mode,
                                  entry_wait=config.entry_wait_bars)
             s = res["stats"]
