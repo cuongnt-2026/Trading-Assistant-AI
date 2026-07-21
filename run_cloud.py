@@ -48,8 +48,11 @@ def _send_test_mail(cfg, notifier):
                      reward_points=0.006, risk_percent=1.0, sl_source="swing-ATR",
                      tp_source="cau truc", trail_distance=0.0038, risk_amount=100.0,
                      lot_size=0.4, expected_profit=200.0)
+    class _Rec:
+        action = "BUY"; confidence = 68.0; label = "Kha manh"
+        reasons = ["MAIL THU"]
     subject, body = build_signal_email(sig, "EURUSD", "M30", _C(),
-                                       recommendation=None, trade_plan=plan)
+                                       recommendation=_Rec(), trade_plan=plan)
     subject = "[CLOUD TEST] " + subject
     ok = notifier.send(subject, body) if notifier else False
     print("MAIL THU -> {}".format("DA GUI OK" if ok else "THAT BAI/khong co notifier"))

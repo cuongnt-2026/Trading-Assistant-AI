@@ -20,11 +20,15 @@ def build_signal_email(signal, symbol, timeframe, candle,
     price = candle.close
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    conf = ""
-    if recommendation is not None:
-        conf = " | {:.0f}%".format(recommendation.confidence)
-    subject = "[{} {}] TIN HIEU {} @ {:.2f}{}".format(
-        symbol, timeframe, action, price, conf)
+    act = "BUY" if signal.action == BUY else ("SELL" if signal.action == SELL else signal.action)
+    conf_txt = "{:.0f}%".format(recommendation.confidence) if recommendation is not None else "-"
+    if trade_plan is not None and trade_plan.action in (BUY, SELL):
+        subject = "{} {} {} | E:{} SL:{} TP:{} | Tin cay {}".format(
+            symbol, timeframe, act, trade_plan.entry_price,
+            trade_plan.stop_loss, trade_plan.take_profit, conf_txt)
+    else:
+        subject = "{} {} {} @ {:.2f} | Tin cay {}".format(
+            symbol, timeframe, act, price, conf_txt)
 
     body = (
         "========================================\n"

@@ -22,12 +22,16 @@ plan = TradePlan(action=BUY, entry_type="limit",
     trail_distance=0.0038, risk_amount=120.0, lot_size=0.40,
     expected_profit=240.0)
 
+class _Rec:
+    action = "BUY"; confidence = 68.0; label = "Kha manh"
+    reasons = ["EMA xep hang", "ADX manh", "co nen xac nhan"]
+
 cfg = Config()
 miss = cfg.validate_email()
 if miss:
     print("[LOI] Thieu cau hinh mail:", miss); raise SystemExit(1)
 subject, body = build_signal_email(sig, "EURUSD", "H1", _C(),
-                                   recommendation=None, trade_plan=plan)
+                                   recommendation=_Rec(), trade_plan=plan)
 subject = "[TEST] " + subject
 n = create_notifier(cfg)
 ok = n.send(subject, body)
