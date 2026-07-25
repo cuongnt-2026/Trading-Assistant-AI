@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Tool ngoai copy vao - khong day len git
+xau_ema_tool/
