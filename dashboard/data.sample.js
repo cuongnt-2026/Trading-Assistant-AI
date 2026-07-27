@@ -1,10 +1,10 @@
 window.TA_DATA = {
-  "updated": "2026-07-21 22:36:35",
+  "updated": "2026-07-27 20:18:56",
   "symbol": "XAUUSD",
   "timeframe": "",
   "signals": [
     {
-      "time": "2026-07-21 22:36:35",
+      "time": "2026-07-27 20:18:56",
       "candle_time": "2026-07-01 12:00:00",
       "symbol": "XAUUSD",
       "timeframe": "M15",
@@ -50,7 +50,7 @@ window.TA_DATA = {
       }
     },
     {
-      "time": "2026-07-21 22:36:35",
+      "time": "2026-07-27 20:18:56",
       "candle_time": "2026-07-01 12:00:00",
       "symbol": "XAUUSD",
       "timeframe": "M30",
@@ -96,7 +96,7 @@ window.TA_DATA = {
       }
     },
     {
-      "time": "2026-07-21 22:36:35",
+      "time": "2026-07-27 20:18:56",
       "candle_time": "2026-07-01 12:00:00",
       "symbol": "EURUSD",
       "timeframe": "H1",

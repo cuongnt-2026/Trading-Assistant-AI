@@ -4,6 +4,7 @@ from src.signal.meanrev_engine import MeanRevEngine
 from src.signal.breakout_engine import BreakoutEngine
 from src.signal.double_engine import DoubleEngine
 from src.signal.flag_engine import FlagEngine
+from src.signal.structure_engine import StructureEngine
 
 
 class SignalService:
@@ -26,5 +27,7 @@ class SignalService:
             return DoubleEngine.analyze(candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)
         if strategy == "flag":
             return FlagEngine.analyze(candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)
+        if strategy == "structure":
+            return StructureEngine.analyze(candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)
         return SignalEngine.analyze(
             candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)

@@ -2,7 +2,7 @@ from src.signal.constants import BUY, SELL, NO_TRADE
 from src.trade.trade_plan import TradePlan
 from src.trade.risk_manager import RiskManager
 from src.trade.constants import (RISK_MIN_PERCENT, RISK_MAX_PERCENT, ATR_SL_BUFFER,
-                                 SWING_LOOKBACK, ENTRY_PULLBACK_ATR, BO_RR, TRAIL_ATR_MULT, DBL_RR, FLAG_RR)
+                                 SWING_LOOKBACK, ENTRY_PULLBACK_ATR, BO_RR, TRAIL_ATR_MULT, DBL_RR, FLAG_RR, STRUCT_RR)
 
 
 class TradeService:
@@ -53,8 +53,8 @@ class TradeService:
             lv = {"stop_loss": sl_raw, "take_profit": tp_raw,
                   "sl_source": "swing-ATR", "tp_source": "mean-EMA20",
                   "trail_distance": 1.5 * atr}
-        elif strategy in ("breakout", "double", "flag"):
-            _rr = {"breakout": BO_RR, "double": DBL_RR, "flag": FLAG_RR}[strategy]
+        elif strategy in ("breakout", "double", "flag", "structure"):
+            _rr = {"breakout": BO_RR, "double": DBL_RR, "flag": FLAG_RR, "structure": STRUCT_RR}[strategy]
             recent = candles[-SWING_LOOKBACK:]
             if signal.action == BUY:
                 sl_raw = min(c.low for c in recent) - ATR_SL_BUFFER * atr

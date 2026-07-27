@@ -264,6 +264,23 @@ def main():
     check(plan_fl.tp_source.startswith("RR"), "flag TP theo RR (got {})".format(plan_fl.tp_source))
     check(plan_fl.take_profit > plan_fl.entry_price, "flag BUY: TP tren entry")
 
+    print("== 5h. Market structure (mua day trend tang) ==")
+    from src.signal.structure_engine import StructureEngine
+    import src.signal.structure_engine as _STE
+    _STE.STRUCT_PIVOT = 3
+    _seq = [100.0]
+    def _leg(a, b, steps):
+        for t in range(1, steps + 1):
+            _seq.append(a + (b - a) * t / steps)
+    _leg(100, 94, 4); _leg(94, 104, 5); _leg(104, 97, 4)
+    _leg(97, 109, 5); _leg(109, 100, 4); _leg(100, 103, 3)
+    stc = [_c(v, v + 0.4, v - 0.4, v, i) for i, v in enumerate(_seq)]
+    s_st = StructureEngine.analyze(stc, 102.0, 101.0, 100.0, 25.0, 1.0, 50.0)
+    check(s_st.action == "BUY", "structure: uptrend HH+HL + day moi -> BUY (got {})".format(s_st.action))
+    plan_st = TradeService.create(s_st, stc, symbol="XAUUSD", balance=10000, confidence=60, strategy="structure")
+    check(plan_st.tp_source.startswith("RR"), "structure TP theo RR (got {})".format(plan_st.tp_source))
+    check(plan_st.stop_loss < plan_st.entry_price, "structure BUY: SL duoi entry")
+
     print("== 6. Sinh data.sample.js ==")
     rec_b = Recommender.evaluate(s_buy, bc)
     rec_s = Recommender.evaluate(s_sell, sc)

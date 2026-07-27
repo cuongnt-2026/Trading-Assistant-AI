@@ -61,3 +61,8 @@ FLAG_POLE_BARS = int(os.getenv("FLAG_POLE_BARS", "5"))     # so nen cua "can co"
 FLAG_POLE_ATR = float(os.getenv("FLAG_POLE_ATR", "3.0"))   # can co phai di >= x*ATR
 FLAG_CONS_BARS = int(os.getenv("FLAG_CONS_BARS", "6"))     # so nen di ngang co lai
 FLAG_CONS_MAX = float(os.getenv("FLAG_CONS_MAX", "0.6"))   # bien do di ngang <= x lan do dai can co
+# ----- Market Structure (HH/HL - mua day trend tang / ban dinh trend giam) -----
+STRUCT_PIVOT = int(os.getenv("STRUCT_PIVOT", "3"))       # so nen 2 ben de xac dinh dinh/day
+STRUCT_LOOKBACK = int(os.getenv("STRUCT_LOOKBACK", "90"))# cua so danh gia cau truc
+STRUCT_SR_TOL = float(os.getenv("STRUCT_SR_TOL", "0.8")) # gom vung S/R: cach nhau <= x*ATR
+STRUCT_ADX_MIN = float(os.getenv("STRUCT_ADX_MIN", "22"))# chi vao khi ADX >= (trend that, khong nhieu)

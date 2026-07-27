@@ -59,3 +59,6 @@ DBL_RR = float(os.getenv("DBL_RR", "1.5"))
 
 # La co / co duoi nheo: chot loi = FLAG_RR lan rui ro
 FLAG_RR = float(os.getenv("FLAG_RR", "2.0"))
+
+# Market structure: chot loi = STRUCT_RR lan rui ro
+STRUCT_RR = float(os.getenv("STRUCT_RR", "1.8"))

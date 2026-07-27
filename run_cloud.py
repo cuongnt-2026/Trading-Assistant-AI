@@ -18,6 +18,7 @@ from src.ai_review.recommender import Recommender
 from src.trade.trade_service import TradeService
 from src.notifier.factory import create_notifier
 from src.notifier.messages import build_signal_email
+from src.trade.outcome import OutcomeEvaluator, OPEN
 
 STATE_PATH = "cloud_state.json"
 
@@ -31,6 +32,27 @@ def load_state():
 
 def save_state(s):
     json.dump(s, open(STATE_PATH, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
+
+
+SIGNALS_PATH = "cloud_signals.json"
+
+
+def load_signals():
+    try:
+        return json.load(open(SIGNALS_PATH, encoding="utf-8"))
+    except Exception:
+        return []
+
+
+def save_signals(sig):
+    json.dump(sig, open(SIGNALS_PATH, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
+
+
+def _parse_ct(ts):
+    try:
+        return datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
+    except Exception:
+        return None
 
 
 def _send_test_mail(cfg, notifier):
@@ -62,6 +84,7 @@ def main():
     cfg = Config()
     notifier = create_notifier(cfg)
     state = load_state()
+    signals_log = load_signals()
 
     if os.getenv("FORCE_TEST_MAIL", "").strip().lower() in ("1", "true"):
         _send_test_mail(cfg, notifier)
@@ -83,6 +106,16 @@ def main():
         if not candles or len(candles) < 200:
             print("[WARN] {} {} khong du nen ({})".format(sym, tf, len(candles) if candles else 0))
             continue
+
+        # Cham WIN/LOSS cho tin hieu OPEN cua cap-khung nay
+        for r in signals_log:
+            if r.get("outcome") == "OPEN" and r.get("symbol") == sym and r.get("timeframe") == tf:
+                st = _parse_ct(r.get("candle_time", ""))
+                fut = [c for c in candles if st and c.time > st]
+                if fut:
+                    res = OutcomeEvaluator.evaluate(r["action"], r["sl"], r["tp"], fut)
+                    if res != OPEN:
+                        r["outcome"] = res
 
         htf_trend = None
         if cfg.use_mtf:
@@ -129,8 +162,17 @@ def main():
         if ok:
             state[skey] = ts
             sent += 1
+            signals_log.append({
+                "time": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+                "candle_time": ts, "symbol": sym, "timeframe": tf,
+                "action": signal.action, "strategy": strat,
+                "entry": plan.entry_price, "sl": plan.stop_loss, "tp": plan.take_profit,
+                "rr": plan.rr_ratio, "confidence": round(rec.confidence, 1),
+                "outcome": "OPEN",
+            })
 
     save_state(state)
+    save_signals(signals_log)
     print("Xong. Da gui {} tin hieu.".format(sent))
 
 
