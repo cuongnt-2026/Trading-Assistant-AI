@@ -80,6 +80,37 @@ def _send_test_mail(cfg, notifier):
     print("MAIL THU -> {}".format("DA GUI OK" if ok else "THAT BAI/khong co notifier"))
 
 
+def write_dashboard(snapshot, signals_log, path="dashboard/data.js"):
+    """Ghi dashboard/data.js: trang thai hien tai + lich su lenh (Win/Loss + ke hoach)."""
+    hist = []
+    for r in signals_log:
+        hist.append({
+            "time": r.get("time"), "candle_time": r.get("candle_time"),
+            "symbol": r.get("symbol"), "timeframe": r.get("timeframe"),
+            "action": r.get("action"), "price": r.get("entry"),
+            "confidence": r.get("confidence"), "notified": True,
+            "outcome": r.get("outcome"),
+            "trade_plan": {
+                "entry": r.get("entry"), "stop_loss": r.get("sl"),
+                "take_profit": r.get("tp"),
+                "risk_reward": r.get("risk_reward", "1 : {:g}".format(r.get("rr", 0))),
+                "risk_percent": r.get("risk_percent", 1),
+                "lot_size": r.get("lot_size"), "expected_profit": r.get("expected_profit"),
+            },
+        })
+    data = {
+        "updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+        "symbol": snapshot[0]["symbol"] if snapshot else "XAUUSD",
+        "signals": snapshot + hist,
+    }
+    try:
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("window.TA_DATA = " + json.dumps(data, ensure_ascii=False, indent=2) + ";\n")
+    except Exception as e:
+        print("[WARN] ghi dashboard loi:", e)
+
+
 def main():
     cfg = Config()
     notifier = create_notifier(cfg)
@@ -95,6 +126,7 @@ def main():
         datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"), len(cfg.watchlist), min_conf))
 
     htf_cache = {}
+    snapshot = []
     sent = 0
     for sym, tf in cfg.watchlist:
         strat = strategy_for(sym)
@@ -136,6 +168,19 @@ def main():
         print("  {} {} [{}] | {} | close={:.5g} | ADX={:.1f}".format(
             sym, tf, strat, signal.action, last.close, signal.adx))
 
+        snapshot.append({
+            "time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+            "symbol": sym, "timeframe": tf, "action": signal.action,
+            "trend": signal.trend, "strength": signal.strength,
+            "price": round(last.close, 5),
+            "ema20": round(signal.ema20, 5), "ema50": round(signal.ema50, 5),
+            "ema200": round(signal.ema200, 5), "adx": round(signal.adx, 2),
+            "atr": round(getattr(signal, "atr", 0.0), 5),
+            "rsi": round(getattr(signal, "rsi", 0.0), 2),
+            "pattern": getattr(signal, "pattern", ""), "reason": signal.reason,
+            "notified": False,
+        })
+
         if signal.action not in (BUY, SELL):
             continue
 
@@ -167,12 +212,15 @@ def main():
                 "candle_time": ts, "symbol": sym, "timeframe": tf,
                 "action": signal.action, "strategy": strat,
                 "entry": plan.entry_price, "sl": plan.stop_loss, "tp": plan.take_profit,
-                "rr": plan.rr_ratio, "confidence": round(rec.confidence, 1),
-                "outcome": "OPEN",
+                "rr": plan.rr_ratio, "risk_reward": plan.risk_reward,
+                "risk_percent": plan.risk_percent, "lot_size": plan.lot_size,
+                "expected_profit": plan.expected_profit,
+                "confidence": round(rec.confidence, 1), "outcome": "OPEN",
             })
 
     save_state(state)
     save_signals(signals_log)
+    write_dashboard(snapshot, signals_log, cfg.dashboard_data)
     print("Xong. Da gui {} tin hieu.".format(sent))
 
 
