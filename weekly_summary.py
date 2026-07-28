@@ -34,7 +34,13 @@ def build_summary(days=7):
     opens = [r for r in week if r.get("outcome") == "OPEN"]
     closed = len(wins) + len(losses)
     wr = round(len(wins) / closed * 100, 1) if closed else 0.0
-    total_r = round(sum(r.get("rr", 0.0) for r in wins) - len(losses), 2)
+    def _rval(r):
+        if r.get("r_result") is not None:
+            return r["r_result"]
+        if r.get("outcome") == "WIN":
+            return r.get("rr") or 0.0
+        return -1.0
+    total_r = round(sum(_rval(r) for r in (wins + losses)), 2)
 
     L = []
     L.append("========================================")

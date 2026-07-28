@@ -90,6 +90,13 @@ class Config:
         self.entry_mode = os.getenv("ENTRY_MODE", "limit").strip().lower()
         self.entry_wait_bars = int(os.getenv("ENTRY_WAIT_BARS", "6"))
 
+        # ----- Supertrend (he dao chieu, cho XAU M30/H1) -----
+        self.supertrend_enabled = os.getenv("SUPERTREND_ENABLED", "1").strip() not in ("0", "false", "")
+        self.supertrend_symbols = _split(os.getenv("SUPERTREND_SYMBOLS", "XAUUSD"))
+        self.supertrend_tfs = _split(os.getenv("SUPERTREND_TFS", "M30,H1"))
+        self.supertrend_period = int(os.getenv("SUPERTREND_PERIOD", "10"))
+        self.supertrend_mult = float(os.getenv("SUPERTREND_MULT", "3"))
+
         # ----- Duong dan output -----
         self.reports_dir = os.getenv("REPORTS_DIR", "reports")
         self.dashboard_data = os.getenv("DASHBOARD_DATA", "dashboard/data.js")

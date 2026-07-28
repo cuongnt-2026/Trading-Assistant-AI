@@ -17,7 +17,8 @@ from src.signal.constants import BUY, SELL
 from src.ai_review.recommender import Recommender
 from src.trade.trade_service import TradeService
 from src.notifier.factory import create_notifier
-from src.notifier.messages import build_signal_email
+from src.notifier.messages import build_signal_email, build_supertrend_email
+from src.signal.supertrend import supertrend
 from src.trade.outcome import OutcomeEvaluator, OPEN
 
 STATE_PATH = "cloud_state.json"
@@ -111,6 +112,45 @@ def write_dashboard(snapshot, signals_log, path="dashboard/data.js"):
         print("[WARN] ghi dashboard loi:", e)
 
 
+def _handle_supertrend(sym, tf, candles, cfg, state, signals_log, notifier):
+    """Supertrend flip -> gui mail dao chieu, dong lenh cu (stop-and-reverse)."""
+    direction, st_line = supertrend(candles, cfg.supertrend_period, cfg.supertrend_mult)
+    if len(direction) < 5 or direction[-1] == direction[-2]:
+        return 0
+    last = candles[-1]
+    ts = str(last.time)
+    key = "ST {} {}".format(sym, tf)
+    if state.get(key) == ts:
+        return 0
+    action = BUY if direction[-1] == 1 else SELL
+    entry = round(last.close, 2)
+    sl = round(st_line[-1], 2)
+    # dong lenh Supertrend cu (dao chieu)
+    for r in signals_log:
+        if (r.get("strategy") == "supertrend" and r.get("symbol") == sym
+                and r.get("timeframe") == tf and r.get("outcome") == "OPEN"):
+            pnl = (entry - r["entry"]) if r["action"] == BUY else (r["entry"] - entry)
+            risk = abs(r["entry"] - r.get("sl", entry)) or 1e-9
+            r["outcome"] = "WIN" if pnl > 0 else "LOSS"
+            r["r_result"] = round(pnl / risk, 3)
+            r["exit"] = entry
+    subject, body = build_supertrend_email(sym, tf, action, entry, sl)
+    subject = "[CLOUD] " + subject
+    ok = notifier.send(subject, body) if notifier else False
+    print("  {} {} [supertrend] FLIP {} -> GUI MAIL: {}".format(sym, tf, action, "OK" if ok else "FAIL"))
+    if ok:
+        state[key] = ts
+        signals_log.append({
+            "time": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+            "candle_time": ts, "symbol": sym, "timeframe": tf,
+            "action": action, "strategy": "supertrend",
+            "entry": entry, "sl": sl, "tp": None, "rr": None,
+            "confidence": None, "outcome": "OPEN",
+        })
+        return 1
+    return 0
+
+
 def main():
     cfg = Config()
     notifier = create_notifier(cfg)
@@ -180,6 +220,11 @@ def main():
             "pattern": getattr(signal, "pattern", ""), "reason": signal.reason,
             "notified": False,
         })
+
+        # Supertrend (he dao chieu) cho XAU M30/H1 - chay song song
+        if (cfg.supertrend_enabled and sym in cfg.supertrend_symbols
+                and tf in cfg.supertrend_tfs):
+            sent += _handle_supertrend(sym, tf, candles, cfg, state, signals_log, notifier)
 
         if signal.action not in (BUY, SELL):
             continue

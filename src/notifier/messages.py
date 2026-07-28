@@ -88,3 +88,36 @@ def build_signal_email(signal, symbol, timeframe, candle,
              signal.reason)
 
     return subject, body
+
+
+def build_supertrend_email(symbol, timeframe, action, entry, st_line):
+    """Email cho tin hieu Supertrend (he dao chieu). Co Entry + SL, khong co TP co dinh."""
+    act = "MUA (BUY)" if action == BUY else "BAN (SELL)"
+    short = "BUY" if action == BUY else "SELL"
+    risk = abs(entry - st_line)
+    tp_ref = round(entry + 2 * risk, 2) if action == BUY else round(entry - 2 * risk, 2)
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    subject = "{} {} SUPERTREND {} | Entry:{} SL:{} | dao chieu".format(
+        symbol, timeframe, short, entry, st_line)
+    body = (
+        "========================================\n"
+        "  TRADING ASSISTANT AI - SUPERTREND\n"
+        "========================================\n\n"
+        "Symbol      : {}\n"
+        "Khung TG    : {}\n"
+        "Tin hieu    : {}  (Supertrend vua DAO CHIEU)\n"
+        "Thoi diem   : {}\n\n"
+        "---------- KE HOACH ----------\n"
+        "Entry       : {}\n"
+        "Stop Loss   : {}  (= duong Supertrend, trailing)\n"
+        "Take Profit : KHONG co dinh - THOAT khi co tin hieu Supertrend NGUOC\n"
+        "TP tham khao: {}  (neu muon chot o 2R)\n\n"
+        "*** CACH QUAN LY (he dao chieu) ***\n"
+        "- Neu dang giu lenh NGUOC lai -> DONG lenh cu truoc, roi mo lenh nay.\n"
+        "- Giu lenh nay toi khi nhan mail Supertrend huong nguoc.\n"
+        "- SL doi theo duong Supertrend (trailing).\n\n"
+        "========================================\n"
+        "Luu y: tin hieu tham khao, khong phai loi khuyen dau tu.\n"
+        "-- Trading Assistant AI (Supertrend)"
+    ).format(symbol, timeframe, act, now, entry, st_line, tp_ref)
+    return subject, body
