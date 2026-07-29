@@ -224,7 +224,10 @@ def main():
         # Supertrend (he dao chieu) cho XAU M30/H1 - chay song song
         if (cfg.supertrend_enabled and sym in cfg.supertrend_symbols
                 and tf in cfg.supertrend_tfs):
-            sent += _handle_supertrend(sym, tf, candles, cfg, state, signals_log, notifier)
+            try:
+                sent += _handle_supertrend(sym, tf, candles, cfg, state, signals_log, notifier)
+            except Exception as e:
+                print("[WARN] supertrend {} {}: {}".format(sym, tf, e))
 
         if signal.action not in (BUY, SELL):
             continue
