@@ -11,12 +11,13 @@ from src.data.data_service import DataService
 from src.signal.signal_service import SignalService
 from src.signal.trend import TrendService, higher_tf
 from src.signal.strategy import strategy_for
-from src.signal.constants import NO_TRADE
+from src.signal.constants import NO_TRADE, BUY, SELL
 from src.trade.trade_service import TradeService
 from src.trade.outcome import OutcomeEvaluator, OPEN
 from src.ai_review.recommender import Recommender
 from src.notifier.factory import create_notifier
-from src.notifier.messages import build_signal_email
+from src.notifier.messages import build_signal_email, build_supertrend_email
+from src.signal.supertrend import supertrend
 from src.scheduler.signal_logger import SignalLogger
 
 
@@ -38,6 +39,7 @@ class Monitor:
         self.logger = SignalLogger(config)
         self.last_action = {}
         self.last_candle_time = {}
+        self.last_st_flip = {}
         self.balance = config.account_balance or None
 
     def _htf_trend(self, symbol, timeframe):
@@ -106,6 +108,34 @@ class Monitor:
             signal, candle, notified, symbol=symbol, timeframe=timeframe,
             recommendation=recommendation, trade_plan=trade_plan)
         self.last_action[key] = signal.action
+
+        # Supertrend (he dao chieu) cho XAU M30/H1 - chay song song
+        if (self.config.supertrend_enabled and symbol in self.config.supertrend_symbols
+                and timeframe in self.config.supertrend_tfs):
+            try:
+                self._handle_supertrend(symbol, timeframe, candles)
+            except Exception as e:
+                print("       -> [WARN] supertrend {} {}: {}".format(symbol, timeframe, e))
+
+    def _handle_supertrend(self, symbol, timeframe, candles):
+        """Supertrend flip -> gui mail dao chieu (he stop-and-reverse)."""
+        direction, st_line = supertrend(candles, self.config.supertrend_period,
+                                        self.config.supertrend_mult)
+        if len(direction) < 5 or direction[-1] == direction[-2]:
+            return
+        last = candles[-1]
+        ts = str(last.time)
+        key = (symbol, timeframe)
+        if self.last_st_flip.get(key) == ts:
+            return
+        action = BUY if direction[-1] == 1 else SELL
+        entry = round(last.close, 2)
+        sl = round(st_line[-1], 2)
+        subject, body = build_supertrend_email(symbol, timeframe, action, entry, sl)
+        print("       -> [supertrend] FLIP {}, dang gui...".format(action))
+        if self.notifier and self.notifier.send(subject, body):
+            self.last_st_flip[key] = ts
+            print("       -> [OK] Da gui Supertrend.")
 
     def _update_outcomes(self):
         """Cham WIN/LOSS cho cac tin hieu OPEN dua theo nen SAU khi vao lenh."""
