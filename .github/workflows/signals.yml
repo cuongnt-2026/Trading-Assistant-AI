@@ -52,5 +52,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add cloud_state.json cloud_signals.json dashboard/data.js || true
-          git diff --staged --quiet || git commit -m "update signal state [skip ci]"
-          git push || true
+          if git diff --staged --quiet; then echo "Khong co thay doi de luu"; exit 0; fi
+          git commit -m "update signal state [skip ci]"
+          git pull --rebase -X ours origin main || true
+          git push && echo "PUSH OK" || echo "PUSH FAIL - vao Settings > Actions > General > Workflow permissions = Read and write"

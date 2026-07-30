@@ -438,5 +438,49 @@
       "lot_size": null,
       "expected_profit": null
     }
+  },
+  {
+    "time": "2026-07-30 21:15:13",
+    "candle_time": "2026-07-31 00:15:00",
+    "symbol": "XAUUSD",
+    "timeframe": "M15",
+    "action": "NO_TRADE",
+    "trend": "SIDEWAYS",
+    "strength": "WEAK",
+    "price": 4097.36,
+    "ema20": 4080.8117,
+    "ema50": 4069.56175,
+    "ema200": 4054.71234,
+    "adx": 31.53,
+    "atr": 12.18529,
+    "rsi": 63.62,
+    "pattern": "",
+    "reason": "Chua pha vo dinh/day 20 nen",
+    "notified": false,
+    "recommendation": "WAIT",
+    "confidence": 55.8,
+    "confidence_label": "MODERATE",
+    "rec_reasons": [
+      "EMA xếp hàng chuẩn xu hướng",
+      "ADX mạnh (31.5)",
+      "Chưa có nến xác nhận",
+      "RSI 64"
+    ],
+    "trade_plan": {
+      "entry": 0.0,
+      "stop_loss": 0.0,
+      "take_profit": 0.0,
+      "risk_reward": "-",
+      "rr_ratio": 0.0,
+      "risk_points": 0.0,
+      "reward_points": 0.0,
+      "risk_percent": 0.0,
+      "sl_source": "",
+      "tp_source": "",
+      "trail_distance": 0.0,
+      "risk_amount": null,
+      "lot_size": null,
+      "expected_profit": null
+    }
   }
 ]
