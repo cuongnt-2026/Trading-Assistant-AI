@@ -1,0 +1,32 @@
+name: Weekly summary (cloud)
+
+on:
+  schedule:
+    # 01:00 UTC thu 7 = 08:00 sang thu 7 gio VN (thi truong da dong).
+    - cron: "0 1 * * 6"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: trading-weekly
+  cancel-in-progress: false
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+    env:
+      GMAIL_USER: ${{ secrets.GMAIL_USER }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      MAIL_TO: ${{ secrets.MAIL_TO }}
+      NOTIFIER_CHANNEL: email
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cai thu vien
+        run: pip install -r requirements-cloud.txt
+      - name: Gui mail tong ket tuan
+        run: python cloud_weekly_summary.py

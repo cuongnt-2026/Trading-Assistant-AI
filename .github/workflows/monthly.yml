@@ -1,0 +1,32 @@
+name: Monthly summary (cloud)
+
+on:
+  schedule:
+    # 01:00 UTC ngay 1 hang thang = 08:00 sang ngay 1 gio VN. Tong ket thang truoc.
+    - cron: "0 1 1 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: trading-monthly
+  cancel-in-progress: false
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+    env:
+      GMAIL_USER: ${{ secrets.GMAIL_USER }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      MAIL_TO: ${{ secrets.MAIL_TO }}
+      NOTIFIER_CHANNEL: email
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cai thu vien
+        run: pip install -r requirements-cloud.txt
+      - name: Gui mail tong ket thang
+        run: python cloud_monthly_summary.py
