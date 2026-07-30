@@ -1,7 +1,9 @@
 name: Weekly summary (cloud)
 
 on:
-  # Kich hoat qua cron-job.org (08:00 sang thu 7 gio VN) de tin cay hon lich GitHub.
+  schedule:
+    # 16:00 UTC thu 6 = 23:00 thu 6 gio VN. Tong ket tuan (mail, khong quet - khong ton token).
+    - cron: "0 16 * * 5"
   workflow_dispatch: {}
 
 permissions:

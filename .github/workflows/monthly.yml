@@ -1,7 +1,9 @@
 name: Monthly summary (cloud)
 
 on:
-  # Kich hoat qua cron-job.org (08:00 sang ngay 1 gio VN) de tin cay hon lich GitHub.
+  schedule:
+    # 16:00 UTC ngay 1 = 23:00 ngay 1 gio VN. Tong ket thang truoc (mail, khong quet - khong ton token).
+    - cron: "0 16 1 * *"
   workflow_dispatch: {}
 
 permissions:
