@@ -121,7 +121,7 @@
       <div class="toolbar">
         <label><input type="checkbox" id="autorefresh" checked> Tự động 15 phút</label>
         <button class="btn" onclick="location.reload()">⟳ Làm mới</button>
-        <div class="updated">Cập nhật<br><b id="updated">—</b></div>
+        <div class="updated">Cập nhật<br>UTC: <b id="updated">—</b><br>VN: <b id="updatedVN">—</b></div>
       </div>
     </div>
 
@@ -223,7 +223,17 @@
   const hr=new Date().getHours();
   const greet=hr<11?"Chào buổi sáng":hr<18?"Chào buổi chiều":"Chào buổi tối";
   document.getElementById('greeting').textContent = greet+", Cường 👋";
+  function toVN(u){
+    if(!u||u==="—") return "—";
+    var m=u.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})/);
+    if(!m) return u;
+    var d=new Date(Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5]));
+    d.setUTCHours(d.getUTCHours()+7);
+    var p=function(n){return String(n).padStart(2,"0");};
+    return p(d.getUTCDate())+"/"+p(d.getUTCMonth()+1)+" "+p(d.getUTCHours())+":"+p(d.getUTCMinutes());
+  }
   document.getElementById('updated').textContent = D.updated||"—";
+  var _vn=document.getElementById('updatedVN'); if(_vn) _vn.textContent = toVN(D.updated);
 
   // ---- KPIs ----
   const cnt=(a)=>S.filter(s=>s.action===a).length;
