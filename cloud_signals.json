@@ -88,5 +88,41 @@
     "expected_profit": null,
     "confidence": 37.7,
     "outcome": "OPEN"
+  },
+  {
+    "time": "2026-07-31 13:16 UTC",
+    "candle_time": "2026-07-31 13:00:00",
+    "symbol": "XAUUSD",
+    "timeframe": "M30",
+    "action": "SELL",
+    "strategy": "breakout",
+    "entry": 4036.06,
+    "sl": 4064.93,
+    "tp": 3963.89,
+    "rr": 2.5,
+    "risk_reward": "1 : 2.5",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 28.9,
+    "outcome": "OPEN"
+  },
+  {
+    "time": "2026-07-31 13:16 UTC",
+    "candle_time": "2026-07-31 13:00:00",
+    "symbol": "XAUUSD",
+    "timeframe": "H1",
+    "action": "SELL",
+    "strategy": "breakout",
+    "entry": 4036.06,
+    "sl": 4070.95,
+    "tp": 3948.83,
+    "rr": 2.5,
+    "risk_reward": "1 : 2.5",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 27.5,
+    "outcome": "OPEN"
   }
 ]
