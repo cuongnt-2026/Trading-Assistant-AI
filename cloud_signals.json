@@ -70,5 +70,23 @@
     "expected_profit": null,
     "confidence": 36.2,
     "outcome": "OPEN"
+  },
+  {
+    "time": "2026-07-31 12:45 UTC",
+    "candle_time": "2026-07-31 12:30:00",
+    "symbol": "XAUUSD",
+    "timeframe": "M30",
+    "action": "SELL",
+    "strategy": "breakout",
+    "entry": 4042.74,
+    "sl": 4064.93,
+    "tp": 3987.27,
+    "rr": 2.5,
+    "risk_reward": "1 : 2.5",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 37.7,
+    "outcome": "OPEN"
   }
 ]
