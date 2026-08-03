@@ -94,6 +94,12 @@
   .tabpage{display:none;}
   .tabpage.active{display:block;}
   .foot{color:var(--muted);font-size:12px;margin-top:26px;text-align:center;line-height:1.7;}
+  .mcell{white-space:nowrap;}
+  .mcell select,.mcell .mPrice{padding:4px 6px;font-size:12px;margin-right:5px;}
+  .mcell .mPrice{width:76px;}
+  .mcell .btn{padding:5px 9px;font-size:12px;}
+  .mcell .mTag{margin-left:6px;}
+  .panel h3 .sub .btn{padding:5px 9px;font-size:12px;margin-left:6px;}
 </style>
 </head>
 <body>
@@ -168,6 +174,20 @@
         </div>
       </div>
       <div class="panel">
+        <h3>📝 Thống kê tay của tôi (what-if)
+          <span class="sub">
+            <button class="btn" id="mExport">⬇ Tải sao lưu</button>
+            <button class="btn" id="mImport">⬆ Nạp sao lưu</button>
+            <input type="file" id="mFile" accept="application/json" style="display:none">
+          </span>
+        </h3>
+        <div id="manualStats"></div>
+        <div class="muted" style="font-size:11.5px;margin-top:8px">
+          Bạn tự chọn Lời/Lỗ/Không vào + nhập giá thoát ở bảng dưới. Đây là thí nghiệm riêng, lưu trong trình duyệt này —
+          <b>KHÔNG</b> ảnh hưởng tổng kết hệ thống hay email. Đổi máy/trình duyệt thì dùng nút Tải/Nạp sao lưu.
+        </div>
+      </div>
+      <div class="panel">
         <h3>Lịch sử tín hiệu <span class="sub" id="sigCount"></span></h3>
         <div id="fullTable"></div>
       </div>
@@ -198,6 +218,10 @@
         </div>
       </div>
       <div class="panel">
+        <h3>Thống kê theo chiến lược <span class="sub">breakout / trend / supertrend — chỉ lệnh đã gửi</span></h3>
+        <div id="stratTable"></div>
+      </div>
+      <div class="panel">
         <h3>Chỉ số nhanh</h3>
         <div id="statTable"></div>
       </div>
@@ -218,6 +242,35 @@
   const num=(x,d=2)=> (x===null||x===undefined||isNaN(x))?"—":Number(x).toFixed(d);
   const g=(o,k,def="—")=> (o && o[k]!==undefined && o[k]!==null)?o[k]:def;
   const confColor=(c)=> c>=75?"var(--buy)": c>=55?"var(--neutral)":"var(--muted)";
+  const stratLabel=(v)=> v?({breakout:'Breakout',trend:'Trend',supertrend:'Supertrend'}[v]||v):'—';
+
+  // ---- Nhap tay "what-if" (luu trong trinh duyet nay, KHONG dung toi he thong) ----
+  const MKEY='ta_manual_overrides';
+  function loadOv(){ try{return JSON.parse(localStorage.getItem(MKEY))||{};}catch(e){return {};} }
+  function saveOv(){ try{localStorage.setItem(MKEY,JSON.stringify(OV));}catch(e){} }
+  let OV=loadOv();
+  function sigId(s){ return [s.candle_time||s.time,s.symbol,s.timeframe,s.action,s.price].join('|'); }
+  function manualTag(o){
+    if(!o||!o.result) return '';
+    if(o.result==='skip') return '<span class="badge OPEN">Bỏ qua</span>';
+    if(o.result==='win')  return '<span class="badge WIN">Lời tay</span>';
+    if(o.result==='loss') return '<span class="badge LOSS">Lỗ tay</span>';
+    return '';
+  }
+  function manualControls(s){
+    const id=sigId(s), o=OV[id]||{}, sel=(v)=> o.result===v?'selected':'';
+    return `<td class="mcell">
+      <select class="mSel">
+        <option value="" ${sel('')}>—</option>
+        <option value="win" ${sel('win')}>Lời</option>
+        <option value="loss" ${sel('loss')}>Lỗ</option>
+        <option value="skip" ${sel('skip')}>Không vào</option>
+      </select>
+      <input type="text" class="mPrice" placeholder="giá" value="${o.price!=null?o.price:''}">
+      <button class="btn mBtn" data-id="${id}">Update</button>
+      <span class="mTag">${manualTag(o)}</span>
+    </td>`;
+  }
 
   // Header
   const hr=new Date().getHours();
@@ -304,6 +357,7 @@
         <td class="muted">${s.time||''}</td>
         <td class="sym">${s.symbol||''}</td>
         <td class="tag">${s.timeframe||''}</td>
+        <td class="tag">${stratLabel(s.strategy)}</td>
         <td><span class="badge ${s.action}">${s.action}</span></td>
         <td>${confCell(s)}</td>
         <td>${g(s,'price')}</td>
@@ -314,10 +368,84 @@
         <td class="tag">${g(s,'pattern','')}</td>`:''}
         <td>${outcomeBadge(s)}</td>
         <td class="${s.notified?'mail-yes':'mail-no'}">${s.notified?'✓':'—'}</td>
+        ${full&&s.notified?manualControls(s):(full?'<td class="muted">—</td>':'')}
       </tr>`).join('');
-    const head=`<tr><th>Thời gian</th><th>Symbol</th><th>TF</th><th>Tín hiệu</th>
-      <th>Tin cậy</th><th>Giá</th>${full?'<th>Trend</th><th>RSI</th><th>ADX</th><th>ATR</th><th>Nến</th>':''}<th>KQ</th><th>Mail</th></tr>`;
+    const head=`<tr><th>Thời gian</th><th>Symbol</th><th>TF</th><th>PP</th><th>Tín hiệu</th>
+      <th>Tin cậy</th><th>Giá</th>${full?'<th>Trend</th><th>RSI</th><th>ADX</th><th>ATR</th><th>Nến</th>':''}<th>KQ</th><th>Mail</th>${full?'<th>Nhập tay (what-if)</th>':''}</tr>`;
     return `<table><thead>${head}</thead><tbody>${rows}</tbody></table>`;
+  }
+  function bindManual(){
+    document.querySelectorAll('#fullTable .mcell').forEach(cell=>{
+      const btn=cell.querySelector('.mBtn'); if(!btn) return;
+      btn.onclick=function(){
+        const id=btn.dataset.id;
+        const result=cell.querySelector('.mSel').value;
+        const pv=cell.querySelector('.mPrice').value.trim();
+        const price=pv!==''?Number(pv):null;
+        if(!result) delete OV[id]; else OV[id]={result:result,price:price};
+        saveOv();
+        cell.querySelector('.mTag').innerHTML=manualTag(OV[id]);
+        renderManualStats();
+      };
+    });
+  }
+  function renderManualStats(){
+    const el=document.getElementById('manualStats'); if(!el) return;
+    const rows=S.filter(s=>s.notified);
+    let win=0,loss=0,skip=0,entered=0,totR=0,rCount=0;
+    rows.forEach(s=>{
+      const o=OV[sigId(s)]; if(!o||!o.result) return;
+      if(o.result==='skip'){skip++; return;}
+      entered++; if(o.result==='win') win++; else if(o.result==='loss') loss++;
+      const entry=Number(s.price), sl=Number(s.trade_plan&&s.trade_plan.stop_loss);
+      const exit=(o.price!=null)?Number(o.price):NaN, risk=Math.abs(entry-sl);
+      if(!isNaN(exit)&&risk>0){
+        let r=(s.action==='BUY')?(exit-entry)/risk:(entry-exit)/risk;
+        r=(o.result==='win')?Math.abs(r):-Math.abs(r);
+        totR+=r; rCount++;
+      }
+    });
+    const wr=entered?Math.round(win/entered*100):null;
+    el.innerHTML=`<table><tbody>
+      <tr><td class="muted">Lệnh mình vào (tay)</td><td><b>${entered}</b></td></tr>
+      <tr><td class="muted">Lời / Lỗ (tay)</td><td><b style="color:var(--buy)">${win}</b> / <b style="color:var(--sell)">${loss}</b></td></tr>
+      <tr><td class="muted">Winrate tay</td><td><b>${wr!==null?wr+'%':'—'}</b></td></tr>
+      <tr><td class="muted">Tổng R tay</td><td><b>${rCount?((totR>=0?'+':'')+totR.toFixed(2)):'—'}</b> <span class="muted">${rCount?('('+rCount+' lệnh có nhập giá)'):''}</span></td></tr>
+      <tr><td class="muted">Lệnh bỏ qua (không vào)</td><td><b>${skip}</b></td></tr>
+    </tbody></table>`;
+  }
+  function renderStrategyStats(){
+    const el=document.getElementById('stratTable'); if(!el) return;
+    const rows=S.filter(s=>s.notified&&(s.action==='BUY'||s.action==='SELL'));
+    const groups={}; rows.forEach(s=>{ const k=s.strategy||'khác'; (groups[k]=groups[k]||[]).push(s); });
+    const rval=(s)=> (typeof s.r_result==='number')?s.r_result:(s.outcome==='WIN'?(s.rr||0):(s.outcome==='LOSS'?-1:0));
+    const keys=Object.keys(groups);
+    if(!keys.length){ el.innerHTML='<div class="empty">Chưa có tín hiệu đã gửi.</div>'; return; }
+    const body=keys.map(k=>{
+      const g2=groups[k], w=g2.filter(s=>s.outcome==='WIN').length, l=g2.filter(s=>s.outcome==='LOSS').length;
+      const op=g2.filter(s=>s.outcome==='OPEN').length, cl=w+l, wr=cl?Math.round(w/cl*100):null;
+      const tr=g2.filter(s=>s.outcome==='WIN'||s.outcome==='LOSS').reduce((a,s)=>a+rval(s),0);
+      return `<tr><td class="sym">${stratLabel(k)}</td><td>${g2.length}</td>
+        <td style="color:var(--buy)">${w}</td><td style="color:var(--sell)">${l}</td>
+        <td class="muted">${op}</td><td>${wr!==null?wr+'%':'—'}</td>
+        <td><b>${(tr>=0?'+':'')+tr.toFixed(2)}</b></td></tr>`;
+    }).join('');
+    el.innerHTML=`<table><thead><tr><th>Chiến lược</th><th>Tổng</th><th>Win</th><th>Loss</th><th>Open</th><th>Winrate</th><th>Tổng R</th></tr></thead><tbody>${body}</tbody></table>`;
+  }
+  function initManualIO(){
+    const ex=document.getElementById('mExport'), im=document.getElementById('mImport'), f=document.getElementById('mFile');
+    if(ex) ex.onclick=function(){
+      const blob=new Blob([JSON.stringify(OV,null,2)],{type:'application/json'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+      a.download='ta_manual_overrides.json'; a.click(); URL.revokeObjectURL(a.href);
+    };
+    if(im&&f){ im.onclick=()=>f.click();
+      f.onchange=function(){ const file=f.files[0]; if(!file) return;
+        const rd=new FileReader(); rd.onload=function(){
+          try{ OV=Object.assign(OV,JSON.parse(rd.result)); saveOv(); applyFilter(); renderManualStats(); alert('Đã nạp dữ liệu tay.'); }
+          catch(e){ alert('File không hợp lệ.'); } };
+        rd.readAsText(file); };
+    }
   }
 
   document.getElementById('recentTable').innerHTML=renderTable([...S].reverse().slice(0,8),false);
@@ -338,10 +466,14 @@
     if(q) list=list.filter(s=>((s.symbol||'')+' '+(s.reason||'')).toLowerCase().includes(q));
     document.getElementById('fullTable').innerHTML=renderTable(list,true);
     document.getElementById('sigCount').textContent=`${list.length} / ${S.length}`;
+    bindManual();
   }
   [fSymbol,fTf,fAction].forEach(e=>e.addEventListener('change',applyFilter));
   fSearch.addEventListener('input',applyFilter);
   applyFilter();
+  initManualIO();
+  renderManualStats();
+  renderStrategyStats();
 
   // ---- Symbols tab: summary ----
   const syms=[...new Set(S.map(s=>s.symbol))].filter(Boolean);

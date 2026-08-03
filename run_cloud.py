@@ -85,16 +85,21 @@ def write_dashboard(snapshot, signals_log, path="dashboard/data.js"):
     """Ghi dashboard/data.js: trang thai hien tai + lich su lenh (Win/Loss + ke hoach)."""
     hist = []
     for r in signals_log:
+        rr = r.get("rr")
+        rr_txt = r.get("risk_reward")
+        if not rr_txt:
+            rr_txt = "1 : {:g}".format(rr) if isinstance(rr, (int, float)) else "—"
         hist.append({
             "time": r.get("time"), "candle_time": r.get("candle_time"),
             "symbol": r.get("symbol"), "timeframe": r.get("timeframe"),
             "action": r.get("action"), "price": r.get("entry"),
+            "strategy": r.get("strategy"),
             "confidence": r.get("confidence"), "notified": True,
-            "outcome": r.get("outcome"),
+            "outcome": r.get("outcome"), "r_result": r.get("r_result"),
             "trade_plan": {
                 "entry": r.get("entry"), "stop_loss": r.get("sl"),
                 "take_profit": r.get("tp"),
-                "risk_reward": r.get("risk_reward", "1 : {:g}".format(r.get("rr", 0))),
+                "risk_reward": rr_txt,
                 "risk_percent": r.get("risk_percent", 1),
                 "lot_size": r.get("lot_size"), "expected_profit": r.get("expected_profit"),
             },
@@ -211,6 +216,7 @@ def main():
         snapshot.append({
             "time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
             "symbol": sym, "timeframe": tf, "action": signal.action,
+            "strategy": strat,
             "trend": signal.trend, "strength": signal.strength,
             "price": round(last.close, 5),
             "ema20": round(signal.ema20, 5), "ema50": round(signal.ema50, 5),
