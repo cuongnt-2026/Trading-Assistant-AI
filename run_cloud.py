@@ -187,12 +187,15 @@ def main():
         # Cham WIN/LOSS cho tin hieu OPEN cua cap-khung nay
         for r in signals_log:
             if r.get("outcome") == "OPEN" and r.get("symbol") == sym and r.get("timeframe") == tf:
-                st = _parse_ct(r.get("candle_time", ""))
-                fut = [c for c in candles if st and c.time > st]
-                if fut:
-                    res = OutcomeEvaluator.evaluate(r["action"], r["sl"], r["tp"], fut)
-                    if res != OPEN:
-                        r["outcome"] = res
+                try:
+                    st = _parse_ct(r.get("candle_time", ""))
+                    fut = [c for c in candles if st and c.time > st]
+                    if fut:
+                        res = OutcomeEvaluator.evaluate(r["action"], r.get("sl"), r.get("tp"), fut)
+                        if res != OPEN:
+                            r["outcome"] = res
+                except Exception as e:
+                    print("[WARN] cham outcome {} {} loi: {}".format(sym, tf, e))
 
         htf_trend = None
         if cfg.use_mtf:

@@ -22,12 +22,18 @@ class OutcomeEvaluator:
         Tra ve WIN / LOSS / OPEN.
         """
         for c in future_candles:
+            hit_sl = False
+            hit_tp = False
             if action == BUY:
-                hit_sl = c.low <= stop_loss
-                hit_tp = c.high >= take_profit
+                if stop_loss is not None:
+                    hit_sl = c.low <= stop_loss
+                if take_profit is not None:
+                    hit_tp = c.high >= take_profit
             elif action == SELL:
-                hit_sl = c.high >= stop_loss
-                hit_tp = c.low <= take_profit
+                if stop_loss is not None:
+                    hit_sl = c.high >= stop_loss
+                if take_profit is not None:
+                    hit_tp = c.low <= take_profit
             else:
                 return OPEN
 
