@@ -142,5 +142,23 @@
     "expected_profit": null,
     "confidence": 31.8,
     "outcome": "LOSS"
+  },
+  {
+    "time": "2026-08-03 07:01 UTC",
+    "candle_time": "2026-08-03 07:00:00",
+    "symbol": "USDJPY",
+    "timeframe": "M30",
+    "action": "SELL",
+    "strategy": "trend",
+    "entry": 156.95,
+    "sl": 157.27,
+    "tp": 155.25,
+    "rr": 5.31,
+    "risk_reward": "1 : 5.31",
+    "risk_percent": 0.872,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 68.6,
+    "outcome": "OPEN"
   }
 ]
