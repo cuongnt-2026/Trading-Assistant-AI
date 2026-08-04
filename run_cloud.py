@@ -210,7 +210,11 @@ def main():
                     htf_cache[ck] = None
             htf_trend = htf_cache[ck]
 
-        signal = SignalService.analyze(candles, htf_trend=htf_trend, strategy=strat)
+        try:
+            signal = SignalService.analyze(candles, htf_trend=htf_trend, strategy=strat)
+        except Exception as e:
+            print("[WARN] {} {} analyze loi: {}".format(sym, tf, e))
+            continue
         last = candles[-1]
         ts = str(last.time)
         print("  {} {} [{}] | {} | close={:.5g} | ADX={:.1f}".format(
@@ -241,7 +245,11 @@ def main():
         if signal.action not in (BUY, SELL):
             continue
 
-        rec = Recommender.evaluate(signal, candles)
+        try:
+            rec = Recommender.evaluate(signal, candles)
+        except Exception as e:
+            print("[WARN] {} {} recommender loi: {}".format(sym, tf, e))
+            continue
         # Loc chat luong: trend dung MIN_CONFIDENCE; breakout dung nguong rieng + ADX
         if strat == "trend" and rec.confidence < min_conf:
             print("     -> [trend] conf {:.0f} < {} -> bo qua".format(rec.confidence, min_conf))
@@ -269,32 +277,42 @@ def main():
                 signal.action, sym, tf))
             continue
 
-        plan = TradeService.create(
-            signal, candles, symbol=sym, balance=cfg.account_balance or None,
-            confidence=rec.confidence, risk_min=cfg.risk_min_percent,
-            risk_max=cfg.risk_max_percent, strategy=strat, entry_mode=cfg.entry_mode)
-        subject, body = build_signal_email(signal, sym, tf, last,
-                                           recommendation=rec, trade_plan=plan)
-        subject = "[CLOUD] " + subject
-        ok = notifier.send(subject, body) if notifier else False
-        print("     -> GUI MAIL: {} (conf {:.0f})".format("OK" if ok else "FAIL/none", rec.confidence))
-        if ok:
-            state[skey] = ts
-            sent += 1
-            signals_log.append({
-                "time": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
-                "candle_time": ts, "symbol": sym, "timeframe": tf,
-                "action": signal.action, "strategy": strat,
-                "entry": plan.entry_price, "sl": plan.stop_loss, "tp": plan.take_profit,
-                "rr": plan.rr_ratio, "risk_reward": plan.risk_reward,
-                "risk_percent": plan.risk_percent, "lot_size": plan.lot_size,
-                "expected_profit": plan.expected_profit,
-                "confidence": round(rec.confidence, 1), "outcome": "OPEN",
-            })
+        try:
+            plan = TradeService.create(
+                signal, candles, symbol=sym, balance=cfg.account_balance or None,
+                confidence=rec.confidence, risk_min=cfg.risk_min_percent,
+                risk_max=cfg.risk_max_percent, strategy=strat, entry_mode=cfg.entry_mode)
+            subject, body = build_signal_email(signal, sym, tf, last,
+                                               recommendation=rec, trade_plan=plan)
+            subject = "[CLOUD] " + subject
+            ok = notifier.send(subject, body) if notifier else False
+            print("     -> GUI MAIL: {} (conf {:.0f})".format("OK" if ok else "FAIL/none", rec.confidence))
+            if ok:
+                state[skey] = ts
+                sent += 1
+                signals_log.append({
+                    "time": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+                    "candle_time": ts, "symbol": sym, "timeframe": tf,
+                    "action": signal.action, "strategy": strat,
+                    "entry": plan.entry_price, "sl": plan.stop_loss, "tp": plan.take_profit,
+                    "rr": plan.rr_ratio, "risk_reward": plan.risk_reward,
+                    "risk_percent": plan.risk_percent, "lot_size": plan.lot_size,
+                    "expected_profit": plan.expected_profit,
+                    "confidence": round(rec.confidence, 1), "outcome": "OPEN",
+                })
+        except Exception as e:
+            print("[WARN] {} {} tao/gui lenh loi: {}".format(sym, tf, e))
+            continue
 
-    save_state(state)
-    save_signals(signals_log)
-    write_dashboard(snapshot, signals_log, cfg.dashboard_data)
+    try:
+        save_state(state)
+        save_signals(signals_log)
+    except Exception as e:
+        print("[WARN] luu state/signals loi:", e)
+    try:
+        write_dashboard(snapshot, signals_log, cfg.dashboard_data)
+    except Exception as e:
+        print("[WARN] ghi dashboard loi:", e)
     print("Xong. Da gui {} tin hieu.".format(sent))
 
 
