@@ -159,7 +159,7 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 68.6,
-    "outcome": "OPEN"
+    "outcome": "LOSS"
   },
   {
     "time": "2026-08-03 07:31 UTC",
@@ -195,7 +195,7 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 67.5,
-    "outcome": "OPEN"
+    "outcome": "LOSS"
   },
   {
     "time": "2026-08-03 08:31 UTC",
@@ -213,7 +213,7 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 65.4,
-    "outcome": "OPEN"
+    "outcome": "LOSS"
   },
   {
     "time": "2026-08-03 11:46 UTC",
@@ -231,7 +231,7 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 61.6,
-    "outcome": "OPEN"
+    "outcome": "LOSS"
   },
   {
     "time": "2026-08-03 14:01 UTC",
@@ -245,6 +245,6 @@
     "tp": null,
     "rr": null,
     "confidence": null,
-    "outcome": "OPEN"
+    "outcome": "LOSS"
   }
 ]
