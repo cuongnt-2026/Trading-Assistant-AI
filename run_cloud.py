@@ -242,14 +242,31 @@ def main():
             continue
 
         rec = Recommender.evaluate(signal, candles)
-        # Loc do tin cay chi ap cho trend (breakout khong dung nguong nay)
+        # Loc chat luong: trend dung MIN_CONFIDENCE; breakout dung nguong rieng + ADX
         if strat == "trend" and rec.confidence < min_conf:
-            print("     -> conf {:.0f} < {} -> bo qua".format(rec.confidence, min_conf))
+            print("     -> [trend] conf {:.0f} < {} -> bo qua".format(rec.confidence, min_conf))
             continue
+        if strat == "breakout":
+            if rec.confidence < cfg.breakout_min_confidence:
+                print("     -> [breakout] conf {:.0f} < {} -> bo qua".format(
+                    rec.confidence, cfg.breakout_min_confidence))
+                continue
+            if cfg.breakout_min_adx and signal.adx < cfg.breakout_min_adx:
+                print("     -> [breakout] ADX {:.1f} < {} (thi truong yeu/sideways) -> bo qua".format(
+                    signal.adx, cfg.breakout_min_adx))
+                continue
 
         skey = "{} {}".format(sym, tf)
         if state.get(skey) == ts:
             print("     -> da bao cho nen nay -> bo qua")
+            continue
+
+        # Chong ban trung: da co lenh CUNG CHIEU dang mo o cap-khung nay -> bo qua
+        if any(r.get("outcome") == "OPEN" and r.get("symbol") == sym
+               and r.get("timeframe") == tf and r.get("action") == signal.action
+               for r in signals_log):
+            print("     -> da co lenh {} dang mo o {} {} -> bo qua (chong ban trung)".format(
+                signal.action, sym, tf))
             continue
 
         plan = TradeService.create(
