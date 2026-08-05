@@ -264,5 +264,23 @@
     "expected_profit": null,
     "confidence": 67.9,
     "outcome": "WIN"
+  },
+  {
+    "time": "2026-08-05 07:16 UTC",
+    "candle_time": "2026-08-05 07:00:00",
+    "symbol": "EURUSD",
+    "timeframe": "M30",
+    "action": "BUY",
+    "strategy": "trend",
+    "entry": 1.15364,
+    "sl": 1.15294,
+    "tp": 1.15462,
+    "rr": 1.4,
+    "risk_reward": "1 : 1.4",
+    "risk_percent": 0.732,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 61.6,
+    "outcome": "OPEN"
   }
 ]
