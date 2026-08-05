@@ -162,6 +162,17 @@ def main():
     state = load_state()
     signals_log = load_signals()
 
+    # Reset 1 lan (do chinh cloud thuc hien -> khong bi race/merge de len):
+    # neu co file RESET_SIGNALS.flag -> xoa sach lich su + trang thai, roi xoa co.
+    if os.path.exists("RESET_SIGNALS.flag"):
+        signals_log = []
+        state = {}
+        try:
+            os.remove("RESET_SIGNALS.flag")
+        except Exception:
+            pass
+        print(">>> RESET_SIGNALS.flag: da xoa sach toan bo lich su tin hieu + trang thai <<<")
+
     if os.getenv("FORCE_TEST_MAIL", "").strip().lower() in ("1", "true"):
         _send_test_mail(cfg, notifier)
         return
