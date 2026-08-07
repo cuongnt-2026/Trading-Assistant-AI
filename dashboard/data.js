@@ -82,7 +82,7 @@ window.TA_DATA = {
       "time": "2026-08-07 15:15:33",
       "symbol": "USDJPY",
       "timeframe": "M30",
-      "action": "SELL",
+      "action": "NO_TRADE",
       "strategy": "trend",
       "trend": "DOWNTREND",
       "strength": "STRONG",
