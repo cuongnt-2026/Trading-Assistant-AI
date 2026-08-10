@@ -164,5 +164,23 @@
     "expected_profit": null,
     "confidence": 79.3,
     "outcome": "OPEN"
+  },
+  {
+    "time": "2026-08-10 10:02 UTC",
+    "candle_time": "2026-08-10 10:00:00",
+    "symbol": "NZDUSD",
+    "timeframe": "M30",
+    "action": "BUY",
+    "strategy": "trend",
+    "entry": 0.58912,
+    "sl": 0.58868,
+    "tp": 0.59037,
+    "rr": 2.84,
+    "risk_reward": "1 : 2.84",
+    "risk_percent": 0.73,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 61.5,
+    "outcome": "OPEN"
   }
 ]
