@@ -354,7 +354,7 @@
     if(!list.length) return '<div class="empty">Không có tín hiệu.</div>';
     const rows=list.map(s=>`
       <tr title="${(s.reason||'').replace(/"/g,'')}">
-        <td class="muted">${s.time||''}</td>
+        <td class="muted" title="${s.time||''} (UTC)">${s.time?toVN(s.time):''}</td>
         <td class="sym">${s.symbol||''}</td>
         <td class="tag">${s.timeframe||''}</td>
         <td class="tag">${stratLabel(s.strategy)}</td>
@@ -370,7 +370,7 @@
         <td class="${s.notified?'mail-yes':'mail-no'}">${s.notified?'✓':'—'}</td>
         ${full&&s.notified?manualControls(s):(full?'<td class="muted">—</td>':'')}
       </tr>`).join('');
-    const head=`<tr><th>Thời gian</th><th>Symbol</th><th>TF</th><th>PP</th><th>Tín hiệu</th>
+    const head=`<tr><th>Thời gian (VN)</th><th>Symbol</th><th>TF</th><th>PP</th><th>Tín hiệu</th>
       <th>Tin cậy</th><th>Giá</th>${full?'<th>Trend</th><th>RSI</th><th>ADX</th><th>ATR</th><th>Nến</th>':''}<th>KQ</th><th>Mail</th>${full?'<th>Nhập tay (what-if)</th>':''}</tr>`;
     return `<table><thead>${head}</thead><tbody>${rows}</tbody></table>`;
   }
