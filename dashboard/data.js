@@ -56,7 +56,7 @@ window.TA_DATA = {
       "atr": 18.62023,
       "rsi": 60.66,
       "pattern": "",
-      "reason": "Chua pha vo dinh/day 20 nen",
+      "reason": "ADX 17.2 yeu - chua co xu huong de breakout",
       "notified": false
     },
     {
@@ -530,6 +530,28 @@ window.TA_DATA = {
         "take_profit": 158.73,
         "risk_reward": "1 : 3.31",
         "risk_percent": 0.776,
+        "lot_size": null,
+        "expected_profit": null
+      }
+    },
+    {
+      "time": "2026-08-12 15:03 UTC",
+      "candle_time": "2026-08-12 15:00:00",
+      "symbol": "EURUSD",
+      "timeframe": "M30",
+      "action": "BUY",
+      "price": 1.15392,
+      "strategy": "trend",
+      "confidence": 60.2,
+      "notified": true,
+      "outcome": "OPEN",
+      "r_result": null,
+      "trade_plan": {
+        "entry": 1.15392,
+        "stop_loss": 1.15326,
+        "take_profit": 1.15622,
+        "risk_reward": "1 : 3.48",
+        "risk_percent": 0.704,
         "lot_size": null,
         "expected_profit": null
       }
