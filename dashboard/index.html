@@ -489,6 +489,15 @@
 
   // ---- Stats tab ----
   const strong=confs.filter(c=>c>=75).length, mod=confs.filter(c=>c>=55&&c<75).length, low=confs.filter(c=>c<55).length;
+  // Tinh R tong the (dung r_result neu co, khong thi WIN=+rr / LOSS=-1)
+  const rOf=(s)=> (typeof s.r_result==='number')?s.r_result:(s.outcome==='WIN'?(s.rr||0):(s.outcome==='LOSS'?-1:0));
+  const closedRows=S.filter(s=>s.outcome==='WIN'||s.outcome==='LOSS');
+  const totR=closedRows.reduce((a,s)=>a+rOf(s),0);
+  const avgR=closed? totR/closed : null;
+  const grossW=closedRows.filter(s=>rOf(s)>0).reduce((a,s)=>a+rOf(s),0);
+  const grossL=Math.abs(closedRows.filter(s=>rOf(s)<0).reduce((a,s)=>a+rOf(s),0));
+  const pf= grossL>0 ? grossW/grossL : (grossW>0? Infinity : null);
+  const rTxt=(x)=> (x>=0?'+':'')+x.toFixed(2)+' R';
   document.getElementById('statTable').innerHTML=`<table><tbody>
     <tr><td class="muted">Tổng tín hiệu</td><td><b>${S.length}</b></td></tr>
     <tr><td class="muted">BUY / SELL / WAIT</td><td><b>${buy} / ${sell} / ${wait}</b></td></tr>
@@ -497,6 +506,9 @@
     <tr><td class="muted">Lệnh đã đóng (Win+Loss)</td><td><b>${closed}</b> (OPEN: ${openCnt})</td></tr>
     <tr><td class="muted">Thắng / Thua</td><td><b style="color:var(--buy)">${wins}</b> / <b style="color:var(--sell)">${losses}</b></td></tr>
     <tr><td class="muted">Tỷ lệ thắng (Win rate)</td><td><b>${winrate!==null? winrate+'%':'—'}</b></td></tr>
+    <tr><td class="muted">📊 Tổng R (đã đóng)</td><td><b style="color:${totR>=0?'var(--buy)':'var(--sell)'}">${closed? rTxt(totR):'—'}</b></td></tr>
+    <tr><td class="muted">📊 R trung bình / lệnh (AvgR)</td><td><b style="color:${avgR>=0?'var(--buy)':'var(--sell)'}">${avgR!==null? rTxt(avgR):'—'}</b></td></tr>
+    <tr><td class="muted">📊 Profit Factor</td><td><b>${pf===null?'—':(pf===Infinity?'∞':pf.toFixed(2))}</b></td></tr>
   </tbody></table>`;
 
   // ---- Charts ----
