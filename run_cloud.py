@@ -130,7 +130,15 @@ def _handle_supertrend(sym, tf, candles, cfg, state, signals_log, notifier):
     action = BUY if direction[-1] == 1 else SELL
     entry = round(last.close, 2)
     sl = round(st_line[-1], 2)
-    # dong lenh Supertrend cu (dao chieu)
+    # Chong lenh rac: neu da co lenh Supertrend CUNG CHIEU dang mo -> khong phai dao chieu that
+    # (do Supertrend repaint gan diem lat) -> bo qua, khong ban trung.
+    if any(r.get("strategy") == "supertrend" and r.get("symbol") == sym
+           and r.get("timeframe") == tf and r.get("outcome") == "OPEN"
+           and r.get("action") == action for r in signals_log):
+        state[key] = ts
+        print("  {} {} [supertrend] {} da mo san -> bo qua (chong ban trung)".format(sym, tf, action))
+        return 0
+    # dong lenh Supertrend cu (dao chieu that - nguoc huong)
     for r in signals_log:
         if (r.get("strategy") == "supertrend" and r.get("symbol") == sym
                 and r.get("timeframe") == tf and r.get("outcome") == "OPEN"):
