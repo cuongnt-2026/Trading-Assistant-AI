@@ -553,7 +553,7 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 73.1,
-    "outcome": "OPEN"
+    "outcome": "LOSS"
   },
   {
     "time": "2026-08-17 12:45 UTC",
@@ -567,6 +567,24 @@
     "tp": null,
     "rr": null,
     "confidence": null,
+    "outcome": "OPEN"
+  },
+  {
+    "time": "2026-08-17 13:46 UTC",
+    "candle_time": "2026-08-17 13:30:00",
+    "symbol": "NZDUSD",
+    "timeframe": "M30",
+    "action": "BUY",
+    "strategy": "trend",
+    "entry": 0.59096,
+    "sl": 0.59045,
+    "tp": 0.5926,
+    "rr": 3.22,
+    "risk_reward": "1 : 3.22",
+    "risk_percent": 0.874,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 68.7,
     "outcome": "OPEN"
   }
 ]
