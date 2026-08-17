@@ -498,5 +498,23 @@
     "expected_profit": null,
     "confidence": 79.3,
     "outcome": "WIN"
+  },
+  {
+    "time": "2026-08-17 07:33 UTC",
+    "candle_time": "2026-08-17 07:30:00",
+    "symbol": "XAUUSD",
+    "timeframe": "M15",
+    "action": "BUY",
+    "strategy": "breakout",
+    "entry": 4405.79,
+    "sl": 4388.74,
+    "tp": 4448.41,
+    "rr": 2.5,
+    "risk_reward": "1 : 2.5",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 47.4,
+    "outcome": "OPEN"
   }
 ]
