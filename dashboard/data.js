@@ -75,7 +75,7 @@ window.TA_DATA = {
       "atr": 0.00078,
       "rsi": 53.86,
       "pattern": "",
-      "reason": "HTF UPTREND + EMA20>EMA50 + ADX 23.5 + Pullback + no-pattern",
+      "reason": "HTF UPTREND + EMA20>EMA50 + ADX 22.3 + Pullback + no-pattern",
       "notified": false
     },
     {
