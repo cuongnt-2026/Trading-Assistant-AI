@@ -241,7 +241,8 @@
 <script>
 (function(){
   const D = (window.TA_DATA)||{signals:[],updated:"—"};
-  const S = (D.signals||[]).slice();
+  // Da tat Trend -> an het du lieu Trend khoi moi thong ke/bang/bieu do cho gon.
+  const S = (D.signals||[]).filter(s=>s.strategy!=='trend').slice();
 
   const num=(x,d=2)=> (x===null||x===undefined||isNaN(x))?"—":Number(x).toFixed(d);
   const g=(o,k,def="—")=> (o && o[k]!==undefined && o[k]!==null)?o[k]:def;

@@ -39,6 +39,8 @@ def _build(since, until, title, range_label):
     recs = load()
     rows = []
     for r in recs:
+        if r.get("strategy") == "trend":   # Trend da tat -> khong tinh vao tong ket
+            continue
         t = parse(r.get("candle_time", ""))
         if t is None:
             continue
