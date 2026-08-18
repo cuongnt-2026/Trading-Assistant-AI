@@ -100,7 +100,10 @@
   .mcell .btn{padding:5px 9px;font-size:12px;}
   .mcell .mTag{margin-left:6px;}
   .panel h3 .sub .btn{padding:5px 9px;font-size:12px;margin-left:6px;}
-  th.sortable{cursor:pointer;user-select:none;} th.sortable:hover{color:var(--txt);}
+  th.colhf{padding:6px 6px;}
+  .colf{background:var(--panel2);border:1px solid var(--line);color:var(--muted);font-size:11px;
+    text-transform:uppercase;font-weight:600;letter-spacing:.4px;padding:4px 6px;border-radius:6px;cursor:pointer;max-width:120px;}
+  .colf:hover{border-color:var(--accent);color:var(--txt);}
 </style>
 </head>
 <body>
@@ -387,17 +390,13 @@
         ${full&&s.notified?manualControls(s):(full?'<td class="muted">—</td>':'')}
       </tr>`).join('');
     const head = full
-      ? `<tr>${thc('time','Thời gian (VN)')}${thc('symbol','Symbol')}${thc('timeframe','TF')}${thc('strategy','PP')}${thc('action','Tín hiệu')}${thc('confidence','Tin cậy')}${thc('price','Giá')}${thc('trend','Trend')}${thc('rsi','RSI')}${thc('adx','ADX')}${thc('atr','ATR')}${thc('pattern','Nến')}${thc('outcome','KQ')}${thc('notified','Mail')}<th>Nhập tay (what-if)</th></tr>`
+      ? `<tr><th>Thời gian (VN)</th>${thf('symbol','Symbol')}${thf('timeframe','TF')}${thf('strategy','PP')}${thf('action','Tín hiệu')}<th>Tin cậy</th><th>Giá</th>${thf('trend','Trend')}<th>RSI</th><th>ADX</th><th>ATR</th>${thf('pattern','Nến')}${thf('outcome','KQ')}<th>Mail</th><th>Nhập tay (what-if)</th></tr>`
       : `<tr><th>Thời gian (VN)</th><th>Symbol</th><th>TF</th><th>PP</th><th>Tín hiệu</th><th>Tin cậy</th><th>Giá</th><th>KQ</th><th>Mail</th></tr>`;
     return `<table><thead>${head}</thead><tbody>${rows}</tbody></table>`;
   }
-  function bindSort(){
-    document.querySelectorAll('#fullTable th.sortable').forEach(th=>{
-      th.onclick=function(){
-        const k=th.dataset.k;
-        if(sortKey===k) sortDir=-sortDir; else { sortKey=k; sortDir=1; }
-        applyFilter();
-      };
+  function bindColFilter(){
+    document.querySelectorAll('#fullTable .colf').forEach(sel=>{
+      sel.onchange=function(){ colFilters[sel.dataset.k]=sel.value; applyFilter(); };
     });
   }
   function bindManual(){
@@ -490,10 +489,10 @@
     if(fAction.value) list=list.filter(s=>s.action===fAction.value);
     const q=fSearch.value.trim().toLowerCase();
     if(q) list=list.filter(s=>((s.symbol||'')+' '+(s.reason||'')).toLowerCase().includes(q));
-    list=sortList(list);
+    Object.keys(colFilters).forEach(k=>{ if(colFilters[k]) list=list.filter(s=>String(s[k])===colFilters[k]); });
     document.getElementById('fullTable').innerHTML=renderTable(list,true);
     document.getElementById('sigCount').textContent=`${list.length} / ${S.length}`;
-    bindManual(); bindSort();
+    bindManual(); bindColFilter();
   }
   [fSymbol,fTf,fAction].forEach(e=>e.addEventListener('change',applyFilter));
   fSearch.addEventListener('input',applyFilter);
