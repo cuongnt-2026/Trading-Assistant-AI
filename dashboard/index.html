@@ -245,21 +245,20 @@
   const confColor=(c)=> c>=75?"var(--buy)": c>=55?"var(--neutral)":"var(--muted)";
   const stratLabel=(v)=> v?({breakout:'Breakout',trend:'Trend',supertrend:'Supertrend'}[v]||v):'—';
 
-  // ---- Sap xep theo header (bam tieu de cot) ----
-  let sortKey=null, sortDir=1;
-  const NUMKEYS=new Set(['confidence','price','rsi','adx','atr','notified']);
-  const arrow=(k)=> sortKey===k ? (sortDir===1?' ▲':' ▼') : '';
-  function sortList(list){
-    if(!sortKey) return list;
-    return list.slice().sort((a,b)=>{
-      let x=a[sortKey], y=b[sortKey], c;
-      if(sortKey==='notified'){ x=x?1:0; y=y?1:0; }
-      if(NUMKEYS.has(sortKey)){ x=(typeof x==='number')?x:-Infinity; y=(typeof y==='number')?y:-Infinity; c=x-y; }
-      else { x=(x==null?'':String(x)); y=(y==null?'':String(y)); c=x<y?-1:x>y?1:0; }
-      return c*sortDir;
-    });
+  // ---- Loc theo header: bam vao tieu de cot -> xo option -> chon de loc ----
+  let colFilters={};
+  function distinctVals(key){
+    const set=new Set();
+    S.forEach(s=>{ const v=s[key]; if(v!==undefined&&v!==null&&v!=='') set.add(v); });
+    return [...set].sort();
   }
-  const thc=(k,label)=> `<th class="sortable" data-k="${k}">${label}${arrow(k)}</th>`;
+  function thf(key,label){
+    const cur=colFilters[key]||'';
+    const disp=(v)=> key==='strategy'?stratLabel(v):v;
+    const opts=[`<option value="">${label} ▾</option>`].concat(
+      distinctVals(key).map(v=>`<option value="${v}" ${cur===String(v)?'selected':''}>${disp(v)}</option>`)).join('');
+    return `<th class="colhf"><select class="colf" data-k="${key}">${opts}</select></th>`;
+  }
 
   // ---- Nhap tay "what-if" (luu trong trinh duyet nay, KHONG dung toi he thong) ----
   const MKEY='ta_manual_overrides';
