@@ -264,6 +264,11 @@ def main():
         if signal.action not in (BUY, SELL):
             continue
 
+        # Trend da tat -> khong gui/khong ghi (van quet de hien snapshot)
+        if strat == "trend" and not cfg.trend_enabled:
+            print("     -> [trend] da TAT (TREND_ENABLED=0) -> bo qua")
+            continue
+
         try:
             rec = Recommender.evaluate(signal, candles)
         except Exception as e:

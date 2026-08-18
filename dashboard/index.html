@@ -100,6 +100,7 @@
   .mcell .btn{padding:5px 9px;font-size:12px;}
   .mcell .mTag{margin-left:6px;}
   .panel h3 .sub .btn{padding:5px 9px;font-size:12px;margin-left:6px;}
+  th.sortable{cursor:pointer;user-select:none;} th.sortable:hover{color:var(--txt);}
 </style>
 </head>
 <body>
@@ -244,6 +245,22 @@
   const confColor=(c)=> c>=75?"var(--buy)": c>=55?"var(--neutral)":"var(--muted)";
   const stratLabel=(v)=> v?({breakout:'Breakout',trend:'Trend',supertrend:'Supertrend'}[v]||v):'—';
 
+  // ---- Sap xep theo header (bam tieu de cot) ----
+  let sortKey=null, sortDir=1;
+  const NUMKEYS=new Set(['confidence','price','rsi','adx','atr','notified']);
+  const arrow=(k)=> sortKey===k ? (sortDir===1?' ▲':' ▼') : '';
+  function sortList(list){
+    if(!sortKey) return list;
+    return list.slice().sort((a,b)=>{
+      let x=a[sortKey], y=b[sortKey], c;
+      if(sortKey==='notified'){ x=x?1:0; y=y?1:0; }
+      if(NUMKEYS.has(sortKey)){ x=(typeof x==='number')?x:-Infinity; y=(typeof y==='number')?y:-Infinity; c=x-y; }
+      else { x=(x==null?'':String(x)); y=(y==null?'':String(y)); c=x<y?-1:x>y?1:0; }
+      return c*sortDir;
+    });
+  }
+  const thc=(k,label)=> `<th class="sortable" data-k="${k}">${label}${arrow(k)}</th>`;
+
   // ---- Nhap tay "what-if" (luu trong trinh duyet nay, KHONG dung toi he thong) ----
   const MKEY='ta_manual_overrides';
   function loadOv(){ try{return JSON.parse(localStorage.getItem(MKEY))||{};}catch(e){return {};} }
@@ -370,9 +387,19 @@
         <td class="${s.notified?'mail-yes':'mail-no'}">${s.notified?'✓':'—'}</td>
         ${full&&s.notified?manualControls(s):(full?'<td class="muted">—</td>':'')}
       </tr>`).join('');
-    const head=`<tr><th>Thời gian (VN)</th><th>Symbol</th><th>TF</th><th>PP</th><th>Tín hiệu</th>
-      <th>Tin cậy</th><th>Giá</th>${full?'<th>Trend</th><th>RSI</th><th>ADX</th><th>ATR</th><th>Nến</th>':''}<th>KQ</th><th>Mail</th>${full?'<th>Nhập tay (what-if)</th>':''}</tr>`;
+    const head = full
+      ? `<tr>${thc('time','Thời gian (VN)')}${thc('symbol','Symbol')}${thc('timeframe','TF')}${thc('strategy','PP')}${thc('action','Tín hiệu')}${thc('confidence','Tin cậy')}${thc('price','Giá')}${thc('trend','Trend')}${thc('rsi','RSI')}${thc('adx','ADX')}${thc('atr','ATR')}${thc('pattern','Nến')}${thc('outcome','KQ')}${thc('notified','Mail')}<th>Nhập tay (what-if)</th></tr>`
+      : `<tr><th>Thời gian (VN)</th><th>Symbol</th><th>TF</th><th>PP</th><th>Tín hiệu</th><th>Tin cậy</th><th>Giá</th><th>KQ</th><th>Mail</th></tr>`;
     return `<table><thead>${head}</thead><tbody>${rows}</tbody></table>`;
+  }
+  function bindSort(){
+    document.querySelectorAll('#fullTable th.sortable').forEach(th=>{
+      th.onclick=function(){
+        const k=th.dataset.k;
+        if(sortKey===k) sortDir=-sortDir; else { sortKey=k; sortDir=1; }
+        applyFilter();
+      };
+    });
   }
   function bindManual(){
     document.querySelectorAll('#fullTable .mcell').forEach(cell=>{
@@ -464,9 +491,10 @@
     if(fAction.value) list=list.filter(s=>s.action===fAction.value);
     const q=fSearch.value.trim().toLowerCase();
     if(q) list=list.filter(s=>((s.symbol||'')+' '+(s.reason||'')).toLowerCase().includes(q));
+    list=sortList(list);
     document.getElementById('fullTable').innerHTML=renderTable(list,true);
     document.getElementById('sigCount').textContent=`${list.length} / ${S.length}`;
-    bindManual();
+    bindManual(); bindSort();
   }
   [fSymbol,fTf,fAction].forEach(e=>e.addEventListener('change',applyFilter));
   fSearch.addEventListener('input',applyFilter);

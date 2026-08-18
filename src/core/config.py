@@ -90,6 +90,8 @@ class Config:
         self.breakout_min_confidence = float(os.getenv("BREAKOUT_MIN_CONFIDENCE", "45"))
         # Breakout can momentum: bo qua neu ADX < nguong nay (0 = tat)
         self.breakout_min_adx = float(os.getenv("BREAKOUT_MIN_ADX", "22"))
+        # Cong tac bat/tat chien luoc trend (pullback). TREND_ENABLED=0 de tat han.
+        self.trend_enabled = os.getenv("TREND_ENABLED", "1").strip() not in ("0", "false", "")
         # Vao lenh: "limit" (cho gia hoi) hoac "market" (vao ngay)
         self.entry_mode = os.getenv("ENTRY_MODE", "limit").strip().lower()
         self.entry_wait_bars = int(os.getenv("ENTRY_WAIT_BARS", "6"))
