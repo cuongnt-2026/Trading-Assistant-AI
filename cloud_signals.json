@@ -427,7 +427,9 @@
     "tp": null,
     "rr": null,
     "confidence": null,
-    "outcome": "OPEN"
+    "outcome": "WIN",
+    "r_result": 0.233,
+    "exit": 4380.1
   },
   {
     "time": "2026-08-14 15:01 UTC",
@@ -596,6 +598,20 @@
     "strategy": "supertrend",
     "entry": 4401.4,
     "sl": 4433.18,
+    "tp": null,
+    "rr": null,
+    "confidence": null,
+    "outcome": "OPEN"
+  },
+  {
+    "time": "2026-08-18 14:45 UTC",
+    "candle_time": "2026-08-18 14:00:00",
+    "symbol": "XAUUSD",
+    "timeframe": "H1",
+    "action": "SELL",
+    "strategy": "supertrend",
+    "entry": 4380.1,
+    "sl": 4427.45,
     "tp": null,
     "rr": null,
     "confidence": null,
