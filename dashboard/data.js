@@ -44,7 +44,7 @@ window.TA_DATA = {
       "time": "2026-08-19 13:59:45",
       "symbol": "XAUUSD",
       "timeframe": "H1",
-      "action": "BUY",
+      "action": "NO_TRADE",
       "strategy": "breakout",
       "trend": "UPTREND",
       "strength": "STRONG",
