@@ -75,7 +75,7 @@ window.TA_DATA = {
       "atr": 0.00051,
       "rsi": 55.99,
       "pattern": "",
-      "reason": "ADX yeu (19.22 <= 20)",
+      "reason": "Thieu nen xac nhan (REQUIRE_PATTERN=1)",
       "notified": false
     },
     {
