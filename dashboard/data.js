@@ -37,7 +37,7 @@ window.TA_DATA = {
       "atr": 9.2449,
       "rsi": 56.0,
       "pattern": "",
-      "reason": "ADX 17.0 yeu - chua co xu huong de breakout",
+      "reason": "ADX 16.4 yeu - chua co xu huong de breakout",
       "notified": false
     },
     {
