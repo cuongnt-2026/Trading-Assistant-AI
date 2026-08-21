@@ -37,7 +37,7 @@ window.TA_DATA = {
       "atr": 11.68414,
       "rsi": 74.36,
       "pattern": "Breakout",
-      "reason": "Breakout dinh 20 nen (ADX 37.0) thuan trend tang",
+      "reason": "Breakout dinh 20 nen (ADX 38.2) thuan trend tang",
       "notified": false
     },
     {
@@ -56,7 +56,7 @@ window.TA_DATA = {
       "atr": 17.42863,
       "rsi": 75.62,
       "pattern": "Breakout",
-      "reason": "Breakout dinh 20 nen (ADX 35.0) thuan trend tang",
+      "reason": "Breakout dinh 20 nen (ADX 36.6) thuan trend tang",
       "notified": false
     },
     {
