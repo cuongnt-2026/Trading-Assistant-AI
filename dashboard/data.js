@@ -94,7 +94,7 @@ window.TA_DATA = {
       "atr": 0.13352,
       "rsi": 46.02,
       "pattern": "",
-      "reason": "HTF DOWNTREND + EMA20<EMA50 + ADX 26.1 + Pullback + no-pattern",
+      "reason": "HTF DOWNTREND + EMA20<EMA50 + ADX 26.0 + Pullback + no-pattern",
       "notified": false
     },
     {
