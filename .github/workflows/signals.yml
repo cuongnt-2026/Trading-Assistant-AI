@@ -39,6 +39,12 @@ jobs:
       ENTRY_MODE: limit
       USE_MTF: "1"
       CANDLE_COUNT: "250"
+      # Bollinger Mean Reversion + London Breakout: tin hieu roi rac, quet doc lap
+      # (khong thuoc watchlist tren) - cap/khung da chot qua backtest (PF > 1).
+      BOLLINGER_ENABLED: "1"
+      BOLLINGER_PAIRS: "EURUSD:H4,USDJPY:H4,EURUSD:M15"
+      LONDON_ENABLED: "1"
+      LONDON_PAIRS: "EURUSD:M30,EURUSD:H1,USDJPY:H1,NZDUSD:M30"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

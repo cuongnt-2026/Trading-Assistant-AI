@@ -25,6 +25,18 @@ def _split(raw):
     return [x.strip() for x in raw.split(",") if x.strip()]
 
 
+def _parse_pairs(raw):
+    """'EURUSD:H4,USDJPY:H4' -> [(EURUSD,H4), (USDJPY,H4)] (bo qua muc sai dinh dang)."""
+    out = []
+    for item in _split(raw):
+        if ":" in item:
+            s, t = item.split(":", 1)
+            s, t = s.strip(), t.strip()
+            if s and t:
+                out.append((s, t))
+    return out
+
+
 class Config:
     """Cau hinh toan cuc cho Trading Assistant AI."""
 
@@ -102,6 +114,18 @@ class Config:
         self.supertrend_tfs = _split(os.getenv("SUPERTREND_TFS", "M30,H1"))
         self.supertrend_period = int(os.getenv("SUPERTREND_PERIOD", "10"))
         self.supertrend_mult = float(os.getenv("SUPERTREND_MULT", "3"))
+
+        # ----- Bollinger Mean Reversion (tin hieu roi rac, quet doc lap ngoai watchlist chinh) -----
+        # Danh sach cap/khung da chot qua backtest (PF > 1.8): EURUSD H4, USDJPY H4, EURUSD M15.
+        self.bollinger_enabled = os.getenv("BOLLINGER_ENABLED", "1").strip() not in ("0", "false", "")
+        self.bollinger_pairs = _parse_pairs(os.getenv(
+            "BOLLINGER_PAIRS", "EURUSD:H4,USDJPY:H4,EURUSD:M15"))
+
+        # ----- London Breakout (tin hieu roi rac, quet doc lap ngoai watchlist chinh) -----
+        # Danh sach cap/khung da chot qua backtest: EURUSD M30+H1, USDJPY H1, NZDUSD M30.
+        self.london_enabled = os.getenv("LONDON_ENABLED", "1").strip() not in ("0", "false", "")
+        self.london_pairs = _parse_pairs(os.getenv(
+            "LONDON_PAIRS", "EURUSD:M30,EURUSD:H1,USDJPY:H1,NZDUSD:M30"))
 
         # ----- Duong dan output -----
         self.reports_dir = os.getenv("REPORTS_DIR", "reports")

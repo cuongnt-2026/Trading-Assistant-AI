@@ -164,6 +164,110 @@ def _handle_supertrend(sym, tf, candles, cfg, state, signals_log, notifier):
     return 0
 
 
+def _scan_discrete(sym, tf, strategy, cfg, state, signals_log, snapshot, notifier):
+    """Tin hieu roi rac (Bollinger/London): quet DOC LAP, khong thuoc watchlist chinh.
+    Gui mail dung kieu Trend/Breakout (Entry/SL/TP/RR qua build_signal_email), KHONG loc
+    them MIN_CONFIDENCE/ADX vi cap/khung da duoc chon loc san qua backtest (chi giu to hop
+    co Profit Factor > 1)."""
+    try:
+        candles = WebData.get_candles(sym, tf, cfg.candle_count)
+    except Exception as e:
+        print("[WARN] {} {} [{}] fetch loi: {}".format(sym, tf, strategy, e))
+        return 0
+    if not candles or len(candles) < 200:
+        print("[WARN] {} {} [{}] khong du nen ({})".format(
+            sym, tf, strategy, len(candles) if candles else 0))
+        return 0
+
+    # Cham WIN/LOSS cho tin hieu OPEN cua chinh strategy + cap-khung nay
+    for r in signals_log:
+        if (r.get("outcome") == "OPEN" and r.get("symbol") == sym
+                and r.get("timeframe") == tf and r.get("strategy") == strategy):
+            try:
+                st = _parse_ct(r.get("candle_time", ""))
+                fut = [c for c in candles if st and c.time > st]
+                if fut:
+                    res = OutcomeEvaluator.evaluate(r["action"], r.get("sl"), r.get("tp"), fut)
+                    if res != OPEN:
+                        r["outcome"] = res
+            except Exception as e:
+                print("[WARN] cham outcome {} {} [{}] loi: {}".format(sym, tf, strategy, e))
+
+    try:
+        signal = SignalService.analyze(candles, htf_trend=None, strategy=strategy)
+    except Exception as e:
+        print("[WARN] {} {} [{}] analyze loi: {}".format(sym, tf, strategy, e))
+        return 0
+    last = candles[-1]
+    ts = str(last.time)
+    print("  {} {} [{}] | {} | close={:.5g} | ADX={:.1f}".format(
+        sym, tf, strategy, signal.action, last.close, signal.adx))
+
+    snapshot.append({
+        "time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        "symbol": sym, "timeframe": tf, "action": signal.action,
+        "strategy": strategy,
+        "trend": signal.trend, "strength": signal.strength,
+        "price": round(last.close, 5),
+        "ema20": round(signal.ema20, 5), "ema50": round(signal.ema50, 5),
+        "ema200": round(signal.ema200, 5), "adx": round(signal.adx, 2),
+        "atr": round(getattr(signal, "atr", 0.0), 5),
+        "rsi": round(getattr(signal, "rsi", 0.0), 2),
+        "pattern": getattr(signal, "pattern", ""), "reason": signal.reason,
+        "notified": False,
+    })
+
+    if signal.action not in (BUY, SELL):
+        return 0
+
+    skey = "{} {} {}".format(strategy, sym, tf)
+    if state.get(skey) == ts:
+        print("     -> [{}] da bao cho nen nay -> bo qua".format(strategy))
+        return 0
+
+    # Chong ban trung: da co lenh CUNG CHIEU dang mo o cap-khung-strategy nay -> bo qua
+    if any(r.get("outcome") == "OPEN" and r.get("symbol") == sym
+           and r.get("timeframe") == tf and r.get("strategy") == strategy
+           and r.get("action") == signal.action for r in signals_log):
+        print("     -> [{}] da co lenh {} dang mo o {} {} -> bo qua (chong ban trung)".format(
+            strategy, signal.action, sym, tf))
+        return 0
+
+    try:
+        rec = Recommender.evaluate(signal, candles)
+    except Exception as e:
+        print("[WARN] {} {} [{}] recommender loi: {}".format(sym, tf, strategy, e))
+        return 0
+
+    try:
+        plan = TradeService.create(
+            signal, candles, symbol=sym, balance=cfg.account_balance or None,
+            confidence=rec.confidence, risk_min=cfg.risk_min_percent,
+            risk_max=cfg.risk_max_percent, strategy=strategy, entry_mode=cfg.entry_mode)
+        subject, body = build_signal_email(signal, sym, tf, last,
+                                           recommendation=rec, trade_plan=plan)
+        subject = "[CLOUD][{}] ".format(strategy.upper()) + subject
+        ok = notifier.send(subject, body) if notifier else False
+        print("     -> [{}] GUI MAIL: {} (conf {:.0f})".format(
+            strategy, "OK" if ok else "FAIL/none", rec.confidence))
+        if ok:
+            state[skey] = ts
+            signals_log.append({
+                "time": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+                "candle_time": ts, "symbol": sym, "timeframe": tf,
+                "action": signal.action, "strategy": strategy,
+                "entry": plan.entry_price, "sl": plan.stop_loss, "tp": plan.take_profit,
+                "rr": plan.rr_ratio, "risk_reward": plan.risk_reward,
+                "risk_percent": plan.risk_percent, "lot_size": plan.lot_size,
+                "expected_profit": plan.expected_profit,
+                "confidence": round(rec.confidence, 1), "outcome": "OPEN",
+            })
+            return 1
+    except Exception as e:
+        print("[WARN] {} {} [{}] tao/gui lenh loi: {}".format(sym, tf, strategy, e))
+    return 0
+
+
 def main():
     cfg = Config()
     notifier = create_notifier(cfg)
@@ -186,8 +290,10 @@ def main():
         return
 
     min_conf = cfg.min_confidence
-    print("Cloud run {} | watchlist={} | MIN_CONF={}".format(
-        datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"), len(cfg.watchlist), min_conf))
+    print("Cloud run {} | watchlist={} | +bollinger={} +london={} | MIN_CONF={}".format(
+        datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"), len(cfg.watchlist),
+        len(cfg.bollinger_pairs) if cfg.bollinger_enabled else 0,
+        len(cfg.london_pairs) if cfg.london_enabled else 0, min_conf))
 
     htf_cache = {}
     snapshot = []
@@ -327,6 +433,20 @@ def main():
         except Exception as e:
             print("[WARN] {} {} tao/gui lenh loi: {}".format(sym, tf, e))
             continue
+
+    # ----- Bollinger + London: tin hieu roi rac, quet DOC LAP ngoai watchlist chinh -----
+    if cfg.bollinger_enabled:
+        for sym, tf in cfg.bollinger_pairs:
+            try:
+                sent += _scan_discrete(sym, tf, "bollinger", cfg, state, signals_log, snapshot, notifier)
+            except Exception as e:
+                print("[WARN] bollinger {} {}: {}".format(sym, tf, e))
+    if cfg.london_enabled:
+        for sym, tf in cfg.london_pairs:
+            try:
+                sent += _scan_discrete(sym, tf, "london", cfg, state, signals_log, snapshot, notifier)
+            except Exception as e:
+                print("[WARN] london {} {}: {}".format(sym, tf, e))
 
     try:
         save_state(state)
