@@ -1,8 +1,10 @@
-from src.signal.constants import BUY, SELL, NO_TRADE
+from src.signal.constants import BUY, SELL, NO_TRADE, BOLL_PERIOD, BOLL_MULT
+from src.indicators.indicator_service import IndicatorService
 from src.trade.trade_plan import TradePlan
 from src.trade.risk_manager import RiskManager
 from src.trade.constants import (RISK_MIN_PERCENT, RISK_MAX_PERCENT, ATR_SL_BUFFER,
-                                 SWING_LOOKBACK, ENTRY_PULLBACK_ATR, BO_RR, TRAIL_ATR_MULT, DBL_RR, FLAG_RR, STRUCT_RR)
+                                 SWING_LOOKBACK, ENTRY_PULLBACK_ATR, BO_RR, TRAIL_ATR_MULT, DBL_RR, FLAG_RR, STRUCT_RR,
+                                 BOLL_TP_MODE, LB_TP_MULT)
 
 
 class TradeService:
@@ -67,6 +69,43 @@ class TradeService:
             lv = {"stop_loss": sl_raw, "take_profit": tp_raw,
                   "sl_source": strategy + "-swing",
                   "tp_source": "RR {:g}x".format(_rr),
+                  "trail_distance": TRAIL_ATR_MULT * atr}
+        elif strategy == "bollinger":
+            # Tai su dung swing_low/swing_high lam SL-ref/gia bien doi dien (xem docstring BollingerEngine).
+            lo = getattr(signal, "swing_low", 0.0)
+            hi = getattr(signal, "swing_high", 0.0)
+            far_buy_tp, far_sell_tp = hi, lo
+            near_tp = 0.0
+            if BOLL_TP_MODE != "opposite":
+                try:
+                    _, near_tp, _ = IndicatorService.bollinger(candles, BOLL_PERIOD, BOLL_MULT)
+                except Exception:
+                    near_tp = (lo + hi) / 2 if (lo and hi) else 0.0
+            if signal.action == BUY:
+                sl_raw = (lo - ATR_SL_BUFFER * atr) if lo else (entry - 2 * atr)
+                tp_raw = near_tp if (near_tp and BOLL_TP_MODE != "opposite") else (far_buy_tp or entry + 2 * atr)
+            else:
+                sl_raw = (hi + ATR_SL_BUFFER * atr) if hi else (entry + 2 * atr)
+                tp_raw = near_tp if (near_tp and BOLL_TP_MODE != "opposite") else (far_sell_tp or entry - 2 * atr)
+            lv = {"stop_loss": sl_raw, "take_profit": tp_raw,
+                  "sl_source": "bollinger-signal-candle",
+                  "tp_source": ("Duong giua bien (TP gan)" if BOLL_TP_MODE != "opposite"
+                                else "Bien doi dien (TP xa)"),
+                  "trail_distance": TRAIL_ATR_MULT * atr}
+        elif strategy == "london":
+            # Tai su dung swing_low/swing_high = day/dinh bien do phien A (xem LondonEngine).
+            lo = getattr(signal, "swing_low", 0.0)
+            hi = getattr(signal, "swing_high", 0.0)
+            rng = (hi - lo) if (hi and lo and hi > lo) else 2 * atr
+            if signal.action == BUY:
+                sl_raw = lo if lo else (entry - 2 * atr)
+                tp_raw = entry + LB_TP_MULT * rng
+            else:
+                sl_raw = hi if hi else (entry + 2 * atr)
+                tp_raw = entry - LB_TP_MULT * rng
+            lv = {"stop_loss": sl_raw, "take_profit": tp_raw,
+                  "sl_source": "london-asia-range",
+                  "tp_source": "TP {:g}x bien do phien A".format(LB_TP_MULT),
                   "trail_distance": TRAIL_ATR_MULT * atr}
         else:
             lv = RiskManager.dynamic_levels(signal.action, entry, candles, atr)

@@ -22,3 +22,7 @@ class Signal:
 
     # ----- Mau hinh nen (Sprint 6) -----
     pattern: str = ""
+
+    # ----- Fibonacci Pullback: nhip impulse dung de ke Fib / dat SL-TP -----
+    swing_low: float = 0.0
+    swing_high: float = 0.0

@@ -66,3 +66,19 @@ STRUCT_PIVOT = int(os.getenv("STRUCT_PIVOT", "3"))       # so nen 2 ben de xac d
 STRUCT_LOOKBACK = int(os.getenv("STRUCT_LOOKBACK", "90"))# cua so danh gia cau truc
 STRUCT_SR_TOL = float(os.getenv("STRUCT_SR_TOL", "0.8")) # gom vung S/R: cach nhau <= x*ATR
 STRUCT_ADX_MIN = float(os.getenv("STRUCT_ADX_MIN", "22"))# chi vao khi ADX >= (trend that, khong nhieu)
+
+# ----- Bollinger Band Mean Reversion (bien EMA + RSI cuc doan, theo Babypips) -----
+BOLL_PERIOD = int(os.getenv("BOLL_PERIOD", "50"))       # chu ky EMA giua + do lech chuan
+BOLL_MULT = float(os.getenv("BOLL_MULT", "2.0"))         # so lan do lech chuan cho bien tren/duoi
+BOLL_RSI_PERIOD = int(os.getenv("BOLL_RSI_PERIOD", "9")) # RSI ngan de bat cuc doan
+BOLL_RSI_OB = float(os.getenv("BOLL_RSI_OB", "75"))       # RSI qua mua -> SELL
+BOLL_RSI_OS = float(os.getenv("BOLL_RSI_OS", "25"))       # RSI qua ban -> BUY
+BOLL_SL_ATR = float(os.getenv("BOLL_SL_ATR", "0.5"))      # dem SL ngoai dinh/day nen tin hieu
+
+# ----- London Breakout (pha bien do phien A khi London mo cua) -----
+LB_ASIA_START = int(os.getenv("LB_ASIA_START", "0"))       # gio bat dau do bien do phien A
+LB_ASIA_END = int(os.getenv("LB_ASIA_END", "8"))            # gio ket thuc phien A / London mo cua
+LB_ENTRY_END = int(os.getenv("LB_ENTRY_END", "11"))         # chi vao lenh truoc gio nay
+LB_BUFFER_ATR = float(os.getenv("LB_BUFFER_ATR", "0.1"))    # dem ngoai bien do (thay "3-5 pip" goc)
+LB_MIN_RANGE_ATR = float(os.getenv("LB_MIN_RANGE_ATR", "0.5"))  # bo qua neu bien do qua hep
+LB_MAX_RANGE_ATR = float(os.getenv("LB_MAX_RANGE_ATR", "4.0"))  # bo qua neu bien do qua rong

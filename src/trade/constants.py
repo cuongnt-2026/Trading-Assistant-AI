@@ -62,3 +62,10 @@ FLAG_RR = float(os.getenv("FLAG_RR", "2.0"))
 
 # Market structure: chot loi = STRUCT_RR lan rui ro
 STRUCT_RR = float(os.getenv("STRUCT_RR", "1.8"))
+
+# Bollinger Reversion: TP mac dinh = duong giua bien (TP gan, giong "chot som" cua tai lieu goc).
+# Doi BOLL_TP_MODE=opposite de dung TP xa = bien doi dien (RR cao hon nhung winrate thap hon nhieu).
+BOLL_TP_MODE = os.getenv("BOLL_TP_MODE", "mid").strip().lower()
+
+# London Breakout: TP = LB_TP_MULT lan do rong bien do phien A (theo tai lieu goc).
+LB_TP_MULT = float(os.getenv("LB_TP_MULT", "1.5"))

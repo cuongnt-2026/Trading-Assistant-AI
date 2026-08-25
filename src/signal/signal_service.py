@@ -5,6 +5,8 @@ from src.signal.breakout_engine import BreakoutEngine
 from src.signal.double_engine import DoubleEngine
 from src.signal.flag_engine import FlagEngine
 from src.signal.structure_engine import StructureEngine
+from src.signal.bollinger_engine import BollingerEngine
+from src.signal.london_engine import LondonEngine
 
 
 class SignalService:
@@ -29,5 +31,9 @@ class SignalService:
             return FlagEngine.analyze(candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)
         if strategy == "structure":
             return StructureEngine.analyze(candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)
+        if strategy == "bollinger":
+            return BollingerEngine.analyze(candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)
+        if strategy == "london":
+            return LondonEngine.analyze(candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)
         return SignalEngine.analyze(
             candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)
