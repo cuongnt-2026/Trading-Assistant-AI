@@ -220,3 +220,6 @@ __marimo__/
 # Tool ngoai copy vao - khong day len git
 xau_ema_tool/
 cron-job.org
+
+# Cac file/strategy da bo (Fibonacci, MACD, ban Bollinger/London chua loc) - cho ban tu xoa
+_to_delete/
