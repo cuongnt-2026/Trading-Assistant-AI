@@ -1,5 +1,5 @@
 window.TA_DATA = {
-  "updated": "2026-08-26 11:34 UTC",
+  "updated": "2026-08-26 11:45 UTC",
   "symbol": "XAUUSD",
   "signals": [
     {
