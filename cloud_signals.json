@@ -618,5 +618,23 @@
     "expected_profit": null,
     "confidence": 29.4,
     "outcome": "WIN"
+  },
+  {
+    "time": "2026-08-26 08:32 UTC",
+    "candle_time": "2026-08-26 08:00:00",
+    "symbol": "EURUSD",
+    "timeframe": "H1",
+    "action": "BUY",
+    "strategy": "london",
+    "entry": 1.1677,
+    "sl": 1.166,
+    "tp": 1.1701,
+    "rr": 1.41,
+    "risk_reward": "1 : 1.41",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 31.8,
+    "outcome": "OPEN"
   }
 ]
