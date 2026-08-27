@@ -667,7 +667,7 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 46.0,
-    "outcome": "OPEN"
+    "outcome": "WIN"
   },
   {
     "time": "2026-08-27 08:32 UTC",
@@ -685,7 +685,7 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 33.5,
-    "outcome": "OPEN"
+    "outcome": "WIN"
   },
   {
     "time": "2026-08-27 09:32 UTC",
