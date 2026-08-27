@@ -704,5 +704,23 @@
     "expected_profit": null,
     "confidence": 44.3,
     "outcome": "OPEN"
+  },
+  {
+    "time": "2026-08-27 09:47 UTC",
+    "candle_time": "2026-08-27 09:30:00",
+    "symbol": "NZDUSD",
+    "timeframe": "M30",
+    "action": "SELL",
+    "strategy": "london",
+    "entry": 0.59377,
+    "sl": 0.59551,
+    "tp": 0.59158,
+    "rr": 1.26,
+    "risk_reward": "1 : 1.26",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 40.0,
+    "outcome": "OPEN"
   }
 ]
