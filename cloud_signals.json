@@ -686,5 +686,23 @@
     "expected_profit": null,
     "confidence": 33.5,
     "outcome": "OPEN"
+  },
+  {
+    "time": "2026-08-27 09:32 UTC",
+    "candle_time": "2026-08-27 09:00:00",
+    "symbol": "USDJPY",
+    "timeframe": "H1",
+    "action": "BUY",
+    "strategy": "london",
+    "entry": 159.42,
+    "sl": 159.12,
+    "tp": 159.84,
+    "rr": 1.4,
+    "risk_reward": "1 : 1.4",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 44.3,
+    "outcome": "OPEN"
   }
 ]
