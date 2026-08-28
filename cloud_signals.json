@@ -649,7 +649,9 @@
     "tp": null,
     "rr": null,
     "confidence": null,
-    "outcome": "OPEN"
+    "outcome": "LOSS",
+    "r_result": -0.332,
+    "exit": 4611.31
   },
   {
     "time": "2026-08-27 08:32 UTC",
@@ -722,5 +724,19 @@
     "expected_profit": null,
     "confidence": 40.0,
     "outcome": "LOSS"
+  },
+  {
+    "time": "2026-08-28 07:01 UTC",
+    "candle_time": "2026-08-28 06:30:00",
+    "symbol": "XAUUSD",
+    "timeframe": "M30",
+    "action": "BUY",
+    "strategy": "supertrend",
+    "entry": 4611.31,
+    "sl": 4563.84,
+    "tp": null,
+    "rr": null,
+    "confidence": null,
+    "outcome": "OPEN"
   }
 ]
