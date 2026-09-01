@@ -1,30 +1,30 @@
 {
-  "generated": "2026-08-25 22:45:16",
+  "generated": "2026-09-01 23:50:22",
   "balance": 100000.0,
   "bars": 5000,
   "results": [
     {
-      "symbol": "EURUSD",
-      "timeframe": "M15",
-      "trades": 17,
-      "wins": 6,
-      "losses": 11,
+      "symbol": "NZDUSD",
+      "timeframe": "M30",
+      "trades": 18,
+      "wins": 8,
+      "losses": 10,
       "timeouts": 0,
-      "win_rate": 35.3,
-      "avg_R": 0.516,
-      "total_R": 8.78,
-      "profit_factor": 1.8,
-      "max_drawdown_R": 3.0,
-      "final_equity_pct": 104.38,
-      "return_pct": 4.38,
-      "max_drawdown_pct": 1.49
+      "win_rate": 44.4,
+      "avg_R": -0.047,
+      "total_R": -0.85,
+      "profit_factor": 0.92,
+      "max_drawdown_R": 3.37,
+      "final_equity_pct": 100.08,
+      "return_pct": 0.08,
+      "max_drawdown_pct": 1.69
     }
   ],
   "summary": {
-    "trades": 17,
-    "wins": 6,
-    "losses": 11,
-    "win_rate": 35.3,
-    "total_R": 8.78
+    "trades": 18,
+    "wins": 8,
+    "losses": 10,
+    "win_rate": 44.4,
+    "total_R": -0.85
   }
 }
