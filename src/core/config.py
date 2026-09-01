@@ -127,7 +127,7 @@ class Config:
         # Danh sach cap/khung da chot qua backtest: EURUSD M30+H1, USDJPY H1, NZDUSD M30.
         self.london_enabled = os.getenv("LONDON_ENABLED", "1").strip() not in ("0", "false", "")
         self.london_pairs = _parse_pairs(os.getenv(
-            "LONDON_PAIRS", "EURUSD:M30,EURUSD:H1,USDJPY:H1,NZDUSD:M30"))
+            "LONDON_PAIRS", "EURUSD:M30,EURUSD:H1,USDJPY:H1"))
 
         # ----- Duong dan output -----
         self.reports_dir = os.getenv("REPORTS_DIR", "reports")

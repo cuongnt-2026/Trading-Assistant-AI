@@ -46,7 +46,7 @@ jobs:
       BOLLINGER_ENABLED: "1"
       BOLLINGER_PAIRS: "EURUSD:H4,USDJPY:H4,EURUSD:M15"
       LONDON_ENABLED: "1"
-      LONDON_PAIRS: "EURUSD:M30,EURUSD:H1,USDJPY:H1,NZDUSD:M30"
+      LONDON_PAIRS: "EURUSD:M30,EURUSD:H1,USDJPY:H1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
