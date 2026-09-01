@@ -838,5 +838,23 @@
     "rr": null,
     "confidence": null,
     "outcome": "LOSS"
+  },
+  {
+    "time": "2026-09-01 08:17 UTC",
+    "candle_time": "2026-09-01 08:00:00",
+    "symbol": "EURUSD",
+    "timeframe": "H1",
+    "action": "SELL",
+    "strategy": "london",
+    "entry": 1.15891,
+    "sl": 1.16245,
+    "tp": 1.15397,
+    "rr": 1.4,
+    "risk_reward": "1 : 1.4",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 36.9,
+    "outcome": "OPEN"
   }
 ]
