@@ -248,6 +248,17 @@
   const g=(o,k,def="—")=> (o && o[k]!==undefined && o[k]!==null)?o[k]:def;
   const confColor=(c)=> c>=75?"var(--buy)": c>=55?"var(--neutral)":"var(--muted)";
   const stratLabel=(v)=> v?({breakout:'Breakout',trend:'Trend',supertrend:'Supertrend'}[v]||v):'—';
+  // Lay RR (so) cua 1 lenh: uu tien s.rr, khong thi doc tu trade_plan (chuoi "1 : 2.5" hoac tinh tu entry/sl/tp)
+  function rrOf(s){
+    if(typeof s.rr==='number') return s.rr;
+    const p=s.trade_plan||{};
+    if(typeof p.risk_reward==='string'){ const m=p.risk_reward.match(/([\d.]+)\s*$/); if(m) return parseFloat(m[1]); }
+    const e=Number(p.entry), sl=Number(p.stop_loss), tp=Number(p.take_profit);
+    if(!isNaN(e)&&!isNaN(sl)&&!isNaN(tp)&&Math.abs(e-sl)>0) return Math.abs(tp-e)/Math.abs(e-sl);
+    return 0;
+  }
+  // R thuc cua 1 lenh da dong: r_result neu co, WIN chua TP=+RR, LOSS=-1
+  const realR=(s)=> (typeof s.r_result==='number')?s.r_result:(s.outcome==='WIN'?rrOf(s):(s.outcome==='LOSS'?-1:0));
 
   // ---- Loc theo header: bam vao tieu de cot -> xo option -> chon de loc ----
   let colFilters={};
@@ -444,7 +455,7 @@
     const el=document.getElementById('stratTable'); if(!el) return;
     const rows=S.filter(s=>s.notified&&(s.action==='BUY'||s.action==='SELL'));
     const groups={}; rows.forEach(s=>{ const k=s.strategy||'khác'; (groups[k]=groups[k]||[]).push(s); });
-    const rval=(s)=> (typeof s.r_result==='number')?s.r_result:(s.outcome==='WIN'?(s.rr||0):(s.outcome==='LOSS'?-1:0));
+    const rval=realR;
     const keys=Object.keys(groups);
     if(!keys.length){ el.innerHTML='<div class="empty">Chưa có tín hiệu đã gửi.</div>'; return; }
     const body=keys.map(k=>{
@@ -517,7 +528,7 @@
   // ---- Stats tab ----
   const strong=confs.filter(c=>c>=75).length, mod=confs.filter(c=>c>=55&&c<75).length, low=confs.filter(c=>c<55).length;
   // Tinh R tong the (dung r_result neu co, khong thi WIN=+rr / LOSS=-1)
-  const rOf=(s)=> (typeof s.r_result==='number')?s.r_result:(s.outcome==='WIN'?(s.rr||0):(s.outcome==='LOSS'?-1:0));
+  const rOf=realR;
   const closedRows=S.filter(s=>s.outcome==='WIN'||s.outcome==='LOSS');
   const totR=closedRows.reduce((a,s)=>a+rOf(s),0);
   const avgR=closed? totR/closed : null;
