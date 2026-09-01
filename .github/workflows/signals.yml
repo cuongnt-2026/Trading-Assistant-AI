@@ -36,6 +36,8 @@ jobs:
       TIMEFRAMES_FOREX: M30
       MIN_CONFIDENCE: "60"
       TREND_ENABLED: "0"
+      SUPERTREND_TFS: "M30"
+      SUPERTREND_RR: "3"
       ENTRY_MODE: limit
       USE_MTF: "1"
       CANDLE_COUNT: "250"

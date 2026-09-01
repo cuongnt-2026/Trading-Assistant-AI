@@ -139,13 +139,18 @@ def _handle_supertrend(sym, tf, candles, cfg, state, signals_log, notifier):
         print("  {} {} [supertrend] {} da mo san -> bo qua (chong ban trung)".format(sym, tf, action))
         return 0
     # dong lenh Supertrend cu (dao chieu that - nguoc huong)
+    # Luat: con duong khi dao -> WIN R that (cap +NR); ve/qua entry -> LOSS -1R (SL da chan)
     for r in signals_log:
         if (r.get("strategy") == "supertrend" and r.get("symbol") == sym
                 and r.get("timeframe") == tf and r.get("outcome") == "OPEN"):
             pnl = (entry - r["entry"]) if r["action"] == BUY else (r["entry"] - entry)
             risk = abs(r["entry"] - r.get("sl", entry)) or 1e-9
-            r["outcome"] = "WIN" if pnl > 0 else "LOSS"
-            r["r_result"] = round(pnl / risk, 3)
+            if pnl > 0:
+                r["outcome"] = "WIN"
+                r["r_result"] = round(min(pnl / risk, cfg.supertrend_rr), 3)
+            else:
+                r["outcome"] = "LOSS"
+                r["r_result"] = -1.0
             r["exit"] = entry
     subject, body = build_supertrend_email(sym, tf, action, entry, sl)
     subject = "[CLOUD] " + subject
@@ -153,11 +158,14 @@ def _handle_supertrend(sym, tf, candles, cfg, state, signals_log, notifier):
     print("  {} {} [supertrend] FLIP {} -> GUI MAIL: {}".format(sym, tf, action, "OK" if ok else "FAIL"))
     if ok:
         state[key] = ts
+        risk = abs(entry - sl) or 1e-9
+        n = cfg.supertrend_rr
+        tp = round(entry + n * risk, 2) if action == BUY else round(entry - n * risk, 2)
         signals_log.append({
             "time": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
             "candle_time": ts, "symbol": sym, "timeframe": tf,
             "action": action, "strategy": "supertrend",
-            "entry": entry, "sl": sl, "tp": None, "rr": None,
+            "entry": entry, "sl": sl, "tp": tp, "rr": n, "risk_reward": "1 : {:g}".format(n),
             "confidence": None, "outcome": "OPEN",
         })
         return 1

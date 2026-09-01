@@ -108,12 +108,14 @@ class Config:
         self.entry_mode = os.getenv("ENTRY_MODE", "limit").strip().lower()
         self.entry_wait_bars = int(os.getenv("ENTRY_WAIT_BARS", "6"))
 
-        # ----- Supertrend (he dao chieu, cho XAU M30/H1) -----
+        # ----- Supertrend (he dao chieu; sau backtest: chi XAU M30, TP 3R) -----
         self.supertrend_enabled = os.getenv("SUPERTREND_ENABLED", "1").strip() not in ("0", "false", "")
         self.supertrend_symbols = _split(os.getenv("SUPERTREND_SYMBOLS", "XAUUSD"))
-        self.supertrend_tfs = _split(os.getenv("SUPERTREND_TFS", "M30,H1"))
+        self.supertrend_tfs = _split(os.getenv("SUPERTREND_TFS", "M30"))
         self.supertrend_period = int(os.getenv("SUPERTREND_PERIOD", "10"))
         self.supertrend_mult = float(os.getenv("SUPERTREND_MULT", "3"))
+        # Moc chot lai (R). Cham +NR -> WIN cap +N; cham SL -> LOSS -1R; dao chieu con duong -> WIN R that.
+        self.supertrend_rr = float(os.getenv("SUPERTREND_RR", "3"))
 
         # ----- Bollinger Mean Reversion (tin hieu roi rac, quet doc lap ngoai watchlist chinh) -----
         # Danh sach cap/khung da chot qua backtest (PF > 1.8): EURUSD H4, USDJPY H4, EURUSD M15.
