@@ -147,10 +147,10 @@ def _handle_supertrend(sym, tf, candles, cfg, state, signals_log, notifier):
             risk = abs(r["entry"] - r.get("sl", entry)) or 1e-9
             if pnl > 0:
                 r["outcome"] = "WIN"
-                r["r_result"] = round(min(pnl / risk, cfg.supertrend_rr), 3)
+                r["r_result"] = round(min(pnl / risk, cfg.supertrend_rr), 3)   # thang: R that, cap +NR
             else:
                 r["outcome"] = "LOSS"
-                r["r_result"] = -1.0
+                r["r_result"] = round(max(pnl / risk, -1.0), 3)                 # thua: R that luc dao, san -1R (SL chan)
             r["exit"] = entry
     subject, body = build_supertrend_email(sym, tf, action, entry, sl)
     subject = "[CLOUD] " + subject

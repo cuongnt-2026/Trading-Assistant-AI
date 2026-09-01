@@ -97,7 +97,8 @@ def run(candles, rr_target):
             exit_p = candles[nxt].close
             pnl = (exit_p - entry) if d == 1 else (entry - exit_p)
             rr = pnl / risk
-            r = min(rr, rr_target) if rr > 0 else -1.0
+            # thang: R that (cap +NR); thua: R that luc dao, san -1R (SL da chan neu tut sau)
+            r = min(rr, rr_target) if rr > 0 else max(rr, -1.0)
         trades.append(r)
 
     n_t = len(trades)
