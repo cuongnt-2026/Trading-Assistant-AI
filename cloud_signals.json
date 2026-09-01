@@ -823,7 +823,7 @@
     "tp": null,
     "rr": null,
     "confidence": null,
-    "outcome": "OPEN"
+    "outcome": "LOSS"
   },
   {
     "time": "2026-08-31 11:31 UTC",
@@ -837,6 +837,6 @@
     "tp": null,
     "rr": null,
     "confidence": null,
-    "outcome": "OPEN"
+    "outcome": "LOSS"
   }
 ]
