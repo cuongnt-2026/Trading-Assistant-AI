@@ -892,5 +892,20 @@
     "expected_profit": null,
     "confidence": 54.0,
     "outcome": "WIN"
+  },
+  {
+    "time": "2026-09-02 13:15 UTC",
+    "candle_time": "2026-09-02 13:00:00",
+    "symbol": "XAUUSD",
+    "timeframe": "M30",
+    "action": "BUY",
+    "strategy": "supertrend",
+    "entry": 4338.77,
+    "sl": 4301.16,
+    "tp": 4451.6,
+    "rr": 3.0,
+    "risk_reward": "1 : 3",
+    "confidence": null,
+    "outcome": "OPEN"
   }
 ]
