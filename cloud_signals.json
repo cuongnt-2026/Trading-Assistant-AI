@@ -855,7 +855,7 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 36.9,
-    "outcome": "OPEN"
+    "outcome": "LOSS"
   },
   {
     "time": "2026-09-01 10:03 UTC",
@@ -907,5 +907,23 @@
     "risk_reward": "1 : 3",
     "confidence": null,
     "outcome": "WIN"
+  },
+  {
+    "time": "2026-09-03 12:45 UTC",
+    "candle_time": "2026-09-03 12:30:00",
+    "symbol": "XAUUSD",
+    "timeframe": "M30",
+    "action": "BUY",
+    "strategy": "breakout",
+    "entry": 4466.23,
+    "sl": 4414.47,
+    "tp": 4595.62,
+    "rr": 2.5,
+    "risk_reward": "1 : 2.5",
+    "risk_percent": 0.58,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 54.0,
+    "outcome": "OPEN"
   }
 ]
