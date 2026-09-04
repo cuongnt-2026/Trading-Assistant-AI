@@ -11,8 +11,10 @@ echo   - Mo dong thoi BUY (TP+20/SL-20) va SELL (TP+10/SL-20)
 echo ============================================================
 echo LUU Y: mo MT5 va dang nhap truoc.
 echo.
+set "BARS=8000"
+set /p BARS=So nen lich su (--bars), Enter=8000:
 pause
-"%PY%" backtest_hedge.py --tf M5,M15,M30,H1
+"%PY%" backtest_hedge.py --tf M5,M15,M30,H1 --bars %BARS%
 echo.
 echo Nhin cot Total$ va Avg$/hg: duong = lai, am = lo.
 pause

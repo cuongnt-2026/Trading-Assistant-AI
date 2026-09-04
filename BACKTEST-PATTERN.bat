@@ -6,15 +6,19 @@ if exist ".venv\Scripts\python.exe" (set "PY=.venv\Scripts\python.exe") else (se
 
 echo LUU Y: mo MT5 va dang nhap truoc.
 echo.
-echo Cac mo hinh: double = hai dinh/hai day ; flag = la co/co duoi nheo ; breakout = pha vo
+echo Cac mo hinh: double = hai dinh/hai day ; flag = la co/co duoi nheo ;
+echo              structure = cau truc HH/HL ; meanrev = danh nguoc trung binh ;
+echo              breakout = pha vo
 set "PAT=double"
-set /p PAT=Mo hinh (double / flag / breakout), Enter=double: 
+set /p PAT=Mo hinh (double/flag/structure/meanrev/breakout), Enter=double:
 set "SYM="
-set /p SYM=Chi test 1 ma (vd XAUUSD), Enter=tat ca: 
-set "ARGS=--strategy %PAT% --tf M5,M15,M30,H1"
+set /p SYM=Chi test 1 ma (vd XAUUSD), Enter=tat ca:
+set "BARS=8000"
+set /p BARS=So nen lich su (--bars), Enter=8000:
+set "ARGS=--strategy %PAT% --tf M5,M15,M30,H1 --bars %BARS%"
 if not "%SYM%"=="" set "ARGS=%ARGS% --symbol %SYM%"
 
-echo Dang backtest mo hinh "%PAT%" tren M5,M15,M30,H1...
+echo Dang backtest mo hinh "%PAT%" tren M5,M15,M30,H1 (%BARS% nen)...
 "%PY%" run_backtest.py %ARGS%
 echo.
 pause
