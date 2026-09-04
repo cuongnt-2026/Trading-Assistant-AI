@@ -14,7 +14,8 @@
   "london NZDUSD M30": "2026-08-28 08:30:00",
   "bollinger USDJPY H4": "2026-09-04 01:00:00",
   "EMACROSS XAUUSD M15": {
-    "about_ts": "2026-09-04 12:30:00"
+    "about_ts": null,
+    "crossed_ts": "2026-09-04 12:45:00"
   },
   "EMACROSS XAUUSD M30": {
     "about_ts": null
