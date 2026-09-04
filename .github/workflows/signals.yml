@@ -29,11 +29,13 @@ jobs:
       MAIL_TO: ${{ secrets.MAIL_TO }}
       NOTIFIER_CHANNEL: email
       FORCE_TEST_MAIL: ${{ inputs.test_mail }}
-      # Danh sach da chot: XAU (breakout, M30+H1) + FX trend (M30)
+      # Danh sach da chot: XAU (breakout, M15/M30/H1). Nhom "FX trend" (EURUSD/USDJPY/
+      # NZDUSD M30) da BO HAN (khong chi tat TREND_ENABLED nua) vi no khong bao gio gui
+      # mail (TREND_ENABLED=0) nhung van ton ~183 request Twelve Data/ngay chi de hien
+      # dashboard - da doi lay quota do cho EMA Cross Watch ben duoi.
       SYMBOLS_GOLD_CRYPTO: XAUUSD
       TIMEFRAMES_GOLD_CRYPTO: M15,M30,H1
-      SYMBOLS_FOREX: EURUSD,USDJPY,NZDUSD
-      TIMEFRAMES_FOREX: M30
+      SYMBOLS_FOREX: ""
       MIN_CONFIDENCE: "60"
       TREND_ENABLED: "0"
       SUPERTREND_TFS: "M30"
@@ -48,10 +50,16 @@ jobs:
       LONDON_ENABLED: "1"
       LONDON_PAIRS: "EURUSD:M30,EURUSD:H1,USDJPY:H1"
       # EMA Cross Watch: CANH BAO rieng (KHONG phai chien luoc vao lenh, khong SL/TP) -
-      # theo doi EMA20/EMA100 tren XAU + 3 cap FX chinh, ca 3 khung M15/M30/H1, bao mail
-      # khi SAP hoac VUA cat cheo nhau (xem src/signal/ema_cross_watcher.py).
+      # theo doi EMA20/EMA100, bao mail khi SAP hoac VUA cat cheo nhau (xem
+      # src/signal/ema_cross_watcher.py). Da RUT GON tu 33 xuong 9 cap de vua quota mien
+      # phi Twelve Data (800 request/ngay): XAUUSD ca 3 khung M15/M30/H1 (mien phi, dung
+      # lai nen da tai cho tin hieu breakout chinh). EURUSD/GBPUSD/USDJPY chi con M30+H1
+      # (bo M15 - FX bien dong nhieu tren M15 de bi cheo gia) VA chi thuc su quet moi 30
+      # phut (EMACROSS_SLOW_SYMBOLS, xem gate trong run_cloud.py), khong phai moi 15 phut.
+      # Tong uoc tinh ~703 request/ngay, du ~97 so voi quota 800.
       EMACROSS_ENABLED: "1"
-      EMACROSS_PAIRS: "XAUUSD:M15,XAUUSD:M30,XAUUSD:H1,EURUSD:M15,EURUSD:M30,EURUSD:H1,GBPUSD:M15,GBPUSD:M30,GBPUSD:H1,USDJPY:M15,USDJPY:M30,USDJPY:H1,BTCUSD:M15,BTCUSD:M30,BTCUSD:H1,USDCHF:M15,USDCHF:M30,USDCHF:H1,USDCAD:M15,USDCAD:M30,USDCAD:H1,EURJPY:M15,EURJPY:M30,EURJPY:H1,GBPJPY:M15,GBPJPY:M30,GBPJPY:H1,EURGBP:M15,EURGBP:M30,EURGBP:H1,NZDUSD:M15,NZDUSD:M30,NZDUSD:H1"
+      EMACROSS_PAIRS: "XAUUSD:M15,XAUUSD:M30,XAUUSD:H1,EURUSD:M30,EURUSD:H1,GBPUSD:M30,GBPUSD:H1,USDJPY:M30,USDJPY:H1"
+      EMACROSS_SLOW_SYMBOLS: "EURUSD,GBPUSD,USDJPY"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

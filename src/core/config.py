@@ -130,21 +130,25 @@ class Config:
             "LONDON_PAIRS", "EURUSD:M30,EURUSD:H1,USDJPY:H1"))
 
         # ----- EMA Cross Watch (CANH BAO rieng, KHONG phai chien luoc vao lenh: chi
-        # theo doi EMA20/EMA100 tren nhieu cap/khung, bao qua mail khi sap/vua cat cheo) -----
+        # theo doi EMA20/EMA100 tren nhieu cap/khung, bao qua mail khi sap/vua cat cheo).
+        # Da CAT GIAM tu 33 cap xuong 9 cap de vua quota mien phi Twelve Data (800
+        # request/ngay) - xem tinh toan trong lich su chat. XAUUSD mien phi (dung lai
+        # nen da tai san cho tin hieu breakout chinh); EURUSD/GBPUSD/USDJPY moi cap chi
+        # con M30+H1 (bo M15) VA chi thuc su quet moi 30 phut (xem emacross_slow_symbols
+        # + gate trong run_cloud.py) de khong vuot quota. -----
         self.emacross_enabled = os.getenv("EMACROSS_ENABLED", "1").strip() not in ("0", "false", "")
         self.emacross_pairs = _parse_pairs(os.getenv(
             "EMACROSS_PAIRS",
             "XAUUSD:M15,XAUUSD:M30,XAUUSD:H1,"
-            "EURUSD:M15,EURUSD:M30,EURUSD:H1,"
-            "GBPUSD:M15,GBPUSD:M30,GBPUSD:H1,"
-            "USDJPY:M15,USDJPY:M30,USDJPY:H1,"
-            "BTCUSD:M15,BTCUSD:M30,BTCUSD:H1,"
-            "USDCHF:M15,USDCHF:M30,USDCHF:H1,"
-            "USDCAD:M15,USDCAD:M30,USDCAD:H1,"
-            "EURJPY:M15,EURJPY:M30,EURJPY:H1,"
-            "GBPJPY:M15,GBPJPY:M30,GBPJPY:H1,"
-            "EURGBP:M15,EURGBP:M30,EURGBP:H1,"
-            "NZDUSD:M15,NZDUSD:M30,NZDUSD:H1"))
+            "EURUSD:M30,EURUSD:H1,"
+            "GBPUSD:M30,GBPUSD:H1,"
+            "USDJPY:M30,USDJPY:H1"))
+        # Cac symbol trong danh sach nay CHI duoc quet khi phut UTC hien tai la :00 hoac
+        # :30 (~moi 30 phut thay vi moi 15 phut) - tiet kiem quota. Symbol KHONG nam
+        # trong danh sach nay (vd XAUUSD) van quet moi lan chay (moi 15 phut) nhu binh
+        # thuong vi da mien phi (dung chung nen voi tin hieu chinh).
+        self.emacross_slow_symbols = set(_split(os.getenv(
+            "EMACROSS_SLOW_SYMBOLS", "EURUSD,GBPUSD,USDJPY")))
 
         # ----- Duong dan output -----
         self.reports_dir = os.getenv("REPORTS_DIR", "reports")

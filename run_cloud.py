@@ -508,9 +508,16 @@ def main():
             except Exception as e:
                 print("[WARN] london {} {}: {}".format(sym, tf, e))
 
-    # ----- EMA Cross Watch: CANH BAO rieng (khong phai chien luoc vao lenh), quet DOC LAP -----
+    # ----- EMA Cross Watch: CANH BAO rieng (khong phai chien luoc vao lenh), quet DOC LAP.
+    # Symbol trong emacross_slow_symbols (vd EURUSD/GBPUSD/USDJPY) CHI duoc quet khi phut
+    # UTC hien tai la :00 hoac :30 (~moi 30 phut) de tiet kiem quota Twelve Data - xem
+    # giai thich trong config.py. Symbol khac (XAUUSD) van quet moi lan chay (moi 15 phut). -----
     if cfg.emacross_enabled:
+        now_min = datetime.utcnow().minute
+        slow_ok = now_min in (0, 30)
         for sym, tf in cfg.emacross_pairs:
+            if sym in cfg.emacross_slow_symbols and not slow_ok:
+                continue
             try:
                 sent += _scan_ema_cross(sym, tf, cfg, state, notifier, cache)
             except Exception as e:
