@@ -924,7 +924,7 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 54.0,
-    "outcome": "OPEN"
+    "outcome": "LOSS"
   },
   {
     "time": "2026-09-04 03:17 UTC",
@@ -996,6 +996,21 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 46.9,
+    "outcome": "OPEN"
+  },
+  {
+    "time": "2026-09-04 12:45 UTC",
+    "candle_time": "2026-09-04 12:30:00",
+    "symbol": "XAUUSD",
+    "timeframe": "M30",
+    "action": "SELL",
+    "strategy": "supertrend",
+    "entry": 4401.14,
+    "sl": 4492.38,
+    "tp": 4127.42,
+    "rr": 3.0,
+    "risk_reward": "1 : 3",
+    "confidence": null,
     "outcome": "OPEN"
   }
 ]

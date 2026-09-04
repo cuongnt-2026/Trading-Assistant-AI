@@ -3,7 +3,7 @@
   "XAUUSD M30": "2026-09-03 12:30:00",
   "XAUUSD H1": "2026-08-05 15:00:00",
   "EURUSD M30": "2026-08-17 10:00:00",
-  "ST XAUUSD M30": "2026-09-02 13:00:00",
+  "ST XAUUSD M30": "2026-09-04 12:30:00",
   "ST XAUUSD H1": "2026-08-31 12:00:00",
   "NZDUSD M30": "2026-08-17 13:30:00",
   "USDJPY M30": "2026-08-14 16:30:00",
@@ -14,7 +14,7 @@
   "london NZDUSD M30": "2026-08-28 08:30:00",
   "bollinger USDJPY H4": "2026-09-04 01:00:00",
   "EMACROSS XAUUSD M15": {
-    "about_ts": null
+    "about_ts": "2026-09-04 12:30:00"
   },
   "EMACROSS XAUUSD M30": {
     "about_ts": null
