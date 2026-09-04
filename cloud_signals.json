@@ -960,7 +960,7 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 31.9,
-    "outcome": "OPEN"
+    "outcome": "WIN"
   },
   {
     "time": "2026-09-04 08:17 UTC",
@@ -978,7 +978,7 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 39.9,
-    "outcome": "OPEN"
+    "outcome": "WIN"
   },
   {
     "time": "2026-09-04 09:47 UTC",
