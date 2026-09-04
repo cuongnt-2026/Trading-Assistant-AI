@@ -101,3 +101,24 @@ EMACROSS_NEAR_ATR = float(os.getenv("EMACROSS_NEAR_ATR", "0.3"))
 EMACROSS_RESET_ATR = float(os.getenv("EMACROSS_RESET_ATR", "0.6"))
 # So nen dung de do do doc (goc) cua duong EMA, chuan hoa theo ATR (xem ema_cross_watcher.py)
 EMACROSS_ANGLE_LOOKBACK = int(os.getenv("EMACROSS_ANGLE_LOOKBACK", "5"))
+
+# ----- RSI Divergence (phan ky gia/RSI) - bat dao chieu SOM HON EMA cross/Supertrend,
+# vi khong can doi 2 duong MA (hoac gia vs EMA) cham nhau - chi can gia va RSI
+# "khong dong thuan" tai 2 diem swing gan nhat:
+#   Bullish (BUY):  gia tao DAY sau THAP hon day truoc (LL), nhung RSI tai day sau
+#                   lai CAO hon RSI tai day truoc -> luc ban da yeu di -> de dao chieu tang.
+#   Bearish (SELL): gia tao DINH sau CAO hon dinh truoc (HH), nhung RSI tai dinh sau
+#                   lai THAP hon RSI tai dinh truoc -> luc mua da yeu di -> de dao chieu giam.
+DIV_PIVOT = int(os.getenv("DIV_PIVOT", "3"))            # so nen 2 ben de xac dinh dinh/day swing
+DIV_LOOKBACK = int(os.getenv("DIV_LOOKBACK", "60"))     # cua so tim phan ky
+DIV_RSI_PERIOD = int(os.getenv("DIV_RSI_PERIOD", "14")) # chu ky RSI dung de so sanh
+DIV_MIN_RSI_DIFF = float(os.getenv("DIV_MIN_RSI_DIFF", "3"))  # RSI phai lech >= x diem moi tinh la phan ky that
+
+# ----- Bollinger Squeeze Breakout (NGUOC voi Bollinger Mean Reversion dang co: o day
+# TRADE THEO huong pha vo, khong fade lai) - bat cac cu no bien do sau khi bien Bollinger
+# "that co lai" (squeeze) - thoi diem thi truong tich luy truoc khi di manh.
+SQZ_BB_PERIOD = int(os.getenv("SQZ_BB_PERIOD", "20"))       # chu ky Bollinger (ngan hon ban Mean Reversion)
+SQZ_BB_MULT = float(os.getenv("SQZ_BB_MULT", "2.0"))         # so lan do lech chuan cho bien tren/duoi
+SQZ_LOOKBACK = int(os.getenv("SQZ_LOOKBACK", "120"))         # so nen lich su dung de xep hang do rong bien
+SQZ_PERCENTILE = float(os.getenv("SQZ_PERCENTILE", "20"))    # do rong bien phai thuoc nhom hep nhat x% gan day
+SQZ_BREAKOUT_CLOSE = float(os.getenv("SQZ_BREAKOUT_CLOSE", "0.5"))  # nen breakout: than nen >= 50% bien do nen (dong manh)

@@ -69,3 +69,9 @@ BOLL_TP_MODE = os.getenv("BOLL_TP_MODE", "mid").strip().lower()
 
 # London Breakout: TP = LB_TP_MULT lan do rong bien do phien A (theo tai lieu goc).
 LB_TP_MULT = float(os.getenv("LB_TP_MULT", "1.5"))
+
+# RSI Divergence: chot loi = DIV_RR lan rui ro
+DIV_RR = float(os.getenv("DIV_RR", "2.0"))
+
+# Bollinger Squeeze Breakout: chot loi = SQZ_RR lan rui ro
+SQZ_RR = float(os.getenv("SQZ_RR", "2.0"))

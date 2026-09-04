@@ -8,9 +8,10 @@ echo LUU Y: mo MT5 va dang nhap truoc.
 echo.
 echo Cac mo hinh: double = hai dinh/hai day ; flag = la co/co duoi nheo ;
 echo              structure = cau truc HH/HL ; meanrev = danh nguoc trung binh ;
-echo              breakout = pha vo
+echo              breakout = pha vo ; divergence = phan ky gia/RSI (bat dao chieu SOM) ;
+echo              squeeze = Bollinger that co lai roi no bien (theo huong pha vo)
 set "PAT=double"
-set /p PAT=Mo hinh (double/flag/structure/meanrev/breakout), Enter=double:
+set /p PAT=Mo hinh (double/flag/structure/meanrev/breakout/divergence/squeeze), Enter=double:
 set "SYM="
 set /p SYM=Chi test 1 ma (vd XAUUSD), Enter=tat ca:
 set "BARS=8000"
