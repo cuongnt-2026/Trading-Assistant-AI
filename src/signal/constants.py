@@ -84,9 +84,16 @@ LB_MIN_RANGE_ATR = float(os.getenv("LB_MIN_RANGE_ATR", "0.5"))  # bo qua neu bie
 LB_MAX_RANGE_ATR = float(os.getenv("LB_MAX_RANGE_ATR", "4.0"))  # bo qua neu bien do qua rong
 
 # ----- EMA Cross Watch (CANH BAO rieng, KHONG phai chien luoc vao lenh - chi theo doi
-# EMA nhanh/cham tren nhieu cap/khung, bao mail khi SAP hoac VUA cat cheo nhau) -----
+# EMA nhanh/cham tren nhieu cap/khung, bao mail khi SAP hoac VUA cat cheo nhau)
+# Da doi 100 -> 50 cho EMA_SLOW (2025-09): voi 20/100, EMA100 qua "nang", khi gia giat
+# manh (vd XAUUSD M15) thi luc bao "sap/vua cat cheo" gia da di qua rat xa diem cat that
+# tren chart - mail toi thi da tre, khong con kip lam gi. 20/50 phan ung nhanh hon nhieu,
+# gia luc bao gan voi diem cat that hon han (test thuc te tren chart: 20/100 bao tre ~vai
+# chuc USD, 20/50 bat duoc ngay tai diem cat). Danh doi: se co nhieu mail hon (kem "chac
+# chan" hon 20/100) trong luc gia di ngang/rung lac - chap nhan duoc vi day chi la canh
+# bao tham khao, khong phai lenh tu dong. -----
 EMACROSS_EMA_FAST = int(os.getenv("EMACROSS_EMA_FAST", "20"))
-EMACROSS_EMA_SLOW = int(os.getenv("EMACROSS_EMA_SLOW", "100"))
+EMACROSS_EMA_SLOW = int(os.getenv("EMACROSS_EMA_SLOW", "50"))
 # Khoang cach |EMA_fast - EMA_slow| <= x*ATR VA dang hep dan lai -> coi la "SAP cat cheo"
 EMACROSS_NEAR_ATR = float(os.getenv("EMACROSS_NEAR_ATR", "0.3"))
 # Khoang cach no rong lai vuot muc nay -> "quen" lan sap-cheo cu, cho phep bao lai tu dau

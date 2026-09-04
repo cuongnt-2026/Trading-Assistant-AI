@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-EmaCrossWatcher - theo doi 2 duong EMA (mac dinh 20/100) tren 1 cap symbol+khung,
+EmaCrossWatcher - theo doi 2 duong EMA (mac dinh 20/50) tren 1 cap symbol+khung,
 PHAT HIEN va tra ve (KHONG tu gui mail, KHONG mutate state - de caller quyet dinh
 sau khi gui mail thanh cong, giong het quy uoc _handle_supertrend/_scan_discrete
 trong run_cloud.py):

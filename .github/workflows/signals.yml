@@ -50,16 +50,21 @@ jobs:
       LONDON_ENABLED: "1"
       LONDON_PAIRS: "EURUSD:M30,EURUSD:H1,USDJPY:H1"
       # EMA Cross Watch: CANH BAO rieng (KHONG phai chien luoc vao lenh, khong SL/TP) -
-      # theo doi EMA20/EMA100, bao mail khi SAP hoac VUA cat cheo nhau (xem
-      # src/signal/ema_cross_watcher.py). Da RUT GON tu 33 xuong 9 cap de vua quota mien
-      # phi Twelve Data (800 request/ngay): XAUUSD ca 3 khung M15/M30/H1 (mien phi, dung
-      # lai nen da tai cho tin hieu breakout chinh). EURUSD/GBPUSD/USDJPY chi con M30+H1
-      # (bo M15 - FX bien dong nhieu tren M15 de bi cheo gia) VA chi thuc su quet moi 30
-      # phut (EMACROSS_SLOW_SYMBOLS, xem gate trong run_cloud.py), khong phai moi 15 phut.
-      # Tong uoc tinh ~703 request/ngay, du ~97 so voi quota 800.
+      # theo doi EMA20/EMA50 (da doi tu EMA100 -> EMA50 vi 20/100 bao QUA TRE khi gia
+      # giat manh - EMA100 qua nang, luc bao thi gia da di xa diem cat that tren chart;
+      # 20/50 phan ung nhanh hon nhieu, da kiem chung thuc te tren chart XAUUSD M15),
+      # bao mail khi SAP hoac VUA cat cheo nhau (xem src/signal/ema_cross_watcher.py).
+      # Da RUT GON tu 33 xuong 9 cap de vua quota mien phi Twelve Data (800 request/ngay):
+      # XAUUSD ca 3 khung M15/M30/H1 (mien phi, dung lai nen da tai cho tin hieu breakout
+      # chinh). EURUSD/GBPUSD/USDJPY chi con M30+H1 (bo M15 - FX bien dong nhieu tren M15
+      # de bi cheo gia) VA chi thuc su quet moi 30 phut (EMACROSS_SLOW_SYMBOLS, xem gate
+      # trong run_cloud.py), khong phai moi 15 phut. Tong uoc tinh ~703 request/ngay, du
+      # ~97 so voi quota 800 (doi EMA_SLOW khong doi so luong request, chi doi cach tinh).
       EMACROSS_ENABLED: "1"
       EMACROSS_PAIRS: "XAUUSD:M15,XAUUSD:M30,XAUUSD:H1,EURUSD:M30,EURUSD:H1,GBPUSD:M30,GBPUSD:H1,USDJPY:M30,USDJPY:H1"
       EMACROSS_SLOW_SYMBOLS: "EURUSD,GBPUSD,USDJPY"
+      EMACROSS_EMA_FAST: "20"
+      EMACROSS_EMA_SLOW: "50"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

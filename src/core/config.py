@@ -130,7 +130,8 @@ class Config:
             "LONDON_PAIRS", "EURUSD:M30,EURUSD:H1,USDJPY:H1"))
 
         # ----- EMA Cross Watch (CANH BAO rieng, KHONG phai chien luoc vao lenh: chi
-        # theo doi EMA20/EMA100 tren nhieu cap/khung, bao qua mail khi sap/vua cat cheo).
+        # theo doi EMA20/EMA50 tren nhieu cap/khung, bao qua mail khi sap/vua cat cheo -
+        # doi tu EMA100 -> EMA50 de bot tre, xem src/signal/constants.py).
         # Da CAT GIAM tu 33 cap xuong 9 cap de vua quota mien phi Twelve Data (800
         # request/ngay) - xem tinh toan trong lich su chat. XAUUSD mien phi (dung lai
         # nen da tai san cho tin hieu breakout chinh); EURUSD/GBPUSD/USDJPY moi cap chi
