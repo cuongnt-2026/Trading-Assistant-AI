@@ -89,7 +89,18 @@ def _send_test_mail(cfg, notifier):
                                        recommendation=_Rec(), trade_plan=plan)
     subject = "[CLOUD TEST] " + subject
     ok = notifier.send(subject, body) if notifier else False
-    print("MAIL THU -> {}".format("DA GUI OK" if ok else "THAT BAI/khong co notifier"))
+    print("MAIL THU (tin hieu chinh) -> {}".format("DA GUI OK" if ok else "THAT BAI/khong co notifier"))
+
+    # Mail thu rieng cho EMA Cross Watch (mau minh hoa, khong phai du lieu that)
+    ev = {
+        "type": "crossed", "direction": "up", "price": 4482.38,
+        "candle_time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        "gap_atr": 0.085, "angle_fast": 34.2, "angle_slow": 6.1,
+    }
+    subj2, body2 = build_ema_cross_email("XAUUSD", "M15", ev)
+    subj2 = "[CLOUD TEST] " + subj2
+    ok2 = notifier.send(subj2, body2) if notifier else False
+    print("MAIL THU (EMA Cross Watch) -> {}".format("DA GUI OK" if ok2 else "THAT BAI/khong co notifier"))
 
 
 def write_dashboard(snapshot, signals_log, path="dashboard/data.js"):
