@@ -6,12 +6,50 @@ He DAO CHIEU (stop-and-reverse): Supertrend chuyen xanh -> BUY,
 giu toi khi chuyen do -> dong + SELL, va nguoc lai.
 Moi lenh: vao tai gia dong nen "flip", dong tai nen "flip" nguoc lai.
 R = lai/lo chia cho khoang cach tu gia vao toi duong Supertrend (stop ban dau).
+
+MOI (phan tich nguyen nhan thua): ngoai bang tong hop nhu cu, script con ghi
+lai CHI TIET tung lenh (gio, thu, phien giao dich, symbol, khung, thang/thua,
+so R) o 1 muc R "dai dien" (mac dinh = SUPERTREND_RR dang chay that, hoac moc
+dau tien trong --tf neu khong set), roi gom nhom thong ke theo gio/phien/thu/
+symbol/khung de xem lo co tap trung vao dieu kien nao khong. Ket qua chi tiet
+duoc xuat ra reports/backtest_supertrend_detail.json + .csv.
+
+LUU Y VE GIO: candle.time la GIO SERVER cua broker MT5 (KHONG chac la UTC -
+da so broker dung UTC+2/+3 tuy DST). Neu muon cot "Gio(UTC)/Phien" chinh xac,
+chinh bien MT5_UTC_OFFSET_HOURS = so gio server dang lech so voi UTC (vd
+broker dang la UTC+3 -> dat MT5_UTC_OFFSET_HOURS=3). Mac dinh = 0 (coi server
+= UTC) - neu khong chac broker lech may gio thi cu de mac dinh, chi can hieu
+la "gio tuong doi", so sanh giua cac khung gio VOI NHAU van dung, chi la nhan
+"UTC" tren cot co the lech vai gio so voi UTC that.
 """
+import csv
+import json
 import os
 import sys
+from datetime import timedelta
 
 ST_PERIOD = int(os.getenv("ST_PERIOD", "10"))
 ST_MULT = float(os.getenv("ST_MULT", "3"))
+MT5_UTC_OFFSET_HOURS = float(os.getenv("MT5_UTC_OFFSET_HOURS", "0"))
+
+# Phien giao dich (theo gio UTC da quy doi qua MT5_UTC_OFFSET_HOURS). Dung
+# chung quy uoc voi BO_SESS_START/END, FX_SESS_START/END trong constants.py
+# (London+NY ~ 7h-20h UTC) nhung tach chi tiet hon de de doi chieu.
+SESSION_BOUNDS = [
+    (0, 7, "Chau A (00-07h)"),
+    (7, 13, "London (07-13h)"),
+    (13, 16, "Chong phien London+NY (13-16h)"),
+    (16, 21, "New York (16-21h)"),
+    (21, 24, "Ngoai phien - thanh khoan thap (21-24h)"),
+]
+WEEKDAY_VN = ["Thu 2", "Thu 3", "Thu 4", "Thu 5", "Thu 6", "Thu 7", "CN"]
+
+
+def session_of(hour_utc):
+    for start, end, name in SESSION_BOUNDS:
+        if start <= hour_utc < end:
+            return name
+    return "?"
 
 
 def supertrend(candles, period, mult):
@@ -53,7 +91,7 @@ def supertrend(candles, period, mult):
     return direction, st_line
 
 
-def run(candles, rr_target):
+def run(candles, rr_target, symbol=None, tf=None, want_detail=False):
     """
     Mo phong dung LUAT MOI, di tung nen (cai nao toi truoc):
       - Cham +rr_target*R  -> WIN, +rr_target
@@ -61,6 +99,9 @@ def run(candles, rr_target):
       - Dao chieu truoc khi cham TP/SL -> dong tai nen flip:
           con duong  -> WIN = R that (cap +rr_target)
           <=0 (ve/qua entry) -> LOSS, -1R
+
+    Neu want_detail=True, tra ve them list chi tiet tung lenh (gio/thu/phien/
+    symbol/khung/direction/R) de gom nhom phan tich - xem ham breakdown().
     """
     direction, st_line = supertrend(candles, ST_PERIOD, ST_MULT)
     n = len(candles)
@@ -70,7 +111,8 @@ def run(candles, rr_target):
         if direction[i] != direction[i - 1]:
             flips.append((i, direction[i]))
 
-    trades = []   # moi phan tu = R cua 1 lenh
+    trades = []    # moi phan tu = R cua 1 lenh
+    details = []   # chi tiet tung lenh (chi dien khi want_detail=True)
     for k in range(len(flips) - 1):
         idx, d = flips[k]
         nxt = flips[k + 1][0]
@@ -101,6 +143,21 @@ def run(candles, rr_target):
             r = min(rr, rr_target) if rr > 0 else max(rr, -1.0)
         trades.append(r)
 
+        if want_detail:
+            entry_time = candles[idx].time
+            utc_dt = entry_time - timedelta(hours=MT5_UTC_OFFSET_HOURS)
+            details.append({
+                "symbol": symbol, "tf": tf, "rr_target": rr_target,
+                "entry_time_server": entry_time.strftime("%Y-%m-%d %H:%M"),
+                "entry_time_utc_est": utc_dt.strftime("%Y-%m-%d %H:%M"),
+                "hour_utc_est": utc_dt.hour,
+                "weekday": WEEKDAY_VN[utc_dt.weekday()],
+                "session": session_of(utc_dt.hour),
+                "direction": "BUY" if d == 1 else "SELL",
+                "r": round(r, 3),
+                "result": "WIN" if r > 0 else "LOSS",
+            })
+
     n_t = len(trades)
     wins = [x for x in trades if x > 0]
     losses = [x for x in trades if x <= 0]
@@ -108,13 +165,44 @@ def run(candles, rr_target):
     gw = sum(wins)
     gl = abs(sum(losses))
     pf = round(gw / gl, 2) if gl else 0.0
-    return {
+    summary = {
         "trades": n_t, "wins": len(wins), "losses": len(losses),
         "win_rate": round(len(wins) / n_t * 100, 1) if n_t else 0.0,
         "avg_R": round(total_r / n_t, 3) if n_t else 0.0,
         "total_R": round(total_r, 2),
         "profit_factor": pf,
     }
+    return (summary, details) if want_detail else summary
+
+
+def breakdown(rows, key_fn, key_label):
+    """Gom nhom `rows` (list dict co 'r') theo key_fn, in bang thong ke,
+    sap xep theo AvgR TANG DAN (te nhat len dau) de de thay ngay diem yeu."""
+    groups = {}
+    for row in rows:
+        k = key_fn(row)
+        groups.setdefault(k, []).append(row["r"])
+
+    items = []
+    for k, rs in groups.items():
+        n = len(rs)
+        wins = [x for x in rs if x > 0]
+        total = sum(rs)
+        items.append({
+            "key": k, "trades": n,
+            "win_rate": round(len(wins) / n * 100, 1) if n else 0.0,
+            "avg_R": round(total / n, 3) if n else 0.0,
+            "total_R": round(total, 2),
+        })
+    items.sort(key=lambda x: x["avg_R"])
+
+    print()
+    print("--- Gom nhom theo {} (sap xep AvgR tang dan - te nhat o TREN) ---".format(key_label))
+    print("{:<32} {:>7} {:>8} {:>8} {:>8}".format(key_label, "Trades", "WinRate", "AvgR", "TotalR"))
+    for it in items:
+        print("{:<32} {:>7} {:>7}% {:>8} {:>+8.2f}".format(
+            str(it["key"])[:32], it["trades"], it["win_rate"], it["avg_R"], it["total_R"]))
+    return items
 
 
 def main():
@@ -136,6 +224,12 @@ def main():
 
     # Cac moc R muon so sanh (mac dinh 2R va 3R). Sua qua env RR_TARGETS="2,3,4"
     targets = [float(x) for x in os.getenv("RR_TARGETS", "2,3").split(",") if x.strip()]
+    # Moc R dung de PHAN TICH CHI TIET (gio/phien/thu) - mac dinh lay dung
+    # SUPERTREND_RR dang chay that tren cloud (env), de ket qua phan tich
+    # phan anh dung he thong dang song, khong phai 1 moc R tuy chon.
+    detail_rr = float(os.getenv("SUPERTREND_RR", str(targets[0])))
+    if detail_rr not in targets:
+        targets = targets + [detail_rr]
 
     conn = MT5Connector()
     print("Ket noi MT5...")
@@ -143,11 +237,13 @@ def main():
         print("[ERROR] Khong ket noi MT5. Mo MT5 va dang nhap truoc.")
         return
     print("Backtest SUPERTREND ({},{}) | LUAT MOI: TP theo moc R + SL -1R + dao chieu".format(ST_PERIOD, ST_MULT))
+    print("Moc R dung de phan tich chi tiet gio/phien/thu: {:g}R (= SUPERTREND_RR dang chay that)".format(detail_rr))
     print("=" * 72)
     print("{:<8} {:<5} {:<5} {:>7} {:>5} {:>6} {:>8} {:>7} {:>8}".format(
         "SYMBOL", "TF", "MOC", "Trades", "Win", "Loss", "WinRate", "AvgR", "TotalR"))
     print("-" * 72)
     grand = {t: 0.0 for t in targets}
+    all_details = []
     try:
         for symbol in symbols:
             for tf in tfs:
@@ -160,7 +256,11 @@ def main():
                     print("{:<8} {:<5} khong du du lieu".format(symbol, tf))
                     continue
                 for ti, t in enumerate(targets):
-                    s = run(candles, t)
+                    want_detail = (t == detail_rr)
+                    result = run(candles, t, symbol=symbol, tf=tf, want_detail=want_detail)
+                    s, det = result if want_detail else (result, [])
+                    if want_detail:
+                        all_details.extend(det)
                     grand[t] += s["total_R"]
                     print("{:<8} {:<5} {:<5} {:>7} {:>5} {:>6} {:>7}% {:>8} {:>+8.2f}".format(
                         symbol if ti == 0 else "", tf if ti == 0 else "",
@@ -175,6 +275,38 @@ def main():
     print()
     print("Luat: cham +NR->WIN +N | cham SL->LOSS -1 | dao chieu: con duong=WIN R that (cap N), am=LOSS -1.")
     print("He dao chieu luon co lenh, chua tru spread/phi. Ket qua chi tham khao.")
+
+    # ----- Phan tich chi tiet: gio / phien / thu / symbol / khung -----
+    if all_details:
+        print()
+        print("#" * 72)
+        print("PHAN TICH CHI TIET ({} lenh, o moc {:g}R)".format(len(all_details), detail_rr))
+        print("LUU Y: cot gio la GIO SERVER MT5 da tru MT5_UTC_OFFSET_HOURS (dang = {:g}).".format(
+            MT5_UTC_OFFSET_HOURS))
+        print("Neu chua chac broker lech UTC bao nhieu gio, dat lai bien nay cho dung roi chay lai.")
+        print("#" * 72)
+
+        breakdown(all_details, lambda r: r["session"], "Phien giao dich")
+        breakdown(all_details, lambda r: r["hour_utc_est"], "Gio (UTC uoc tinh)")
+        breakdown(all_details, lambda r: r["weekday"], "Thu trong tuan")
+        breakdown(all_details, lambda r: r["symbol"], "Symbol")
+        breakdown(all_details, lambda r: r["tf"], "Khung thoi gian")
+        breakdown(all_details, lambda r: (r["symbol"], r["tf"]), "Symbol+Khung")
+
+        os.makedirs("reports", exist_ok=True)
+        json_path = os.path.join("reports", "backtest_supertrend_detail.json")
+        csv_path = os.path.join("reports", "backtest_supertrend_detail.csv")
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(all_details, f, ensure_ascii=False, indent=2)
+        with open(csv_path, "w", encoding="utf-8", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=list(all_details[0].keys()))
+            w.writeheader()
+            w.writerows(all_details)
+        print()
+        print("Da xuat chi tiet {} lenh ra:".format(len(all_details)))
+        print("  - {}".format(json_path))
+        print("  - {}".format(csv_path))
+        print("Gui 2 file nay cho Claude de phan tich sau/de xuat bo loc cu the.")
 
 
 if __name__ == "__main__":

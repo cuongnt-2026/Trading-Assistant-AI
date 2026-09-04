@@ -23,10 +23,20 @@ set /p GRP=Chon nhom (1/2/3), Enter=3:
 set "SYMS=XAUUSD,EURUSD,GBPUSD,USDJPY,USDCHF,AUDUSD,USDCAD,NZDUSD"
 if "%GRP%"=="1" set "SYMS=XAUUSD"
 if "%GRP%"=="2" set "SYMS=EURUSD,GBPUSD,USDJPY,USDCHF,AUDUSD,USDCAD,NZDUSD"
+if "%GRP%"=="1" echo (Nhom 1 = dung y Supertrend dang chay that tren cloud: chi XAUUSD)
+
+echo.
+echo Server MT5 cua ban lech UTC bao nhieu gio? (vd broker UTC+3 -> nhap 3)
+echo Enter = 0 (coi server = UTC luon, cot Gio/Phien co the lech thuc te vai gio)
+set "OFFSET=0"
+set /p OFFSET=Lech gio server so voi UTC, Enter=0:
+set "MT5_UTC_OFFSET_HOURS=%OFFSET%"
 
 echo.
 echo === Backtest Supertrend (10, %MULT%) - nhom %GRP% - M5/M15/M30/H1 ===
 "%PY%" backtest_supertrend.py --symbols %SYMS% --tf M5,M15,M30,H1
 echo.
 echo Nhin AvgR / PF / TotalR: duong = co edge.
+echo Phan tich chi tiet gio/phien/thu o cuoi ket qua, va 2 file trong thu muc reports/
+echo (backtest_supertrend_detail.json + .csv) - gui 2 file do cho Claude de phan tich sau.
 pause
