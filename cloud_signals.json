@@ -979,5 +979,23 @@
     "expected_profit": null,
     "confidence": 39.9,
     "outcome": "OPEN"
+  },
+  {
+    "time": "2026-09-04 09:47 UTC",
+    "candle_time": "2026-09-04 09:00:00",
+    "symbol": "USDJPY",
+    "timeframe": "H1",
+    "action": "BUY",
+    "strategy": "london",
+    "entry": 156.55,
+    "sl": 155.3,
+    "tp": 158.29,
+    "rr": 1.39,
+    "risk_reward": "1 : 1.39",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 46.9,
+    "outcome": "OPEN"
   }
 ]
