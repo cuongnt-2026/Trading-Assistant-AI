@@ -93,6 +93,8 @@ class EmaCrossWatcher:
                 "gap_atr": round(gap / atr, 3),
                 "angle_fast": _angle_deg(fast_s, atr),
                 "angle_slow": _angle_deg(slow_s, atr),
+                "ema_fast": EMACROSS_EMA_FAST,
+                "ema_slow": EMACROSS_EMA_SLOW,
                 "_ts": ts,
             }
 
@@ -110,6 +112,8 @@ class EmaCrossWatcher:
                 "gap_atr": round(gap / atr, 3),
                 "angle_fast": _angle_deg(fast_s, atr),
                 "angle_slow": _angle_deg(slow_s, atr),
+                "ema_fast": EMACROSS_EMA_FAST,
+                "ema_slow": EMACROSS_EMA_SLOW,
                 "eta_bars": eta_bars,
                 "_ts": ts,
             }

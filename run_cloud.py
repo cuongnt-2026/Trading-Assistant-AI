@@ -92,10 +92,12 @@ def _send_test_mail(cfg, notifier):
     print("MAIL THU (tin hieu chinh) -> {}".format("DA GUI OK" if ok else "THAT BAI/khong co notifier"))
 
     # Mail thu rieng cho EMA Cross Watch (mau minh hoa, khong phai du lieu that)
+    from src.signal.constants import EMACROSS_EMA_FAST, EMACROSS_EMA_SLOW
     ev = {
         "type": "crossed", "direction": "up", "price": 4482.38,
         "candle_time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
         "gap_atr": 0.085, "angle_fast": 34.2, "angle_slow": 6.1,
+        "ema_fast": EMACROSS_EMA_FAST, "ema_slow": EMACROSS_EMA_SLOW,
     }
     subj2, body2 = build_ema_cross_email("XAUUSD", "M15", ev)
     subj2 = "[CLOUD TEST] " + subj2
