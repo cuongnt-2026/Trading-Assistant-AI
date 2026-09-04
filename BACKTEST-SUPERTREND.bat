@@ -33,8 +33,15 @@ set /p OFFSET=Lech gio server so voi UTC, Enter=0:
 set "MT5_UTC_OFFSET_HOURS=%OFFSET%"
 
 echo.
-echo === Backtest Supertrend (10, %MULT%) - nhom %GRP% - M5/M15/M30/H1 ===
-"%PY%" backtest_supertrend.py --symbols %SYMS% --tf M5,M15,M30,H1
+echo So nen lich su muon lay (cang nhieu cang chac, nhung MT5 co the gioi han
+echo do sau lich su - neu loi/thieu du lieu thi thu giam lai).
+echo Enter = 8000 (M30 ~ 8000 nen = tam vai thang; muon test dai hon thi tang len).
+set "BARS=8000"
+set /p BARS=So nen (--bars), Enter=8000:
+
+echo.
+echo === Backtest Supertrend (10, %MULT%) - nhom %GRP% - M5/M15/M30/H1 - %BARS% nen ===
+"%PY%" backtest_supertrend.py --symbols %SYMS% --tf M5,M15,M30,H1 --bars %BARS%
 echo.
 echo Nhin AvgR / PF / TotalR: duong = co edge.
 echo Phan tich chi tiet gio/phien/thu o cuoi ket qua, va 2 file trong thu muc reports/

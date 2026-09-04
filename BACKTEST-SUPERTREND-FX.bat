@@ -11,8 +11,10 @@ echo.
 set "OFFSET=0"
 set /p OFFSET=Server MT5 lech UTC bao nhieu gio? Enter=0:
 set "MT5_UTC_OFFSET_HOURS=%OFFSET%"
+set "BARS=8000"
+set /p BARS=So nen lich su (--bars), Enter=8000:
 pause
-"%PY%" backtest_supertrend.py --symbols EURUSD,GBPUSD,USDJPY,USDCHF,AUDUSD,USDCAD,NZDUSD --tf M5,M15,M30,H1
+"%PY%" backtest_supertrend.py --symbols EURUSD,GBPUSD,USDJPY,USDCHF,AUDUSD,USDCAD,NZDUSD --tf M5,M15,M30,H1 --bars %BARS%
 echo.
 echo Nhin AvgR / PF / TotalR: duong = co edge.
 echo Phan tich chi tiet gio/phien/thu + 2 file reports/backtest_supertrend_detail.(json/csv)
