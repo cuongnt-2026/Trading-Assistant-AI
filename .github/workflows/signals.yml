@@ -47,6 +47,11 @@ jobs:
       BOLLINGER_PAIRS: "EURUSD:H4,USDJPY:H4,EURUSD:M15"
       LONDON_ENABLED: "1"
       LONDON_PAIRS: "EURUSD:M30,EURUSD:H1,USDJPY:H1"
+      # EMA Cross Watch: CANH BAO rieng (KHONG phai chien luoc vao lenh, khong SL/TP) -
+      # theo doi EMA20/EMA100 tren XAU + 3 cap FX chinh, ca 3 khung M15/M30/H1, bao mail
+      # khi SAP hoac VUA cat cheo nhau (xem src/signal/ema_cross_watcher.py).
+      EMACROSS_ENABLED: "1"
+      EMACROSS_PAIRS: "XAUUSD:M15,XAUUSD:M30,XAUUSD:H1,EURUSD:M15,EURUSD:M30,EURUSD:H1,GBPUSD:M15,GBPUSD:M30,GBPUSD:H1,USDJPY:M15,USDJPY:M30,USDJPY:H1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

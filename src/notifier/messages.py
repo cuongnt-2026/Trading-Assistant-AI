@@ -121,3 +121,52 @@ def build_supertrend_email(symbol, timeframe, action, entry, st_line):
         "-- Trading Assistant AI (Supertrend)"
     ).format(symbol, timeframe, act, now, entry, st_line, tp_ref)
     return subject, body
+
+
+def build_ema_cross_email(symbol, timeframe, ev):
+    """Email CANH BAO EMA nhanh/cham (mac dinh 20/100) SAP hoac VUA cat cheo nhau.
+    KHONG phai tin hieu vao lenh (khong co Entry/SL/TP) - chi de theo doi thu cong.
+    `ev` la dict tra ve tu EmaCrossWatcher.check()."""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    up = ev["direction"] == "up"
+    dir_txt = "TANG (EMA nhanh cat LEN TREN EMA cham)" if up else "GIAM (EMA nhanh cat XUONG DUOI EMA cham)"
+    dir_short = "TANG" if up else "GIAM"
+
+    if ev["type"] == "crossed":
+        headline = "VUA CAT CHEO"
+        eta_line = ""
+    else:
+        headline = "SAP CAT CHEO"
+        eta_txt = "~{:g} nen nua".format(ev["eta_bars"]) if ev.get("eta_bars") else "chua uoc tinh duoc"
+        eta_line = "Du kien       : con {} se cham nhau (ngoai suy tuyen tinh tu toc do hep\n                lai hien tai - CHI tham khao, gia co the doi chieu bat ky luc nao)\n".format(eta_txt)
+
+    subject = "{} {} EMA {} {} | gap {}xATR".format(
+        symbol, timeframe, headline, dir_short, ev["gap_atr"])
+
+    body = (
+        "========================================\n"
+        "   TRADING ASSISTANT AI - EMA CROSS WATCH\n"
+        "========================================\n\n"
+        "Symbol        : {}\n"
+        "Khung TG      : {}\n"
+        "Tin hieu      : {} - {}\n"
+        "Gia hien tai  : {}\n"
+        "Thoi diem     : {}\n"
+        "Nen tin hieu  : {}\n\n"
+        "---------- CHI TIET ----------\n"
+        "Khoang cach EMA hien tai : {} x ATR\n"
+        "{}"
+        "Do doc EMA nhanh (5 nen gan nhat): {} do\n"
+        "Do doc EMA cham  (5 nen gan nhat): {} do\n"
+        "  (Quy uoc do de so sanh giua cac symbol/khung: doc ~1*ATR/nen ~= 45 do; cang\n"
+        "   gan 90 do = xu huong dang manh/dot ngot, cang gan 0 do = di ngang phang.\n"
+        "   Chenh lech giua 2 goc nay CANG LON -> cu cat cheo cang 'dut khoat' (dang tin\n"
+        "   cay hon); chenh lech nho/2 duong gan nhu song song -> de bi nhieu/fake.)\n\n"
+        "========================================\n"
+        "Luu y QUAN TRONG: day CHI la canh bao ky thuat (EMA giao nhau), KHONG phai tin\n"
+        "hieu vao lenh co san Entry/SL/TP - ban tu quyet dinh dua tren cac yeu to khac\n"
+        "(xu huong khung lon hon, tin tuc, khoi luong, v.v).\n"
+        "-- Trading Assistant AI (EMA Cross Watch)"
+    ).format(symbol, timeframe, headline, dir_txt, ev["price"], now, ev["candle_time"],
+             ev["gap_atr"], eta_line, ev["angle_fast"], ev["angle_slow"])
+    return subject, body

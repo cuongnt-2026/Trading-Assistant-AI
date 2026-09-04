@@ -129,6 +129,16 @@ class Config:
         self.london_pairs = _parse_pairs(os.getenv(
             "LONDON_PAIRS", "EURUSD:M30,EURUSD:H1,USDJPY:H1"))
 
+        # ----- EMA Cross Watch (CANH BAO rieng, KHONG phai chien luoc vao lenh: chi
+        # theo doi EMA20/EMA100 tren nhieu cap/khung, bao qua mail khi sap/vua cat cheo) -----
+        self.emacross_enabled = os.getenv("EMACROSS_ENABLED", "1").strip() not in ("0", "false", "")
+        self.emacross_pairs = _parse_pairs(os.getenv(
+            "EMACROSS_PAIRS",
+            "XAUUSD:M15,XAUUSD:M30,XAUUSD:H1,"
+            "EURUSD:M15,EURUSD:M30,EURUSD:H1,"
+            "GBPUSD:M15,GBPUSD:M30,GBPUSD:H1,"
+            "USDJPY:M15,USDJPY:M30,USDJPY:H1"))
+
         # ----- Duong dan output -----
         self.reports_dir = os.getenv("REPORTS_DIR", "reports")
         self.dashboard_data = os.getenv("DASHBOARD_DATA", "dashboard/data.js")

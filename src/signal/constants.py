@@ -82,3 +82,15 @@ LB_ENTRY_END = int(os.getenv("LB_ENTRY_END", "11"))         # chi vao lenh truoc
 LB_BUFFER_ATR = float(os.getenv("LB_BUFFER_ATR", "0.1"))    # dem ngoai bien do (thay "3-5 pip" goc)
 LB_MIN_RANGE_ATR = float(os.getenv("LB_MIN_RANGE_ATR", "0.5"))  # bo qua neu bien do qua hep
 LB_MAX_RANGE_ATR = float(os.getenv("LB_MAX_RANGE_ATR", "4.0"))  # bo qua neu bien do qua rong
+
+# ----- EMA Cross Watch (CANH BAO rieng, KHONG phai chien luoc vao lenh - chi theo doi
+# EMA nhanh/cham tren nhieu cap/khung, bao mail khi SAP hoac VUA cat cheo nhau) -----
+EMACROSS_EMA_FAST = int(os.getenv("EMACROSS_EMA_FAST", "20"))
+EMACROSS_EMA_SLOW = int(os.getenv("EMACROSS_EMA_SLOW", "100"))
+# Khoang cach |EMA_fast - EMA_slow| <= x*ATR VA dang hep dan lai -> coi la "SAP cat cheo"
+EMACROSS_NEAR_ATR = float(os.getenv("EMACROSS_NEAR_ATR", "0.3"))
+# Khoang cach no rong lai vuot muc nay -> "quen" lan sap-cheo cu, cho phep bao lai tu dau
+# lan sau ap sat nhau (tranh bao 1 lan roi im re neu gia chi lang vang gan nguong mai).
+EMACROSS_RESET_ATR = float(os.getenv("EMACROSS_RESET_ATR", "0.6"))
+# So nen dung de do do doc (goc) cua duong EMA, chuan hoa theo ATR (xem ema_cross_watcher.py)
+EMACROSS_ANGLE_LOOKBACK = int(os.getenv("EMACROSS_ANGLE_LOOKBACK", "5"))

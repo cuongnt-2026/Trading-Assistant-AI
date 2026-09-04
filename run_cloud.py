@@ -17,8 +17,9 @@ from src.signal.constants import BUY, SELL
 from src.ai_review.recommender import Recommender
 from src.trade.trade_service import TradeService
 from src.notifier.factory import create_notifier
-from src.notifier.messages import build_signal_email, build_supertrend_email
+from src.notifier.messages import build_signal_email, build_supertrend_email, build_ema_cross_email
 from src.signal.supertrend import supertrend
+from src.signal.ema_cross_watcher import EmaCrossWatcher
 from src.trade.outcome import OutcomeEvaluator, OPEN
 
 STATE_PATH = "cloud_state.json"
@@ -54,6 +55,16 @@ def _parse_ct(ts):
         return datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
     except Exception:
         return None
+
+
+def _fetch_cached(cache, sym, tf, cfg):
+    """Nen dung chung trong 1 lan chay: nhieu khu vuc (watchlist chinh, HTF filter,
+    Bollinger/London, EMA Cross Watch) hay trung cap-khung nhau -> chi goi API 1 lan
+    cho moi (symbol, tf), tiet kiem quota Twelve Data (free tier gioi han request/ngay)."""
+    key = (sym, tf)
+    if key not in cache:
+        cache[key] = WebData.get_candles(sym, tf, cfg.candle_count)
+    return cache[key]
 
 
 def _send_test_mail(cfg, notifier):
@@ -172,13 +183,13 @@ def _handle_supertrend(sym, tf, candles, cfg, state, signals_log, notifier):
     return 0
 
 
-def _scan_discrete(sym, tf, strategy, cfg, state, signals_log, snapshot, notifier):
+def _scan_discrete(sym, tf, strategy, cfg, state, signals_log, snapshot, notifier, cache):
     """Tin hieu roi rac (Bollinger/London): quet DOC LAP, khong thuoc watchlist chinh.
     Gui mail dung kieu Trend/Breakout (Entry/SL/TP/RR qua build_signal_email), KHONG loc
     them MIN_CONFIDENCE/ADX vi cap/khung da duoc chon loc san qua backtest (chi giu to hop
     co Profit Factor > 1)."""
     try:
-        candles = WebData.get_candles(sym, tf, cfg.candle_count)
+        candles = _fetch_cached(cache, sym, tf, cfg)
     except Exception as e:
         print("[WARN] {} {} [{}] fetch loi: {}".format(sym, tf, strategy, e))
         return 0
@@ -276,6 +287,45 @@ def _scan_discrete(sym, tf, strategy, cfg, state, signals_log, snapshot, notifie
     return 0
 
 
+def _scan_ema_cross(sym, tf, cfg, state, notifier, cache):
+    """EMA Cross Watch: CANH BAO rieng (KHONG phai chien luoc vao lenh) khi EMA nhanh/cham
+    (mac dinh 20/100) SAP hoac VUA cat cheo nhau. Quet DOC LAP, dung chung cache nen voi
+    cac khu vuc khac trong lan chay nay de tiet kiem quota API."""
+    try:
+        candles = _fetch_cached(cache, sym, tf, cfg)
+    except Exception as e:
+        print("[WARN] {} {} [emacross] fetch loi: {}".format(sym, tf, e))
+        return 0
+    if not candles or len(candles) < 150:
+        print("[WARN] {} {} [emacross] khong du nen ({})".format(
+            sym, tf, len(candles) if candles else 0))
+        return 0
+
+    key = "EMACROSS {} {}".format(sym, tf)
+    try:
+        ev = EmaCrossWatcher.check(candles, state, key)
+    except Exception as e:
+        print("[WARN] {} {} [emacross] check loi: {}".format(sym, tf, e))
+        return 0
+    if not ev:
+        return 0
+
+    subject, body = build_ema_cross_email(sym, tf, ev)
+    subject = "[CLOUD][EMA-CROSS] " + subject
+    ok = notifier.send(subject, body) if notifier else False
+    print("  {} {} [emacross] {} {} (gap {}xATR) -> GUI MAIL: {}".format(
+        sym, tf, ev["type"], ev["direction"], ev["gap_atr"], "OK" if ok else "FAIL"))
+    if ok:
+        st = state.setdefault(key, {})
+        if ev["type"] == "crossed":
+            st["crossed_ts"] = ev["_ts"]
+            st["about_ts"] = None
+        else:
+            st["about_ts"] = ev["_ts"]
+        return 1
+    return 0
+
+
 def main():
     cfg = Config()
     notifier = create_notifier(cfg)
@@ -298,18 +348,20 @@ def main():
         return
 
     min_conf = cfg.min_confidence
-    print("Cloud run {} | watchlist={} | +bollinger={} +london={} | MIN_CONF={}".format(
+    print("Cloud run {} | watchlist={} | +bollinger={} +london={} +emacross={} | MIN_CONF={}".format(
         datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"), len(cfg.watchlist),
         len(cfg.bollinger_pairs) if cfg.bollinger_enabled else 0,
-        len(cfg.london_pairs) if cfg.london_enabled else 0, min_conf))
+        len(cfg.london_pairs) if cfg.london_enabled else 0,
+        len(cfg.emacross_pairs) if cfg.emacross_enabled else 0, min_conf))
 
+    cache = {}       # (symbol, tf) -> candles, dung chung ca lan chay de do goi API trung
     htf_cache = {}
     snapshot = []
     sent = 0
     for sym, tf in cfg.watchlist:
         strat = strategy_for(sym)
         try:
-            candles = WebData.get_candles(sym, tf, cfg.candle_count)
+            candles = _fetch_cached(cache, sym, tf, cfg)
         except Exception as e:
             print("[WARN] {} {} fetch loi: {}".format(sym, tf, e))
             continue
@@ -336,7 +388,7 @@ def main():
             ck = (sym, htf)
             if ck not in htf_cache:
                 try:
-                    hc = WebData.get_candles(sym, htf, cfg.candle_count)
+                    hc = _fetch_cached(cache, sym, htf, cfg)
                     htf_cache[ck] = (TrendService.direction(hc)
                                      if hc and len(hc) >= 60 else None)
                 except Exception:
@@ -446,15 +498,23 @@ def main():
     if cfg.bollinger_enabled:
         for sym, tf in cfg.bollinger_pairs:
             try:
-                sent += _scan_discrete(sym, tf, "bollinger", cfg, state, signals_log, snapshot, notifier)
+                sent += _scan_discrete(sym, tf, "bollinger", cfg, state, signals_log, snapshot, notifier, cache)
             except Exception as e:
                 print("[WARN] bollinger {} {}: {}".format(sym, tf, e))
     if cfg.london_enabled:
         for sym, tf in cfg.london_pairs:
             try:
-                sent += _scan_discrete(sym, tf, "london", cfg, state, signals_log, snapshot, notifier)
+                sent += _scan_discrete(sym, tf, "london", cfg, state, signals_log, snapshot, notifier, cache)
             except Exception as e:
                 print("[WARN] london {} {}: {}".format(sym, tf, e))
+
+    # ----- EMA Cross Watch: CANH BAO rieng (khong phai chien luoc vao lenh), quet DOC LAP -----
+    if cfg.emacross_enabled:
+        for sym, tf in cfg.emacross_pairs:
+            try:
+                sent += _scan_ema_cross(sym, tf, cfg, state, notifier, cache)
+            except Exception as e:
+                print("[WARN] emacross {} {}: {}".format(sym, tf, e))
 
     try:
         save_state(state)
