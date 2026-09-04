@@ -137,7 +137,14 @@ class Config:
             "XAUUSD:M15,XAUUSD:M30,XAUUSD:H1,"
             "EURUSD:M15,EURUSD:M30,EURUSD:H1,"
             "GBPUSD:M15,GBPUSD:M30,GBPUSD:H1,"
-            "USDJPY:M15,USDJPY:M30,USDJPY:H1"))
+            "USDJPY:M15,USDJPY:M30,USDJPY:H1,"
+            "BTCUSD:M15,BTCUSD:M30,BTCUSD:H1,"
+            "USDCHF:M15,USDCHF:M30,USDCHF:H1,"
+            "USDCAD:M15,USDCAD:M30,USDCAD:H1,"
+            "EURJPY:M15,EURJPY:M30,EURJPY:H1,"
+            "GBPJPY:M15,GBPJPY:M30,GBPJPY:H1,"
+            "EURGBP:M15,EURGBP:M30,EURGBP:H1,"
+            "NZDUSD:M15,NZDUSD:M30,NZDUSD:H1"))
 
         # ----- Duong dan output -----
         self.reports_dir = os.getenv("REPORTS_DIR", "reports")
