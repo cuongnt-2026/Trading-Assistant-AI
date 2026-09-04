@@ -224,12 +224,23 @@ def main():
 
     # Cac moc R muon so sanh (mac dinh 2R va 3R). Sua qua env RR_TARGETS="2,3,4"
     targets = [float(x) for x in os.getenv("RR_TARGETS", "2,3").split(",") if x.strip()]
-    # Moc R dung de PHAN TICH CHI TIET (gio/phien/thu) - mac dinh lay dung
-    # SUPERTREND_RR dang chay that tren cloud (env), de ket qua phan tich
-    # phan anh dung he thong dang song, khong phai 1 moc R tuy chon.
-    detail_rr = float(os.getenv("SUPERTREND_RR", str(targets[0])))
+    # Moc R dung de PHAN TICH CHI TIET (gio/phien/thu) - MAC DINH CUNG 3, dung
+    # y SUPERTREND_RR dang chay that tren cloud (xem .github/workflows/signals.yml).
+    # Chu y: may local thuong KHONG co SUPERTREND_RR trong .env (bien nay chi
+    # dat trong GitHub Actions secrets/env) - neu fallback ve targets[0] (co
+    # the la 2) se phan tich SAI moc dang chay that. Muon doi thi tu dat bien
+    # moi truong SUPERTREND_RR truoc khi chay, dung dua vao .env.
+    detail_rr = float(os.getenv("SUPERTREND_RR", "3"))
     if detail_rr not in targets:
         targets = targets + [detail_rr]
+
+    # Phan tich chi tiet CHI tinh cho dung cap/khung dang chay THAT ngoai doi
+    # (khong tinh ca cac cap FX/khung ban chi dang backtest thu nghiem) - de
+    # bang gio/phien/thu phan anh dung Supertrend dang gui mail that, khong bi
+    # pha loang boi cac cap khong lien quan. Mac dinh XAUUSD/M30 (dung config
+    # that); sua qua bien moi truong SUPERTREND_SYMBOLS/SUPERTREND_TFS neu can.
+    live_symbols = set(x.strip().upper() for x in os.getenv("SUPERTREND_SYMBOLS", "XAUUSD").split(",") if x.strip())
+    live_tfs = set(x.strip().upper() for x in os.getenv("SUPERTREND_TFS", "M30").split(",") if x.strip())
 
     conn = MT5Connector()
     print("Ket noi MT5...")
@@ -238,6 +249,8 @@ def main():
         return
     print("Backtest SUPERTREND ({},{}) | LUAT MOI: TP theo moc R + SL -1R + dao chieu".format(ST_PERIOD, ST_MULT))
     print("Moc R dung de phan tich chi tiet gio/phien/thu: {:g}R (= SUPERTREND_RR dang chay that)".format(detail_rr))
+    print("Phan tich chi tiet CHI ap dung cho: symbol in {{{}}}, khung in {{{}}} (dung config dang chay that)".format(
+        ",".join(sorted(live_symbols)), ",".join(sorted(live_tfs))))
     print("=" * 72)
     print("{:<8} {:<5} {:<5} {:>7} {:>5} {:>6} {:>8} {:>7} {:>8}".format(
         "SYMBOL", "TF", "MOC", "Trades", "Win", "Loss", "WinRate", "AvgR", "TotalR"))
@@ -256,7 +269,7 @@ def main():
                     print("{:<8} {:<5} khong du du lieu".format(symbol, tf))
                     continue
                 for ti, t in enumerate(targets):
-                    want_detail = (t == detail_rr)
+                    want_detail = (t == detail_rr and symbol in live_symbols and tf in live_tfs)
                     result = run(candles, t, symbol=symbol, tf=tf, want_detail=want_detail)
                     s, det = result if want_detail else (result, [])
                     if want_detail:
@@ -276,11 +289,18 @@ def main():
     print("Luat: cham +NR->WIN +N | cham SL->LOSS -1 | dao chieu: con duong=WIN R that (cap N), am=LOSS -1.")
     print("He dao chieu luon co lenh, chua tru spread/phi. Ket qua chi tham khao.")
 
-    # ----- Phan tich chi tiet: gio / phien / thu / symbol / khung -----
+    # ----- Phan tich chi tiet: gio / phien / thu (chi cap/khung dang chay that) -----
+    if not all_details:
+        print()
+        print("(Khong co lenh nao khop dung cap/khung dang chay that: symbol in {{{}}}, khung in {{{}}}".format(
+            ",".join(sorted(live_symbols)), ",".join(sorted(live_tfs))))
+        print(" - chay lai va nho chon nhom/khung co bao gom cap nay de xem phan tich chi tiet.)")
+        return
     if all_details:
         print()
         print("#" * 72)
-        print("PHAN TICH CHI TIET ({} lenh, o moc {:g}R)".format(len(all_details), detail_rr))
+        print("PHAN TICH CHI TIET ({} lenh, o moc {:g}R, dung cap/khung dang chay that)".format(
+            len(all_details), detail_rr))
         print("LUU Y: cot gio la GIO SERVER MT5 da tru MT5_UTC_OFFSET_HOURS (dang = {:g}).".format(
             MT5_UTC_OFFSET_HOURS))
         print("Neu chua chac broker lech UTC bao nhieu gio, dat lai bien nay cho dung roi chay lai.")
@@ -289,9 +309,10 @@ def main():
         breakdown(all_details, lambda r: r["session"], "Phien giao dich")
         breakdown(all_details, lambda r: r["hour_utc_est"], "Gio (UTC uoc tinh)")
         breakdown(all_details, lambda r: r["weekday"], "Thu trong tuan")
-        breakdown(all_details, lambda r: r["symbol"], "Symbol")
-        breakdown(all_details, lambda r: r["tf"], "Khung thoi gian")
-        breakdown(all_details, lambda r: (r["symbol"], r["tf"]), "Symbol+Khung")
+        if len(live_symbols) > 1:
+            breakdown(all_details, lambda r: r["symbol"], "Symbol")
+        if len(live_tfs) > 1:
+            breakdown(all_details, lambda r: r["tf"], "Khung thoi gian")
 
         os.makedirs("reports", exist_ok=True)
         json_path = os.path.join("reports", "backtest_supertrend_detail.json")
