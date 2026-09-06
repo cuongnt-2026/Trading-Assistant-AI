@@ -5,6 +5,7 @@
 - build_summary_prev_month() : tong ket THANG DUONG LICH truoc do.
 """
 import json
+import re
 from datetime import datetime, timedelta
 
 PATH = "cloud_signals.json"
@@ -26,11 +27,37 @@ def parse(ts):
     return None
 
 
+def _rr_of(r):
+    """RR (so lan rui ro) cua 1 lenh: uu tien r['rr'] (so thuc), neu thieu/0 thi doc
+    chuoi r['risk_reward'] (vd "1 : 2.5" -> 2.5), cuoi cung tinh tu entry/sl/tp.
+    (Fix cung logic voi rrOf() da vá trong dashboard/index.html ngay 2026-09-01 -
+    truoc day thieu ham nay nen lenh WIN ma thieu/0 "rr" se bi tinh nham thanh 0R.)
+    """
+    rr = r.get("rr")
+    if isinstance(rr, (int, float)) and rr:
+        return float(rr)
+    rrs = r.get("risk_reward")
+    if isinstance(rrs, str):
+        m = re.search(r"([\d.]+)\s*$", rrs.strip())
+        if m:
+            try:
+                return float(m.group(1))
+            except Exception:
+                pass
+    try:
+        e, sl, tp = float(r.get("entry")), float(r.get("sl")), float(r.get("tp"))
+        if abs(e - sl) > 0:
+            return abs(tp - e) / abs(e - sl)
+    except Exception:
+        pass
+    return 0.0
+
+
 def _rval(r):
     if r.get("r_result") is not None:
         return r["r_result"]
     if r.get("outcome") == "WIN":
-        return r.get("rr") or 0.0
+        return _rr_of(r)
     return -1.0
 
 
