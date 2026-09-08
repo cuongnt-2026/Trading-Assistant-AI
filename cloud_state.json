@@ -22,6 +22,7 @@
     "crossed_ts": "2026-09-04 13:30:00"
   },
   "EMACROSS XAUUSD H1": {
-    "about_ts": "2026-09-08 03:00:00"
+    "about_ts": null,
+    "crossed_ts": "2026-09-08 04:00:00"
   }
 }
