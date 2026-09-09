@@ -1153,5 +1153,23 @@
     "risk_reward": "1 : 3",
     "confidence": null,
     "outcome": "OPEN"
+  },
+  {
+    "time": "2026-09-09 12:16 UTC",
+    "candle_time": "2026-09-09 09:00:00",
+    "symbol": "EURUSD",
+    "timeframe": "H4",
+    "action": "SELL",
+    "strategy": "bollinger",
+    "entry": 1.16522,
+    "sl": 1.16614,
+    "tp": 1.16191,
+    "rr": 3.6,
+    "risk_reward": "1 : 3.6",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 10.9,
+    "outcome": "OPEN"
   }
 ]
