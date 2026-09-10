@@ -18,12 +18,12 @@
     "crossed_ts": "2026-09-10 09:00:00"
   },
   "EMACROSS XAUUSD M30": {
-    "about_ts": "2026-09-10 10:30:00",
-    "crossed_ts": "2026-09-09 08:30:00"
+    "about_ts": null,
+    "crossed_ts": "2026-09-10 11:00:00"
   },
   "EMACROSS XAUUSD H1": {
-    "about_ts": "2026-09-10 10:00:00",
-    "crossed_ts": "2026-09-08 06:00:00"
+    "about_ts": null,
+    "crossed_ts": "2026-09-10 11:00:00"
   },
   "bollinger EURUSD H4": "2026-09-09 09:00:00"
 }
