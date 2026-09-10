@@ -1,66 +1,9 @@
 window.TA_DATA = {
-  "updated": "2026-09-10 03:46 UTC",
-  "symbol": "XAUUSD",
+  "updated": "2026-09-10 04:02 UTC",
+  "symbol": "EURUSD",
   "signals": [
     {
-      "time": "2026-09-10 03:45:30",
-      "symbol": "XAUUSD",
-      "timeframe": "M15",
-      "action": "NO_TRADE",
-      "strategy": "breakout",
-      "trend": "SIDEWAYS",
-      "strength": "WEAK",
-      "price": 4406.73727,
-      "ema20": 4408.77423,
-      "ema50": 4405.3018,
-      "ema200": 4399.52151,
-      "adx": 18.58,
-      "atr": 8.0018,
-      "rsi": 48.8,
-      "pattern": "",
-      "reason": "Chua pha vo dinh/day 20 nen",
-      "notified": false
-    },
-    {
-      "time": "2026-09-10 03:45:46",
-      "symbol": "XAUUSD",
-      "timeframe": "M30",
-      "action": "NO_TRADE",
-      "strategy": "breakout",
-      "trend": "SIDEWAYS",
-      "strength": "WEAK",
-      "price": 4406.73727,
-      "ema20": 4406.21206,
-      "ema50": 4401.77681,
-      "ema200": 4405.75558,
-      "adx": 15.74,
-      "atr": 10.56335,
-      "rsi": 51.44,
-      "pattern": "",
-      "reason": "ADX 15.7 yeu - chua co xu huong de breakout",
-      "notified": false
-    },
-    {
-      "time": "2026-09-10 03:45:46",
-      "symbol": "XAUUSD",
-      "timeframe": "H1",
-      "action": "NO_TRADE",
-      "strategy": "breakout",
-      "trend": "SIDEWAYS",
-      "strength": "WEAK",
-      "price": 4406.73727,
-      "ema20": 4402.99764,
-      "ema50": 4401.01612,
-      "ema200": 4413.82787,
-      "adx": 12.13,
-      "atr": 15.32233,
-      "rsi": 52.68,
-      "pattern": "",
-      "reason": "ADX 12.1 yeu - chua co xu huong de breakout",
-      "notified": false
-    },
-    {
-      "time": "2026-09-10 03:45:54",
+      "time": "2026-09-10 04:01:36",
       "symbol": "EURUSD",
       "timeframe": "H4",
       "action": "NO_TRADE",
@@ -79,7 +22,7 @@ window.TA_DATA = {
       "notified": false
     },
     {
-      "time": "2026-09-10 03:46:03",
+      "time": "2026-09-10 04:01:46",
       "symbol": "USDJPY",
       "timeframe": "H4",
       "action": "NO_TRADE",
@@ -98,7 +41,7 @@ window.TA_DATA = {
       "notified": false
     },
     {
-      "time": "2026-09-10 03:46:12",
+      "time": "2026-09-10 04:01:55",
       "symbol": "EURUSD",
       "timeframe": "M15",
       "action": "NO_TRADE",
@@ -117,7 +60,7 @@ window.TA_DATA = {
       "notified": false
     },
     {
-      "time": "2026-09-10 03:46:20",
+      "time": "2026-09-10 04:02:04",
       "symbol": "EURUSD",
       "timeframe": "M30",
       "action": "NO_TRADE",
@@ -136,7 +79,7 @@ window.TA_DATA = {
       "notified": false
     },
     {
-      "time": "2026-09-10 03:46:28",
+      "time": "2026-09-10 04:02:13",
       "symbol": "EURUSD",
       "timeframe": "H1",
       "action": "NO_TRADE",
@@ -155,7 +98,7 @@ window.TA_DATA = {
       "notified": false
     },
     {
-      "time": "2026-09-10 03:46:36",
+      "time": "2026-09-10 04:02:22",
       "symbol": "USDJPY",
       "timeframe": "H1",
       "action": "NO_TRADE",
