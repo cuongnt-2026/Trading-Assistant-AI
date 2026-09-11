@@ -1205,7 +1205,9 @@
     "rr": 3.0,
     "risk_reward": "1 : 3",
     "confidence": null,
-    "outcome": "OPEN"
+    "outcome": "WIN",
+    "r_result": 1.128,
+    "exit": 4347.23
   },
   {
     "time": "2026-09-10 10:46 UTC",
@@ -1260,5 +1262,20 @@
     "expected_profit": null,
     "confidence": 11.5,
     "outcome": "WIN"
+  },
+  {
+    "time": "2026-09-11 06:01 UTC",
+    "candle_time": "2026-09-11 05:30:00",
+    "symbol": "XAUUSD",
+    "timeframe": "M30",
+    "action": "BUY",
+    "strategy": "supertrend",
+    "entry": 4347.23,
+    "sl": 4299.3,
+    "tp": 4491.02,
+    "rr": 3.0,
+    "risk_reward": "1 : 3",
+    "confidence": null,
+    "outcome": "OPEN"
   }
 ]
