@@ -60,7 +60,9 @@ jobs:
       # de bi cheo gia) VA chi thuc su quet moi 30 phut (EMACROSS_SLOW_SYMBOLS, xem gate
       # trong run_cloud.py), khong phai moi 15 phut. Tong uoc tinh ~703 request/ngay, du
       # ~97 so voi quota 800 (doi EMA_SLOW khong doi so luong request, chi doi cach tinh).
-      EMACROSS_ENABLED: "1"
+      # TAM TAT (2026-09-14): thay bang bo tin hieu M15 moi (EMA20/50/200,
+      # co loc theo che do EMA200) - xem README/tin nhan trao doi voi CuongNT.
+      EMACROSS_ENABLED: "0"
       EMACROSS_PAIRS: "XAUUSD:M15,XAUUSD:M30,XAUUSD:H1,EURUSD:M30,EURUSD:H1,GBPUSD:M30,GBPUSD:H1,USDJPY:M30,USDJPY:H1"
       EMACROSS_SLOW_SYMBOLS: "EURUSD,GBPUSD,USDJPY"
       EMACROSS_EMA_FAST: "20"
