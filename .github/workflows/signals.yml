@@ -67,6 +67,10 @@ jobs:
       EMACROSS_SLOW_SYMBOLS: "EURUSD,GBPUSD,USDJPY"
       EMACROSS_EMA_FAST: "20"
       EMACROSS_EMA_SLOW: "50"
+      # EMA Trend Watch (thay the EMA Cross Watch o tren) - chi XAUUSD M15, EMA20/50/200
+      # loc theo che do EMA200 (xem src/signal/ema_trend_watcher.py).
+      EMATREND_ENABLED: "1"
+      EMATREND_PAIRS: "XAUUSD:M15"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

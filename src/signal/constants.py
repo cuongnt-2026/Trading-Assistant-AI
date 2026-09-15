@@ -122,3 +122,18 @@ SQZ_BB_MULT = float(os.getenv("SQZ_BB_MULT", "2.0"))         # so lan do lech ch
 SQZ_LOOKBACK = int(os.getenv("SQZ_LOOKBACK", "120"))         # so nen lich su dung de xep hang do rong bien
 SQZ_PERCENTILE = float(os.getenv("SQZ_PERCENTILE", "20"))    # do rong bien phai thuoc nhom hep nhat x% gan day
 SQZ_BREAKOUT_CLOSE = float(os.getenv("SQZ_BREAKOUT_CLOSE", "0.5"))  # nen breakout: than nen >= 50% bien do nen (dong manh)
+
+# ----- EMA Trend Watch (thay the EMA Cross Watch cu - EMA20/50/200 loc theo che do
+# EMA200 de giam nhieu, chi ap dung XAUUSD M15 - yeu cau CuongNT 2026-09-14, xem
+# src/signal/ema_trend_watcher.py) -----
+EMATREND_EMA_FAST = int(os.getenv("EMATREND_EMA_FAST", "20"))
+EMATREND_EMA_MID = int(os.getenv("EMATREND_EMA_MID", "50"))
+EMATREND_EMA_SLOW = int(os.getenv("EMATREND_EMA_SLOW", "200"))
+# Nguong "sap cat cheo" / "reset" cho cap EMA20/50 (giong quy uoc EMACROSS_NEAR_ATR/
+# RESET_ATR cu, tach constant rieng de tinh chinh doc lap voi bo EMA Cross cu da tat).
+EMATREND_NEAR_ATR = float(os.getenv("EMATREND_NEAR_ATR", "0.3"))
+EMATREND_RESET_ATR = float(os.getenv("EMATREND_RESET_ATR", "0.6"))
+# Nguong hoi tu cho CA 3 duong (tin hieu "triple") + so nen cho sau khi hoi tu de
+# xac nhan thu tu xep hang cuoi cung (mac dinh 3 nen, dung y "3 nen vua cat qua").
+EMATREND_TRIPLE_NEAR_ATR = float(os.getenv("EMATREND_TRIPLE_NEAR_ATR", "0.3"))
+EMATREND_TRIPLE_CONFIRM_BARS = int(os.getenv("EMATREND_TRIPLE_CONFIRM_BARS", "3"))

@@ -179,3 +179,89 @@ def build_ema_cross_email(symbol, timeframe, ev):
     ).format(ef, es, symbol, timeframe, headline, dir_txt, ev["price"], now, ev["candle_time"],
              ef, ev["angle_fast"], es, ev["angle_slow"], eta_line, ev["gap_atr"], ef, es)
     return subject, body
+
+
+def build_ema_trend_email(symbol, timeframe, ev):
+    """Email cho EmaTrendWatcher (EMA20/50/200 loc theo che do EMA200, thay EMA Cross
+    Watch cu). `ev` la dict tra ve tu EmaTrendWatcher.check_triple()/check_cross().
+    KHONG phai tin hieu vao lenh (khong co Entry/SL/TP co san) - chi la nhan dinh/de
+    xuat de nguoi dung tu quyet dinh vao lenh tay."""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ef, em, es = ev["ef"], ev["em"], ev["es"]
+    up = ev["direction"] == "up"
+    de_xuat = "BUY (MUA)" if up else "SELL (BAN)"
+
+    if ev["type"] == "triple":
+        headline = "CA 3 EMA VUA HOI TU ROI TACH RA - {}".format("THUAN TANG" if up else "THUAN GIAM")
+        nhan_dinh = (
+            "Ca 3 duong EMA{}/EMA{}/EMA{} vua hoi tu sat nhau ({} nen truoc), sau {} nen\n"
+            "da tach ra va xep lai HOAN TOAN theo thu tu {} - day la tin hieu HIEM nhung\n"
+            "MANH, thuong bao hieu kha nang xac lap hoac dao chieu mot xu huong lon hon\n"
+            "(khong chi la mot nhip dao dong ngan). Nen cao trach nhiem xem xet vao lenh\n"
+            "theo huong {} tu day, VOI dieu kien cho gia xac nhan them (vd nen dong manh\n"
+            "cung huong, khong chi dua vao mot minh tin hieu nay)."
+        ).format(ef, em, es, ev["confirm_bars"], ev["confirm_bars"],
+                 "EMA{}>EMA{}>EMA{}".format(ef, em, es) if up else "EMA{}<EMA{}<EMA{}".format(ef, em, es),
+                 "TANG" if up else "GIAM")
+        chi_tiet = (
+            "EMA{:<4}: {}\n"
+            "EMA{:<4}: {}\n"
+            "EMA{:<4}: {}\n"
+        ).format(ef, ev["ema_fast"], em, ev["ema_mid"], es, ev["ema_slow"])
+        subject = "{} {} EMA{}/{}/{} TRIPLE {} | {}".format(
+            symbol, timeframe, ef, em, es, "TANG" if up else "GIAM", de_xuat)
+
+    else:
+        headline = "VUA CAT CHEO" if ev["type"] == "crossed" else "SAP CAT CHEO"
+        che_do = "DUOI EMA{} (downtrend)".format(es) if not up else "TREN EMA{} (uptrend)".format(es)
+        if ev["type"] == "crossed":
+            eta_line = ""
+            dong_luc = "vua cat"
+        else:
+            eta_txt = "~{:g} nen nua".format(ev["eta_bars"]) if ev.get("eta_bars") else "chua uoc tinh duoc"
+            eta_line = "Du kien       : con {} se cham nhau (ngoai suy tuyen tinh - CHI tham\n                khao, gia co the doi chieu bat ky luc nao)\n".format(eta_txt)
+            dong_luc = "sap"
+        nhan_dinh = (
+            "EMA{} va EMA{} deu dang nam {} - xac nhan xu huong {} da on dinh o khung\n"
+            "lon hon. Trong boi canh do, EMA{} {} cat {} EMA{} - dong luc ngan han dang\n"
+            "{} theo dung huong trend, cung co kha nang gia se tiep tuc di theo huong nay.\n"
+            "De xuat: canh nhap {} theo trend, dat SL qua dinh/day gan nhat, KHONG vao\n"
+            "nguoc huong trend lon (EMA{}/EMA{} so voi EMA{})."
+        ).format(ef, em, che_do, "GIAM" if not up else "TANG",
+                 ef, dong_luc, "XUONG DUOI" if not up else "LEN TREN", em,
+                 "manh len" if not up else "manh len",
+                 de_xuat, ef, em, es)
+        chi_tiet = (
+            "EMA{:<4}: {}\n"
+            "EMA{:<4}: {}\n"
+            "EMA{:<4}: {}\n"
+            "Khoang cach EMA{}/EMA{}: {} x ATR\n"
+            "{}"
+        ).format(ef, ev["ema_fast"], em, ev["ema_mid"], es, ev["ema_slow"],
+                 ef, em, ev["gap_atr"], eta_line)
+        subject = "{} {} EMA{}/{} {} ({}) | {}".format(
+            symbol, timeframe, ef, em, headline, "GIAM" if not up else "TANG", de_xuat)
+
+    body = (
+        "========================================\n"
+        "   TRADING ASSISTANT AI - EMA TREND WATCH\n"
+        "========================================\n\n"
+        "Symbol        : {}\n"
+        "Khung TG      : {}\n"
+        "Tin hieu      : {}\n"
+        "De xuat       : {}\n"
+        "Gia hien tai  : {}\n"
+        "Thoi diem     : {}\n"
+        "Nen tin hieu  : {}\n\n"
+        "---------- NHAN DINH THI TRUONG ----------\n"
+        "{}\n\n"
+        "---------- CHI TIET CHI BAO ----------\n"
+        "{}\n"
+        "========================================\n"
+        "Luu y QUAN TRONG: day CHI la canh bao/nhan dinh ky thuat dua tren EMA{}/{}/{},\n"
+        "KHONG phai tin hieu vao lenh co san Entry/SL/TP tu dong - ban tu quyet dinh va\n"
+        "tu quan ly rui ro (SL/khoi luong) khi vao lenh tay.\n"
+        "-- Trading Assistant AI (EMA Trend Watch)"
+    ).format(symbol, timeframe, headline, de_xuat, ev["price"], now, ev["candle_time"],
+             nhan_dinh, chi_tiet, ef, em, es)
+    return subject, body

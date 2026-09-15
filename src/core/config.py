@@ -151,6 +151,13 @@ class Config:
         self.emacross_slow_symbols = set(_split(os.getenv(
             "EMACROSS_SLOW_SYMBOLS", "EURUSD,GBPUSD,USDJPY")))
 
+        # ----- EMA Trend Watch (thay the EMA Cross Watch o tren - da tat EMACROSS_ENABLED.
+        # Chi XAUUSD M15 theo yeu cau CuongNT (2026-09-14): mot nguon mail duy nhat, don
+        # gian, dung EMA20/50/200 loc theo che do EMA200 de giam nhieu so voi ban cross
+        # 20/50 tho truoc day. Xem src/signal/ema_trend_watcher.py.) -----
+        self.ematrend_enabled = os.getenv("EMATREND_ENABLED", "1").strip() not in ("0", "false", "")
+        self.ematrend_pairs = _parse_pairs(os.getenv("EMATREND_PAIRS", "XAUUSD:M15"))
+
         # ----- Duong dan output -----
         self.reports_dir = os.getenv("REPORTS_DIR", "reports")
         self.dashboard_data = os.getenv("DASHBOARD_DATA", "dashboard/data.js")

@@ -17,9 +17,11 @@ from src.signal.constants import BUY, SELL
 from src.ai_review.recommender import Recommender
 from src.trade.trade_service import TradeService
 from src.notifier.factory import create_notifier
-from src.notifier.messages import build_signal_email, build_supertrend_email, build_ema_cross_email
+from src.notifier.messages import (build_signal_email, build_supertrend_email,
+                                   build_ema_cross_email, build_ema_trend_email)
 from src.signal.supertrend import supertrend
 from src.signal.ema_cross_watcher import EmaCrossWatcher
+from src.signal.ema_trend_watcher import EmaTrendWatcher
 from src.trade.outcome import OutcomeEvaluator, OPEN
 
 STATE_PATH = "cloud_state.json"
@@ -103,6 +105,31 @@ def _send_test_mail(cfg, notifier):
     subj2 = "[CLOUD TEST] " + subj2
     ok2 = notifier.send(subj2, body2) if notifier else False
     print("MAIL THU (EMA Cross Watch) -> {}".format("DA GUI OK" if ok2 else "THAT BAI/khong co notifier"))
+
+    # Mail thu rieng cho EMA Trend Watch (mau minh hoa, khong phai du lieu that)
+    from src.signal.constants import EMATREND_EMA_FAST, EMATREND_EMA_MID, EMATREND_EMA_SLOW
+    ev3 = {
+        "type": "crossed", "direction": "down", "price": 4271.95,
+        "candle_time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        "gap_atr": -0.09,
+        "ema_fast": 4290.2, "ema_mid": 4308.3, "ema_slow": 4340.9,
+        "ef": EMATREND_EMA_FAST, "em": EMATREND_EMA_MID, "es": EMATREND_EMA_SLOW,
+    }
+    subj3, body3 = build_ema_trend_email("XAUUSD", "M15", ev3)
+    subj3 = "[CLOUD TEST] " + subj3
+    ok3 = notifier.send(subj3, body3) if notifier else False
+    print("MAIL THU (EMA Trend Watch - cross) -> {}".format("DA GUI OK" if ok3 else "THAT BAI/khong co notifier"))
+
+    ev4 = {
+        "type": "triple", "direction": "up", "price": 4271.95,
+        "candle_time": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        "ema_fast": 4292.1, "ema_mid": 4290.4, "ema_slow": 4288.7, "confirm_bars": 3,
+        "ef": EMATREND_EMA_FAST, "em": EMATREND_EMA_MID, "es": EMATREND_EMA_SLOW,
+    }
+    subj4, body4 = build_ema_trend_email("XAUUSD", "M15", ev4)
+    subj4 = "[CLOUD TEST] " + subj4
+    ok4 = notifier.send(subj4, body4) if notifier else False
+    print("MAIL THU (EMA Trend Watch - triple) -> {}".format("DA GUI OK" if ok4 else "THAT BAI/khong co notifier"))
 
 
 def write_dashboard(snapshot, signals_log, path="dashboard/data.js"):
@@ -339,6 +366,61 @@ def _scan_ema_cross(sym, tf, cfg, state, notifier, cache):
     return 0
 
 
+def _scan_ema_trend(sym, tf, cfg, state, notifier, cache):
+    """EMA Trend Watch: thay the EMA Cross Watch cu, dua tren EMA20/50/200 loc theo
+    che do EMA200 (xem src/signal/ema_trend_watcher.py). Quet DOC LAP, dung chung
+    cache nen voi cac khu vuc khac trong lan chay nay."""
+    try:
+        candles = _fetch_cached(cache, sym, tf, cfg)
+    except Exception as e:
+        print("[WARN] {} {} [ematrend] fetch loi: {}".format(sym, tf, e))
+        return 0
+    if not candles or len(candles) < 210:
+        print("[WARN] {} {} [ematrend] khong du nen ({})".format(
+            sym, tf, len(candles) if candles else 0))
+        return 0
+
+    sent = 0
+    key_triple = "EMATREND-TRIPLE {} {}".format(sym, tf)
+    key_cross = "EMATREND-CROSS {} {}".format(sym, tf)
+
+    try:
+        ev = EmaTrendWatcher.check_triple(candles, state, key_triple)
+    except Exception as e:
+        print("[WARN] {} {} [ematrend-triple] check loi: {}".format(sym, tf, e))
+        ev = None
+    if ev:
+        subject, body = build_ema_trend_email(sym, tf, ev)
+        subject = "[CLOUD][EMA-TREND] " + subject
+        ok = notifier.send(subject, body) if notifier else False
+        print("  {} {} [ematrend-triple] {} -> GUI MAIL: {}".format(
+            sym, tf, ev["direction"], "OK" if ok else "FAIL"))
+        if ok:
+            sent += 1
+
+    try:
+        ev = EmaTrendWatcher.check_cross(candles, state, key_cross)
+    except Exception as e:
+        print("[WARN] {} {} [ematrend-cross] check loi: {}".format(sym, tf, e))
+        ev = None
+    if ev:
+        subject, body = build_ema_trend_email(sym, tf, ev)
+        subject = "[CLOUD][EMA-TREND] " + subject
+        ok = notifier.send(subject, body) if notifier else False
+        print("  {} {} [ematrend-cross] {} {} -> GUI MAIL: {}".format(
+            sym, tf, ev["type"], ev["direction"], "OK" if ok else "FAIL"))
+        if ok:
+            st = state.setdefault(key_cross, {})
+            if ev["type"] == "crossed":
+                st["crossed_ts"] = ev["_ts"]
+                st["about_ts"] = None
+            else:
+                st["about_ts"] = ev["_ts"]
+            sent += 1
+
+    return sent
+
+
 def main():
     cfg = Config()
     notifier = create_notifier(cfg)
@@ -535,6 +617,16 @@ def main():
                 sent += _scan_ema_cross(sym, tf, cfg, state, notifier, cache)
             except Exception as e:
                 print("[WARN] emacross {} {}: {}".format(sym, tf, e))
+
+    # ----- EMA Trend Watch: thay the EMA Cross Watch (khi EMACROSS_ENABLED=0), dua
+    # tren EMA20/50/200 loc theo che do EMA200 - xem src/signal/ema_trend_watcher.py.
+    # Mac dinh chi XAUUSD M15 (EMATREND_PAIRS). -----
+    if cfg.ematrend_enabled:
+        for sym, tf in cfg.ematrend_pairs:
+            try:
+                sent += _scan_ema_trend(sym, tf, cfg, state, notifier, cache)
+            except Exception as e:
+                print("[WARN] ematrend {} {}: {}".format(sym, tf, e))
 
     try:
         save_state(state)
