@@ -1413,6 +1413,23 @@
     "rr": 3.0,
     "risk_reward": "1 : 3",
     "confidence": null,
+    "outcome": "LOSS",
+    "r_result": -0.514,
+    "exit": 4283.29
+  },
+  {
+    "time": "2026-09-15 07:45 UTC",
+    "candle_time": "2026-09-15 07:30:00",
+    "symbol": "XAUUSD",
+    "timeframe": "M30",
+    "action": "SELL",
+    "strategy": "supertrend",
+    "entry": 4283.29,
+    "sl": 4314.25,
+    "tp": 4190.41,
+    "rr": 3.0,
+    "risk_reward": "1 : 3",
+    "confidence": null,
     "outcome": "OPEN"
   }
 ]
