@@ -437,7 +437,7 @@ def _scan_ema_trend(sym, tf, cfg, state, notifier, cache, ematrend_history):
         print("  {} {} [ematrend-triple] {} -> GUI MAIL: {}".format(
             sym, tf, ev["direction"], "OK" if ok else "FAIL"))
         if ok:
-            record_event(ematrend_history, sym, tf, ev)
+            record_event(ematrend_history, sym, tf, ev, candles)
             sent += 1
 
     try:
@@ -459,7 +459,7 @@ def _scan_ema_trend(sym, tf, cfg, state, notifier, cache, ematrend_history):
                 st["about_ts"] = None
             else:
                 st["about_ts"] = ev["_ts"]
-            record_event(ematrend_history, sym, tf, ev)
+            record_event(ematrend_history, sym, tf, ev, candles)
             sent += 1
 
     return sent

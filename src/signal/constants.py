@@ -138,11 +138,23 @@ EMATREND_RESET_ATR = float(os.getenv("EMATREND_RESET_ATR", "0.6"))
 EMATREND_TRIPLE_NEAR_ATR = float(os.getenv("EMATREND_TRIPLE_NEAR_ATR", "0.3"))
 EMATREND_TRIPLE_CONFIRM_BARS = int(os.getenv("EMATREND_TRIPLE_CONFIRM_BARS", "3"))
 # Cham "dung/sai" cho tin hieu EMA Trend Watch (xem src/signal/ema_trend_tracker.py)
-# theo kieu R:R that (giong 1 lenh co SL/TP ao), KHONG doi xung 1:1 - theo yeu cau
-# CuongNT (2026-09-16): "dung" phai kho hon "sai", giong danh doi rui ro/loi nhuan
-# that. RISK_ATR = khoang cach SL_ao (boi so ATR); RR = ty le loi nhuan/rui ro, TP_ao
-# = risk * RR (vd RISK=0.5, RR=2.0 -> SL cach 0.5xATR, TP cach 1.0xATR, ty le 1:2).
-EMATREND_EVAL_RISK_ATR = float(os.getenv("EMATREND_EVAL_RISK_ATR", "0.5"))
+# theo kieu R:R that (giong 1 lenh co SL/TP ao), KHONG doi xung 1:1 va KHONG dung
+# 1 boi so ATR co dinh cho SL - theo phan hoi CuongNT (2026-09-16, cap nhat lan 2):
+# (1) "dung" phai kho hon "sai" (R:R that); (2) SL/TP phai tinh theo CAU TRUC gia +
+# nen gan nhat (swing high/low), KHONG phai mot con so ATR co dinh moi lan - dung
+# LAI dung logic RiskManager.dynamic_levels() dang dung cho lenh THAT (xem
+# src/trade/risk_manager.py) de nhat quan trong toan bo du an:
+#   SL_ao = swing high/low gan nhat (EMATREND_EVAL_SWING_LOOKBACK nen) +/- dem ATR
+#           (EMATREND_EVAL_SL_ATR_BUFFER), nhung KHONG duoc gan hon
+#           EMATREND_EVAL_MIN_RISK_ATR x ATR (san rui ro toi thieu, tranh SL qua sat
+#           bi quet rau nen ngay lap tuc).
+#   TP_ao = khang cu/ho tro doi dien gan nhat (EMATREND_EVAL_TP_LOOKBACK nen) NEU no
+#           cho RR >= EMATREND_EVAL_RR; neu khong (cau truc qua gan hoac khong co) ->
+#           ep TP_ao = risk x EMATREND_EVAL_RR (san R:R toi thieu).
+EMATREND_EVAL_SWING_LOOKBACK = int(os.getenv("EMATREND_EVAL_SWING_LOOKBACK", "5"))
+EMATREND_EVAL_SL_ATR_BUFFER = float(os.getenv("EMATREND_EVAL_SL_ATR_BUFFER", "0.5"))
+EMATREND_EVAL_MIN_RISK_ATR = float(os.getenv("EMATREND_EVAL_MIN_RISK_ATR", "1.0"))
+EMATREND_EVAL_TP_LOOKBACK = int(os.getenv("EMATREND_EVAL_TP_LOOKBACK", "40"))
 EMATREND_EVAL_RR = float(os.getenv("EMATREND_EVAL_RR", "2.0"))
 # Qua so nen nay (tren M15) ma van chua cham SL_ao/TP_ao nao -> tinh "het_han" (khong
 # ket luan duoc, khong tinh vao ty le dung/sai). Mac dinh 96 nen ~ 1 ngay.

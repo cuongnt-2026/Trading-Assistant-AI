@@ -241,13 +241,18 @@
         <div class="card"><div class="k">🎯 Tỷ lệ đúng</div><div class="v" id="etAcc">—</div></div>
       </div>
       <div class="panel">
-        <h3>Cách chấm điểm <span class="sub">giống 1 lệnh có SL/TP ảo, không phải ngưỡng đối xứng 1:1</span></h3>
+        <h3>Cách chấm điểm <span class="sub">giống 1 lệnh có SL/TP ảo, đặt theo cấu trúc giá — không phải 1 con số ATR cố định</span></h3>
         <div class="muted" style="font-size:12px;line-height:1.7">
-          Mỗi tín hiệu được gán 1 "lệnh ảo" theo đúng hướng dự đoán: SL ảo cách
-          <b id="etRisk">0.5</b>×ATR (lúc báo tín hiệu), TP ảo cách <b id="etReward">1.0</b>×ATR
-          — tức tỷ lệ R:R <b>1 : <span id="etRR">2.0</span></b> (đúng phải "ăn" nhiều hơn sai, không phải 50/50).
+          Mỗi tín hiệu được gán 1 "lệnh ảo" theo đúng hướng dự đoán, với SL/TP tính giống hệt
+          cách đặt SL/TP cho lệnh thật trong hệ thống (RiskManager): <b>SL ảo</b> = đỉnh/đáy gần
+          nhất (swing) trước đó, cộng đệm ATR chống quét râu nến, nhưng không được gần hơn 1
+          mức rủi ro tối thiểu; <b>TP ảo</b> = kháng cự/hỗ trợ đối diện gần nhất nếu đủ tỷ lệ
+          R:R tối thiểu <b>1 : <span id="etRR">2.0</span></b>, nếu cấu trúc quá gần thì lấy đúng
+          mốc R:R đó làm TP. Vì vậy SL/TP ảo của mỗi tín hiệu <b>khác nhau</b>, tùy theo hình
+          dạng nến/thị trường lúc đó — không cố định.
           Nến nào chạm TP ảo trước → <b style="color:var(--buy)">Đúng</b>; chạm SL ảo trước (hoặc chạm cả 2 cùng 1 nến) →
           <b style="color:var(--sell)">Sai</b>; quá <b id="etMaxBars">96</b> nến (~1 ngày) chưa chạm gì → <span class="muted">Hết hạn</span> (không tính vào tỷ lệ).
+          R:R thực tế trung bình đạt được: <b id="etAvgRR">—</b>.
         </div>
       </div>
       <div class="panel">
@@ -523,9 +528,8 @@
     setTxt('etDung', et.overall_dung||0);
     setTxt('etSai', et.overall_sai||0);
     setTxt('etAcc', et.overall_accuracy_pct!=null? et.overall_accuracy_pct+'%':'—');
-    setTxt('etRisk', (et.risk_atr!=null?et.risk_atr:'—'));
-    setTxt('etReward', (et.risk_atr!=null&&et.rr!=null)? (et.risk_atr*et.rr).toFixed(2) : '—');
-    setTxt('etRR', et.rr!=null? et.rr : '—');
+    setTxt('etRR', et.rr_target!=null? et.rr_target : '—');
+    setTxt('etAvgRR', et.avg_rr_actual!=null? ('1 : '+et.avg_rr_actual) : '—');
     setTxt('etMaxBars', et.max_bars!=null? et.max_bars : '—');
 
     const kindLabel=(k)=> k==='triple' ? '3 EMA hội tụ' : 'EMA20/50 cắt';
@@ -562,13 +566,17 @@
         <td>${kindLabel(r.kind)}</td>
         <td style="color:${r.direction==='up'?'var(--buy)':'var(--sell)'}">${dirLabel(r.direction)}</td>
         <td>${r.signal_price!=null?Number(r.signal_price).toFixed(2):'—'}</td>
-        <td class="muted" style="font-size:11px">SL ${r.sl!=null?Number(r.sl).toFixed(2):'—'} / TP ${r.tp!=null?Number(r.tp).toFixed(2):'—'}</td>
+        <td class="muted" style="font-size:11px">
+          SL ${r.sl!=null?Number(r.sl).toFixed(2):'—'}${r.sl_source?' <span style="opacity:.7">('+r.sl_source+')</span>':''}
+          / TP ${r.tp!=null?Number(r.tp).toFixed(2):'—'}${r.tp_source?' <span style="opacity:.7">('+r.tp_source+')</span>':''}
+          ${r.rr!=null?' — R:R 1:'+r.rr:''}
+        </td>
         <td>${resultBadge(r.result)}</td>
       </tr>`;
     }).join('');
     const rtEl=document.getElementById('etRecentTable');
     if(rtEl) rtEl.innerHTML = recentRows ?
-      `<table><thead><tr><th>Thời điểm</th><th>Cặp</th><th>Loại</th><th>Hướng</th><th>Giá lúc báo</th><th>SL/TP ảo</th><th>Kết quả</th></tr></thead><tbody>${recentRows}</tbody></table>`
+      `<table><thead><tr><th>Thời điểm</th><th>Cặp</th><th>Loại</th><th>Hướng</th><th>Giá lúc báo</th><th>SL/TP ảo (nguồn gốc)</th><th>Kết quả</th></tr></thead><tbody>${recentRows}</tbody></table>`
       : '<div class="empty">Chưa có tín hiệu nào.</div>';
   }
 

@@ -1,19 +1,32 @@
 # -*- coding: utf-8 -*-
 """
 EmaTrendTracker - theo doi "dung/sai" cho tin hieu EmaTrendWatcher (xem
-ema_trend_watcher.py). Theo yeu cau CuongNT (2026-09-15, cap nhat lai
-2026-09-16 sau phan hoi): muon "dung" phai AN NANG hon "sai" theo kieu
-R:R that (giong 1 lenh co SL/TP that), KHONG phai nguong doi xung (truoc day
-ca 2 phia dung chung 1 nguong = R:R 1:1).
+ema_trend_watcher.py). Lich su thay doi cach cham diem (theo phan hoi CuongNT):
 
-Cach cham diem MOI (gia lap 1 "lenh ao" theo dung huong tin hieu, dung SL/TP
-"ao" tinh tu ATR - CHUA tung la lenh that, chi la thuoc do tham khao):
+  v1 (2026-09-15): "chua_ro" trong 1 khoang ATR doi xung quanh gia tin hieu, kiem
+      tra tai 3 moc thoi gian co dinh (1h/4h/1 ngay).
+  v2 (2026-09-16): doi sang "lenh ao" co SL/TP, nhung SL/TP la MOT BOI SO ATR CO
+      DINH (vd luon 0.5xATR) - CuongNT phan hoi dung the la chua on: "sl dat sao
+      cho ko duoc, phai tinh duoc quy luat dat sl/tp, khong phai co dinh luc nao
+      cung chung do, ma tuy thi truong/nen".
+  v3 (hien tai): SL/TP AO tinh THEO CAU TRUC GIA THAT (swing high/low + khang cu/
+      ho tro gan nhat), dung LAI CHINH XAC logic RiskManager.dynamic_levels() dang
+      dung cho lenh THAT trong he thong (xem src/trade/risk_manager.py) - de nhat
+      quan va vi day la cach dat SL/TP da duoc kiem chung, khong phai bia moi:
 
-    risk  = EMATREND_EVAL_RISK_ATR  x ATR (luc ban tin hieu)   - vd 0.5 x ATR
-    reward= risk x EMATREND_EVAL_RR                            - vd risk x 2 = 1.0 x ATR
+        SL_ao = swing high/low gan nhat trong EMATREND_EVAL_SWING_LOOKBACK nen
+                truoc tin hieu, +/- dem EMATREND_EVAL_SL_ATR_BUFFER x ATR (dem
+                chong "quet rau nen"). Khong duoc gan hon
+                EMATREND_EVAL_MIN_RISK_ATR x ATR (san rui ro toi thieu - neu swing
+                gan sat gia thi ep SL ra xa hon, tranh bi quet ngay tuc khac).
+                -> SL_ao BIEN DOI theo tung tin hieu, KHONG con la 1 con so co
+                   dinh nhu ban truoc.
 
-    Tin hieu "up" (BUY):  SL_ao = gia_tin_hieu - risk   TP_ao = gia_tin_hieu + reward
-    Tin hieu "down"(SELL):SL_ao = gia_tin_hieu + risk   TP_ao = gia_tin_hieu - reward
+        TP_ao = khang cu (BUY) / ho tro (SELL) gan nhat trong
+                EMATREND_EVAL_TP_LOOKBACK nen truoc tin hieu, NEU muc do cho ty
+                le R:R >= EMATREND_EVAL_RR; neu khong (cau truc qua gan hoac
+                khong ro) -> ep TP_ao = risk x EMATREND_EVAL_RR (san R:R toi
+                thieu, giong yeu cau "dung phai kho hon sai" cua CuongNT).
 
 Sau do quet cac nen KE TIEP (dung high/low tung nen, giong het OutcomeEvaluator
 dung cho lenh that o src/trade/outcome.py - de nhat quan quy uoc trong toan bo
@@ -22,16 +35,10 @@ cham CA HAI -> tinh "sai" (bao thu, uu tien rui ro - giong OutcomeEvaluator).
 Neu qua EMATREND_EVAL_MAX_BARS nen (mac dinh 96 nen ~ 1 ngay tren M15) van
 chua cham gi ca -> "het_han" (khong ket luan duoc, KHONG tinh vao ty le).
 
-Vi du cu the (dung so ATR THAT cua XAUUSD M15 luc viet, ~8.1 - xem giai thich
-rieng voi CuongNT ve vi sao 0.3/0.09 la TY LE (boi so ATR) chu khong phai gia
-USD, thuc te ra gia USD phai NHAN voi ATR):
-
-    Tin hieu "cross" BUY luc 10:00, gia = 4300.0, ATR = 8.1.
-    RISK_ATR=0.5 -> risk = 0.5*8.1 = 4.05   -> SL_ao = 4300.0 - 4.05 = 4295.95
-    RR=2.0       -> reward = 4.05*2 = 8.10  -> TP_ao = 4300.0 + 8.10 = 4308.10
-        - Neu gia cham 4308.10 TRUOC khi cham 4295.95 (theo thu tu nen) -> "dung".
-        - Neu gia cham 4295.95 truoc (hoac ca 2 trong cung 1 nen)       -> "sai".
-        - Neu sau 96 nen (~1 ngay) van lung lay giua 2 muc do             -> "het_han".
+QUAN TRONG (tranh nhin-truoc-tuong-lai/lookahead bias): SL/TP ao CHI duoc tinh
+tu cac nen CO SAN TAI THOI DIEM ban tin hieu (candles[:idx_tin_hieu+1], KHONG
+dung bat ky nen nao SAU do) - dung y nghia "neu la lenh that thi luc do minh chi
+biet duoc bay nhieu thong tin nay thoi".
 
 Luu vao 1 file JSON rieng (ematrend_history.json, xem run_cloud.py) - KHONG dung
 chung voi cloud_signals.json (file danh cho lenh that co Entry/SL/TP/Win-Loss).
@@ -41,7 +48,9 @@ de hien thi ty le tren dashboard cho CuongNT tu danh gia.
 from datetime import datetime
 
 from src.signal.constants import (
-    EMATREND_EVAL_RISK_ATR, EMATREND_EVAL_RR, EMATREND_EVAL_MAX_BARS,
+    EMATREND_EVAL_SWING_LOOKBACK, EMATREND_EVAL_SL_ATR_BUFFER,
+    EMATREND_EVAL_MIN_RISK_ATR, EMATREND_EVAL_TP_LOOKBACK, EMATREND_EVAL_RR,
+    EMATREND_EVAL_MAX_BARS,
 )
 
 PENDING = "pending"
@@ -50,14 +59,55 @@ SAI = "sai"
 HET_HAN = "het_han"
 
 
-def record_event(history, symbol, timeframe, ev):
+def _virtual_levels(direction, price0, atr, candles_upto_signal):
+    """Tinh SL_ao/TP_ao theo CAU TRUC (swing + khang cu/ho tro), y het
+    RiskManager.dynamic_levels() dung cho lenh that - xem docstring module.
+    `candles_upto_signal` PHAI la danh sach nen tinh DEN VA BAO GOM nen tin hieu
+    (khong duoc chua nen nao sau do, tranh lookahead bias)."""
+    recent = candles_upto_signal[-EMATREND_EVAL_SWING_LOOKBACK:]
+    wide = (candles_upto_signal[-EMATREND_EVAL_TP_LOOKBACK:]
+            if len(candles_upto_signal) >= EMATREND_EVAL_TP_LOOKBACK else candles_upto_signal)
+
+    if direction == "up":
+        swing_low = min(c.low for c in recent)
+        sl = swing_low - EMATREND_EVAL_SL_ATR_BUFFER * atr
+        sl = min(sl, price0 - EMATREND_EVAL_MIN_RISK_ATR * atr)   # san rui ro toi thieu
+        sl_source = "swing-ATR"
+        risk = price0 - sl
+
+        resistance = max(c.high for c in wide)
+        if resistance > price0 + 0.1 * atr and (resistance - price0) >= EMATREND_EVAL_RR * risk:
+            tp, tp_source = resistance, "structure"
+        else:
+            tp, tp_source = price0 + EMATREND_EVAL_RR * risk, "rr{:g}".format(EMATREND_EVAL_RR)
+    else:
+        swing_high = max(c.high for c in recent)
+        sl = swing_high + EMATREND_EVAL_SL_ATR_BUFFER * atr
+        sl = max(sl, price0 + EMATREND_EVAL_MIN_RISK_ATR * atr)
+        sl_source = "swing-ATR"
+        risk = sl - price0
+
+        support = min(c.low for c in wide)
+        if support < price0 - 0.1 * atr and (price0 - support) >= EMATREND_EVAL_RR * risk:
+            tp, tp_source = support, "structure"
+        else:
+            tp, tp_source = price0 - EMATREND_EVAL_RR * risk, "rr{:g}".format(EMATREND_EVAL_RR)
+
+    rr_actual = round(abs(tp - price0) / risk, 2) if risk else None
+    return sl, tp, sl_source, tp_source, risk, rr_actual
+
+
+def record_event(history, symbol, timeframe, ev, candles):
     """Tao 1 ban ghi moi cho tin hieu vua ban (ev tu EmaTrendWatcher.check_triple()/
-    check_cross(), da duoc _scan_ema_trend gan them ev["atr"] = ATR tai thoi diem do).
+    check_cross(), da duoc _scan_ema_trend gan them ev["atr"] = ATR tai thoi diem
+    do). `candles` la danh sach nen dung de PHAT HIEN tin hieu nay (nen cuoi cung =
+    nen tin hieu, KHONG chua nen nao sau do) - dung de tinh SL/TP ao theo cau truc.
+
     Goi ngay sau khi GUI MAIL THANH CONG (giong quy uoc cap nhat `state` trong
     run_cloud.py) - neu mail loi va tin hieu duoc thu lai o lan chay sau, candle_time
     khong doi nen se bi chan trung boi kiem tra id ben duoi, khong ghi 2 lan.
 
-    Tra ve ban ghi vua tao, hoac None neu da ton tai (trung id) hoac thieu ATR.
+    Tra ve ban ghi vua tao, hoac None neu da ton tai (trung id) hoac thieu du lieu.
     """
     records = history.setdefault("records", [])
     rec_id = "{}-{}-{}-{}".format(symbol, timeframe, ev.get("_ts", ev.get("candle_time")),
@@ -68,15 +118,10 @@ def record_event(history, symbol, timeframe, ev):
     atr = ev.get("atr")
     price0 = ev.get("price")
     direction = ev.get("direction")
-    if not atr or price0 is None or direction not in ("up", "down"):
+    if not atr or price0 is None or direction not in ("up", "down") or not candles:
         return None  # thieu du lieu goc -> khong the tao SL/TP ao, bo qua
 
-    risk = EMATREND_EVAL_RISK_ATR * atr
-    reward = risk * EMATREND_EVAL_RR
-    if direction == "up":
-        sl, tp = price0 - risk, price0 + reward
-    else:
-        sl, tp = price0 + risk, price0 - reward
+    sl, tp, sl_source, tp_source, risk, rr_actual = _virtual_levels(direction, price0, atr, candles)
 
     rec = {
         "id": rec_id,
@@ -88,10 +133,12 @@ def record_event(history, symbol, timeframe, ev):
         "signal_time": ev.get("candle_time"),
         "signal_price": price0,
         "atr": atr,
-        "risk_atr": EMATREND_EVAL_RISK_ATR,
-        "rr": EMATREND_EVAL_RR,
         "sl": round(sl, 5),
         "tp": round(tp, 5),
+        "sl_source": sl_source,
+        "tp_source": tp_source,
+        "risk": round(risk, 5),
+        "rr": rr_actual,
         "result": PENDING,
         "resolved_time": None,
         "resolved_bars": None,
@@ -195,6 +242,9 @@ def compute_stats(history, symbol=None, timeframe=None, recent_limit=20):
     total_eval = total_dung + total_sai
     overall_acc = round(total_dung / total_eval * 100, 1) if total_eval else None
 
+    rr_vals = [r["rr"] for r in records if isinstance(r.get("rr"), (int, float))]
+    avg_rr = round(sum(rr_vals) / len(rr_vals), 2) if rr_vals else None
+
     recent = sorted(records, key=lambda r: r.get("signal_time") or "", reverse=True)[:recent_limit]
 
     return {
@@ -204,7 +254,7 @@ def compute_stats(history, symbol=None, timeframe=None, recent_limit=20):
         "overall_sai": total_sai,
         "by_kind_direction": by_kind_direction,
         "recent": recent,
-        "risk_atr": EMATREND_EVAL_RISK_ATR,
-        "rr": EMATREND_EVAL_RR,
+        "rr_target": EMATREND_EVAL_RR,     # R:R toi thieu ap dung (san), xem docstring
+        "avg_rr_actual": avg_rr,           # R:R thuc te trung binh (co the > target neu TP theo cau truc xa hon)
         "max_bars": EMATREND_EVAL_MAX_BARS,
     }
