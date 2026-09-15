@@ -1,43 +1,37 @@
 # -*- coding: utf-8 -*-
 """
 EmaTrendTracker - theo doi "dung/sai" cho tin hieu EmaTrendWatcher (xem
-ema_trend_watcher.py). Theo yeu cau CuongNT (2026-09-15): muon biet cac tin hieu
-EMA moi (cross/triple) ban ra co thuc su dung huong hay khong, de co so ma tin
-tuong (hoac nghi ngo) khi doc mail.
+ema_trend_watcher.py). Theo yeu cau CuongNT (2026-09-15, cap nhat lai
+2026-09-16 sau phan hoi): muon "dung" phai AN NANG hon "sai" theo kieu
+R:R that (giong 1 lenh co SL/TP that), KHONG phai nguong doi xung (truoc day
+ca 2 phia dung chung 1 nguong = R:R 1:1).
 
-Tin hieu EMA Trend Watch KHONG phai lenh co san Entry/SL/TP nen khong the cham
-Win/Loss/R nhu cac chien luoc khac (Supertrend/Breakout/Trend...). Thay vao do,
-module nay do xem SAU khi tin hieu ban ra, gia co thuc su di DUNG huong du doan
-(BUY/SELL) hay khong, tai 3 moc thoi gian co dinh (tinh theo so nen M15):
+Cach cham diem MOI (gia lap 1 "lenh ao" theo dung huong tin hieu, dung SL/TP
+"ao" tinh tu ATR - CHUA tung la lenh that, chi la thuoc do tham khao):
 
-    h1 = 4  nen sau khi tin hieu  (~1 gio)
-    h4 = 16 nen sau khi tin hieu  (~4 gio)
-    d1 = 96 nen sau khi tin hieu  (~1 ngay)
+    risk  = EMATREND_EVAL_RISK_ATR  x ATR (luc ban tin hieu)   - vd 0.5 x ATR
+    reward= risk x EMATREND_EVAL_RR                            - vd risk x 2 = 1.0 x ATR
 
-Quy tac cham diem tai moi moc: so gia luc do voi gia luc ban tin hieu, doi ra
-BOI SO ATR (ATR tai thoi diem ban tin hieu, de chuan hoa - khong dung % gia tho
-vi XAUUSD bien dong manh yeu hon/manh hon tuy giai doan):
+    Tin hieu "up" (BUY):  SL_ao = gia_tin_hieu - risk   TP_ao = gia_tin_hieu + reward
+    Tin hieu "down"(SELL):SL_ao = gia_tin_hieu + risk   TP_ao = gia_tin_hieu - reward
 
-    doi_ATR = (gia_luc_do - gia_luc_tin_hieu) / ATR_luc_tin_hieu
-              (dao dau neu tin hieu la "down"/SELL, de "doi_ATR duong" luon
-              nghia la "di dung huong du doan")
+Sau do quet cac nen KE TIEP (dung high/low tung nen, giong het OutcomeEvaluator
+dung cho lenh that o src/trade/outcome.py - de nhat quan quy uoc trong toan bo
+du an): nen nao cham TP_ao TRUOC -> "dung"; cham SL_ao TRUOC -> "sai"; 1 nen
+cham CA HAI -> tinh "sai" (bao thu, uu tien rui ro - giong OutcomeEvaluator).
+Neu qua EMATREND_EVAL_MAX_BARS nen (mac dinh 96 nen ~ 1 ngay tren M15) van
+chua cham gi ca -> "het_han" (khong ket luan duoc, KHONG tinh vao ty le).
 
-    doi_ATR >= +EMATREND_EVAL_ATR_MULT  -> "dung"    (gia di dung huong, du xa)
-    doi_ATR <= -EMATREND_EVAL_ATR_MULT  -> "sai"      (gia di NGUOC huong, du xa)
-    o giua (|doi_ATR| < nguong)          -> "chua_ro" (gia loanh quanh, chua ro
-                                             ret dung/sai - KHONG tinh vao ca 2
-                                             phia de khoi lam ao ty le)
+Vi du cu the (dung so ATR THAT cua XAUUSD M15 luc viet, ~8.1 - xem giai thich
+rieng voi CuongNT ve vi sao 0.3/0.09 la TY LE (boi so ATR) chu khong phai gia
+USD, thuc te ra gia USD phai NHAN voi ATR):
 
-Vi du cu the (xem huong dan trong lich su chat voi CuongNT):
-    Tin hieu "cross" huong up (BUY) luc 10:00, gia luc do = 4270.0, ATR = 3.0.
-    Nguong EMATREND_EVAL_ATR_MULT mac dinh = 0.3 -> can gia doi >= 0.3*3.0 = 0.9
-    (theo dung huong tang) moi tinh la "dung".
-        - Sau 1 gio (10:00 + 4 nen), gia = 4271.5 -> doi_ATR = (4271.5-4270)/3.0
-          = +0.5  -> |0.5| < 0.9 (nguong) -> "chua_ro" (chua du ro rang).
-        - Sau 4 gio, gia = 4273.2 -> doi_ATR = (4273.2-4270)/3.0 = +1.07
-          -> >= +0.9 -> "dung" (gia da tang du ro theo dung huong BUY).
-        - Neu thay vi vay gia lai giam con 4267.0 -> doi_ATR = (4267-4270)/3.0
-          = -1.0 -> <= -0.9 -> "sai" (gia di NGUOC voi du doan BUY).
+    Tin hieu "cross" BUY luc 10:00, gia = 4300.0, ATR = 8.1.
+    RISK_ATR=0.5 -> risk = 0.5*8.1 = 4.05   -> SL_ao = 4300.0 - 4.05 = 4295.95
+    RR=2.0       -> reward = 4.05*2 = 8.10  -> TP_ao = 4300.0 + 8.10 = 4308.10
+        - Neu gia cham 4308.10 TRUOC khi cham 4295.95 (theo thu tu nen) -> "dung".
+        - Neu gia cham 4295.95 truoc (hoac ca 2 trong cung 1 nen)       -> "sai".
+        - Neu sau 96 nen (~1 ngay) van lung lay giua 2 muc do             -> "het_han".
 
 Luu vao 1 file JSON rieng (ematrend_history.json, xem run_cloud.py) - KHONG dung
 chung voi cloud_signals.json (file danh cho lenh that co Entry/SL/TP/Win-Loss).
@@ -46,17 +40,14 @@ de hien thi ty le tren dashboard cho CuongNT tu danh gia.
 """
 from datetime import datetime
 
-from src.signal.constants import EMATREND_EVAL_ATR_MULT
+from src.signal.constants import (
+    EMATREND_EVAL_RISK_ATR, EMATREND_EVAL_RR, EMATREND_EVAL_MAX_BARS,
+)
 
-# (ten_moc, so_nen_sau_tin_hieu) - co the them moc khac o day neu can (vd "d3"=288).
-HORIZONS = [("h1", 4), ("h4", 16), ("d1", 96)]
-
-PENDING_STATES = ("pending", "khong_du_du_lieu")
-
-
-def _empty_eval():
-    return {hk: {"bars": bars, "result": "pending", "price": None, "atr_mult": None}
-            for hk, bars in HORIZONS}
+PENDING = "pending"
+DUNG = "dung"
+SAI = "sai"
+HET_HAN = "het_han"
 
 
 def record_event(history, symbol, timeframe, ev):
@@ -66,7 +57,7 @@ def record_event(history, symbol, timeframe, ev):
     run_cloud.py) - neu mail loi va tin hieu duoc thu lai o lan chay sau, candle_time
     khong doi nen se bi chan trung boi kiem tra id ben duoi, khong ghi 2 lan.
 
-    Tra ve ban ghi vua tao, hoac None neu da ton tai (trung id).
+    Tra ve ban ghi vua tao, hoac None neu da ton tai (trung id) hoac thieu ATR.
     """
     records = history.setdefault("records", [])
     rec_id = "{}-{}-{}-{}".format(symbol, timeframe, ev.get("_ts", ev.get("candle_time")),
@@ -74,41 +65,58 @@ def record_event(history, symbol, timeframe, ev):
     if any(r.get("id") == rec_id for r in records):
         return None
 
+    atr = ev.get("atr")
+    price0 = ev.get("price")
+    direction = ev.get("direction")
+    if not atr or price0 is None or direction not in ("up", "down"):
+        return None  # thieu du lieu goc -> khong the tao SL/TP ao, bo qua
+
+    risk = EMATREND_EVAL_RISK_ATR * atr
+    reward = risk * EMATREND_EVAL_RR
+    if direction == "up":
+        sl, tp = price0 - risk, price0 + reward
+    else:
+        sl, tp = price0 + risk, price0 - reward
+
     rec = {
         "id": rec_id,
         "symbol": symbol,
         "timeframe": timeframe,
         "kind": "triple" if ev.get("type") == "triple" else "cross",
         "event_type": ev.get("type"),        # "triple" | "about" | "crossed"
-        "direction": ev.get("direction"),     # "up" | "down"
+        "direction": direction,               # "up" | "down"
         "signal_time": ev.get("candle_time"),
-        "signal_price": ev.get("price"),
-        "atr": ev.get("atr"),
+        "signal_price": price0,
+        "atr": atr,
+        "risk_atr": EMATREND_EVAL_RISK_ATR,
+        "rr": EMATREND_EVAL_RR,
+        "sl": round(sl, 5),
+        "tp": round(tp, 5),
+        "result": PENDING,
+        "resolved_time": None,
+        "resolved_bars": None,
         "logged_at": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
-        "eval": _empty_eval(),
     }
     records.append(rec)
     return rec
 
 
 def evaluate_pending(history, candles, symbol, timeframe):
-    """Voi moi ban ghi (cung sym/tf) con moc "pending": tim lai nen tin hieu trong
+    """Voi moi ban ghi (cung sym/tf) con "pending": tim lai nen tin hieu trong
     `candles` hien tai (danh sach da fetch san trong lan chay nay, KHONG ton them
-    request API); neu da du so nen tinh tu do (theo HORIZONS) -> cham diem "dung/
-    sai/chua_ro". Neu nen tin hieu da roi khoi cua so du lieu (qua cu, ATR/gia luc do
-    khong con trong `candles`) -> danh dau "khong_du_du_lieu" de khoi thu cham lai
-    vo han lan moi lan chay. Tra ve so moc vua cham xong trong lan goi nay."""
+    request API), quet TUNG NEN KE TIEP (dung high/low - giong OutcomeEvaluator o
+    src/trade/outcome.py) xem cham TP_ao hay SL_ao truoc. Neu nen tin hieu da roi
+    khoi cua so du lieu (qua cu) ma van chua ket luan -> "het_han" luon (khong con
+    du lieu qua khu de quet tiep). Tra ve so ban ghi vua duoc ket luan trong lan
+    goi nay (dung/sai/het_han - khong tinh "van dang cho them du lieu")."""
     records = [r for r in history.get("records", [])
-               if r.get("symbol") == symbol and r.get("timeframe") == timeframe]
+               if r.get("symbol") == symbol and r.get("timeframe") == timeframe
+               and r.get("result") == PENDING]
     if not records or not candles:
         return 0
 
     n_done = 0
     for rec in records:
-        pending_keys = [k for k, v in rec["eval"].items() if v["result"] == "pending"]
-        if not pending_keys:
-            continue
-
         sig_ts = rec.get("signal_time")
         idx = None
         for i, c in enumerate(candles):
@@ -116,42 +124,49 @@ def evaluate_pending(history, candles, symbol, timeframe):
                 idx = i
                 break
         if idx is None:
-            for k in pending_keys:
-                rec["eval"][k] = {**rec["eval"][k], "result": "khong_du_du_lieu"}
+            rec["result"] = HET_HAN
+            n_done += 1
             continue
 
-        atr = rec.get("atr") or 0
-        price0 = rec.get("signal_price")
-        direction = rec.get("direction")
-        if not atr or price0 is None:
-            continue  # thieu du lieu goc (khong nen xay ra) -> bo qua, thu lai sau
-
-        for k in pending_keys:
-            bars = rec["eval"][k]["bars"]
-            target_idx = idx + bars
-            if target_idx >= len(candles):
-                continue  # chua toi luc, cho lan chay sau
-            price_then = candles[target_idx].close
-            atr_mult = (price_then - price0) / atr
-            if direction == "down":
-                atr_mult = -atr_mult
-            if atr_mult >= EMATREND_EVAL_ATR_MULT:
-                result = "dung"
-            elif atr_mult <= -EMATREND_EVAL_ATR_MULT:
-                result = "sai"
+        sl, tp, direction = rec["sl"], rec["tp"], rec["direction"]
+        max_bars = EMATREND_EVAL_MAX_BARS
+        resolved = False
+        for j in range(idx + 1, len(candles)):
+            bars = j - idx
+            if bars > max_bars:
+                rec["result"] = HET_HAN
+                resolved = True
+                break
+            c = candles[j]
+            if direction == "up":
+                hit_sl = c.low <= sl
+                hit_tp = c.high >= tp
             else:
-                result = "chua_ro"
-            rec["eval"][k] = {"bars": bars, "result": result,
-                               "price": round(price_then, 5),
-                               "atr_mult": round(atr_mult, 3)}
+                hit_sl = c.high >= sl
+                hit_tp = c.low <= tp
+            if hit_sl and hit_tp:
+                rec["result"] = SAI          # bao thu: cung 1 nen cham ca 2 -> tinh sai
+            elif hit_tp:
+                rec["result"] = DUNG
+            elif hit_sl:
+                rec["result"] = SAI
+            else:
+                continue
+            rec["resolved_time"] = str(c.time)
+            rec["resolved_bars"] = bars
+            resolved = True
+            break
+        if resolved:
             n_done += 1
+        # Con lai (chua du nen de ket luan, cung chua qua han) -> giu "pending",
+        # cho lan chay sau (candles se dai them).
     return n_done
 
 
 def compute_stats(history, symbol=None, timeframe=None, recent_limit=20):
-    """Tong hop ty le dung/sai theo (kind, direction) x moc thoi gian (h1/h4/d1).
-    `accuracy_pct` = dung / (dung+sai) * 100 (bo qua "chua_ro"/"pending" o mau so,
-    vi 2 loai nay chua co ket luan). Tra ve dict de ghi vao dashboard (data.js)."""
+    """Tong hop ty le dung/sai theo (kind, direction). `accuracy_pct` = dung /
+    (dung+sai) * 100 (bo qua "het_han"/"pending" o mau so, vi 2 loai nay chua co
+    ket luan). Tra ve dict de ghi vao dashboard (data.js)."""
     records = history.get("records", [])
     if symbol:
         records = [r for r in records if r.get("symbol") == symbol]
@@ -161,34 +176,35 @@ def compute_stats(history, symbol=None, timeframe=None, recent_limit=20):
     buckets = {}
     for r in records:
         key = (r.get("kind"), r.get("direction"))
-        b = buckets.setdefault(key, {hk: {"dung": 0, "sai": 0, "chua_ro": 0, "pending": 0}
-                                      for hk, _ in HORIZONS})
-        for hk, _ in HORIZONS:
-            res = r.get("eval", {}).get(hk, {}).get("result", "pending")
-            if res in PENDING_STATES:
-                b[hk]["pending"] += 1
-            else:
-                b[hk][res] += 1
+        b = buckets.setdefault(key, {"dung": 0, "sai": 0, "het_han": 0, "pending": 0})
+        res = r.get("result", PENDING)
+        b[res if res in (DUNG, SAI, HET_HAN) else PENDING] += 1
 
     by_kind_direction = []
     for (kind, direction), b in sorted(buckets.items(), key=lambda kv: (kv[0][0] or "", kv[0][1] or "")):
-        row = {"kind": kind, "direction": direction, "horizons": {}}
-        for hk, _ in HORIZONS:
-            d = b[hk]
-            evaluated = d["dung"] + d["sai"]
-            acc = round(d["dung"] / evaluated * 100, 1) if evaluated else None
-            row["horizons"][hk] = {
-                "dung": d["dung"], "sai": d["sai"], "chua_ro": d["chua_ro"],
-                "pending": d["pending"], "accuracy_pct": acc,
-            }
-        by_kind_direction.append(row)
+        evaluated = b["dung"] + b["sai"]
+        acc = round(b["dung"] / evaluated * 100, 1) if evaluated else None
+        by_kind_direction.append({
+            "kind": kind, "direction": direction,
+            "dung": b["dung"], "sai": b["sai"], "het_han": b["het_han"],
+            "pending": b["pending"], "accuracy_pct": acc,
+        })
+
+    total_dung = sum(b["dung"] for b in buckets.values())
+    total_sai = sum(b["sai"] for b in buckets.values())
+    total_eval = total_dung + total_sai
+    overall_acc = round(total_dung / total_eval * 100, 1) if total_eval else None
 
     recent = sorted(records, key=lambda r: r.get("signal_time") or "", reverse=True)[:recent_limit]
 
     return {
         "total_records": len(records),
+        "overall_accuracy_pct": overall_acc,
+        "overall_dung": total_dung,
+        "overall_sai": total_sai,
         "by_kind_direction": by_kind_direction,
         "recent": recent,
-        "eval_atr_mult": EMATREND_EVAL_ATR_MULT,
-        "horizons": [{"key": hk, "bars": bars} for hk, bars in HORIZONS],
+        "risk_atr": EMATREND_EVAL_RISK_ATR,
+        "rr": EMATREND_EVAL_RR,
+        "max_bars": EMATREND_EVAL_MAX_BARS,
     }

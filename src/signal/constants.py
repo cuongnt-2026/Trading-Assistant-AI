@@ -137,8 +137,13 @@ EMATREND_RESET_ATR = float(os.getenv("EMATREND_RESET_ATR", "0.6"))
 # xac nhan thu tu xep hang cuoi cung (mac dinh 3 nen, dung y "3 nen vua cat qua").
 EMATREND_TRIPLE_NEAR_ATR = float(os.getenv("EMATREND_TRIPLE_NEAR_ATR", "0.3"))
 EMATREND_TRIPLE_CONFIRM_BARS = int(os.getenv("EMATREND_TRIPLE_CONFIRM_BARS", "3"))
-# Nguong (boi so ATR luc ban tin hieu) de cham 1 tin hieu EMA Trend Watch la "dung" hay
-# "sai" sau do - xem src/signal/ema_trend_tracker.py. Gia phai di THEO dung huong du
-# doan >= nguong nay moi tinh "dung"; nguoc lai >= nguong (theo huong sai) moi tinh
-# "sai"; con lai (trong khoang nhieu) tinh "chua_ro", khong cong vao ca 2 phia.
-EMATREND_EVAL_ATR_MULT = float(os.getenv("EMATREND_EVAL_ATR_MULT", "0.3"))
+# Cham "dung/sai" cho tin hieu EMA Trend Watch (xem src/signal/ema_trend_tracker.py)
+# theo kieu R:R that (giong 1 lenh co SL/TP ao), KHONG doi xung 1:1 - theo yeu cau
+# CuongNT (2026-09-16): "dung" phai kho hon "sai", giong danh doi rui ro/loi nhuan
+# that. RISK_ATR = khoang cach SL_ao (boi so ATR); RR = ty le loi nhuan/rui ro, TP_ao
+# = risk * RR (vd RISK=0.5, RR=2.0 -> SL cach 0.5xATR, TP cach 1.0xATR, ty le 1:2).
+EMATREND_EVAL_RISK_ATR = float(os.getenv("EMATREND_EVAL_RISK_ATR", "0.5"))
+EMATREND_EVAL_RR = float(os.getenv("EMATREND_EVAL_RR", "2.0"))
+# Qua so nen nay (tren M15) ma van chua cham SL_ao/TP_ao nao -> tinh "het_han" (khong
+# ket luan duoc, khong tinh vao ty le dung/sai). Mac dinh 96 nen ~ 1 ngay.
+EMATREND_EVAL_MAX_BARS = int(os.getenv("EMATREND_EVAL_MAX_BARS", "96"))

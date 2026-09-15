@@ -236,22 +236,31 @@
     <section class="tabpage" data-page="ematrend">
       <div class="grid">
         <div class="card"><div class="k">📶 Tổng tín hiệu</div><div class="v" id="etTotal">0</div></div>
-        <div class="card"><div class="k">✅ Đúng sau 4 giờ</div><div class="v buy" id="etAccH4">—</div></div>
-        <div class="card"><div class="k">✅ Đúng sau 1 ngày</div><div class="v buy" id="etAccD1">—</div></div>
+        <div class="card"><div class="k">✅ Đúng</div><div class="v buy" id="etDung">0</div></div>
+        <div class="card"><div class="k">❌ Sai</div><div class="v sell" id="etSai">0</div></div>
+        <div class="card"><div class="k">🎯 Tỷ lệ đúng</div><div class="v" id="etAcc">—</div></div>
       </div>
       <div class="panel">
-        <h3>Tỷ lệ đúng/sai theo loại &amp; hướng
-          <span class="sub">"đúng" = giá đi đúng hướng dự đoán ≥ <span id="etThresh">0.3</span>×ATR lúc báo tín hiệu</span>
-        </h3>
+        <h3>Cách chấm điểm <span class="sub">giống 1 lệnh có SL/TP ảo, không phải ngưỡng đối xứng 1:1</span></h3>
+        <div class="muted" style="font-size:12px;line-height:1.7">
+          Mỗi tín hiệu được gán 1 "lệnh ảo" theo đúng hướng dự đoán: SL ảo cách
+          <b id="etRisk">0.5</b>×ATR (lúc báo tín hiệu), TP ảo cách <b id="etReward">1.0</b>×ATR
+          — tức tỷ lệ R:R <b>1 : <span id="etRR">2.0</span></b> (đúng phải "ăn" nhiều hơn sai, không phải 50/50).
+          Nến nào chạm TP ảo trước → <b style="color:var(--buy)">Đúng</b>; chạm SL ảo trước (hoặc chạm cả 2 cùng 1 nến) →
+          <b style="color:var(--sell)">Sai</b>; quá <b id="etMaxBars">96</b> nến (~1 ngày) chưa chạm gì → <span class="muted">Hết hạn</span> (không tính vào tỷ lệ).
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Tỷ lệ đúng/sai theo loại &amp; hướng</h3>
         <div id="etStatsTable"></div>
       </div>
       <div class="panel">
         <h3>Tín hiệu gần đây <span class="sub" id="etRecentCount"></span></h3>
         <div id="etRecentTable"></div>
         <div class="muted" style="font-size:11.5px;margin-top:8px">
-          Tín hiệu EMA Trend Watch chỉ là cảnh báo tham khảo (không có Entry/SL/TP tự động) —
-          bảng này CHỈ để xem sau đó giá có thật sự đi đúng hướng dự đoán hay không, KHÔNG phải
-          kết quả giao dịch thật (khác với Win/Loss/R ở các tab khác).
+          Tín hiệu EMA Trend Watch chỉ là cảnh báo tham khảo (không có Entry/SL/TP tự động khi gửi mail) —
+          SL/TP ảo ở đây CHỈ dùng để tự chấm điểm đúng/sai, KHÔNG phải kết quả giao dịch thật
+          (khác với Win/Loss/R ở các tab khác).
         </div>
       </div>
     </section>
@@ -494,12 +503,15 @@
     }).join('');
     el.innerHTML=`<table><thead><tr><th>Chiến lược</th><th>Tổng</th><th>Win</th><th>Loss</th><th>Open</th><th>Winrate</th><th>Tổng R</th></tr></thead><tbody>${body}</tbody></table>`;
   }
-  // ---- EMA Trend Watch: thong ke "dung/sai" (xem src/signal/ema_trend_tracker.py) ----
+  // ---- EMA Trend Watch: thong ke "dung/sai" kieu R:R (xem src/signal/ema_trend_tracker.py) ----
   function renderEmaTrend(){
     const et = D.ematrend;
     const totalEl=document.getElementById('etTotal');
     if(!et || !et.total_records){
       if(totalEl) totalEl.textContent='0';
+      const ed=document.getElementById('etDung'); if(ed) ed.textContent='0';
+      const es=document.getElementById('etSai'); if(es) es.textContent='0';
+      const ea=document.getElementById('etAcc'); if(ea) ea.textContent='—';
       const st=document.getElementById('etStatsTable');
       if(st) st.innerHTML='<div class="empty">Chưa có tín hiệu EMA Trend Watch nào được ghi nhận.</div>';
       const rt=document.getElementById('etRecentTable');
@@ -507,65 +519,56 @@
       return;
     }
     if(totalEl) totalEl.textContent = et.total_records;
-    const threshEl=document.getElementById('etThresh');
-    if(threshEl) threshEl.textContent = et.eval_atr_mult;
+    const setTxt=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+    setTxt('etDung', et.overall_dung||0);
+    setTxt('etSai', et.overall_sai||0);
+    setTxt('etAcc', et.overall_accuracy_pct!=null? et.overall_accuracy_pct+'%':'—');
+    setTxt('etRisk', (et.risk_atr!=null?et.risk_atr:'—'));
+    setTxt('etReward', (et.risk_atr!=null&&et.rr!=null)? (et.risk_atr*et.rr).toFixed(2) : '—');
+    setTxt('etRR', et.rr!=null? et.rr : '—');
+    setTxt('etMaxBars', et.max_bars!=null? et.max_bars : '—');
 
     const kindLabel=(k)=> k==='triple' ? '3 EMA hội tụ' : 'EMA20/50 cắt';
     const dirLabel=(d)=> d==='up' ? 'BUY' : 'SELL';
-    const horizons=(et.horizons||[]).map(h=>h.key);
-    const hLabel={h1:'1 giờ',h4:'4 giờ',d1:'1 ngày'};
 
     const rows=(et.by_kind_direction||[]).map(row=>{
-      const cells=horizons.map(hk=>{
-        const h=row.horizons[hk]||{};
-        const acc=h.accuracy_pct;
-        const color=(acc===null||acc===undefined)?'var(--muted)':(acc>=55?'var(--buy)':(acc<45?'var(--sell)':'var(--neutral)'));
-        const detail=`${h.dung||0}Đ / ${h.sai||0}S / ${h.chua_ro||0}chưa rõ`;
-        return `<td><b style="color:${color}">${(acc!==null&&acc!==undefined)?acc+'%':'—'}</b><br><span class="muted" style="font-size:10.5px">${detail}</span></td>`;
-      }).join('');
+      const acc=row.accuracy_pct;
+      const color=(acc===null||acc===undefined)?'var(--muted)':(acc>=55?'var(--buy)':(acc<45?'var(--sell)':'var(--neutral)'));
       return `<tr><td class="sym">${kindLabel(row.kind)}</td>
-        <td style="color:${row.direction==='up'?'var(--buy)':'var(--sell)'}">${dirLabel(row.direction)}</td>${cells}</tr>`;
+        <td style="color:${row.direction==='up'?'var(--buy)':'var(--sell)'}">${dirLabel(row.direction)}</td>
+        <td><b style="color:${color}">${(acc!==null&&acc!==undefined)?acc+'%':'—'}</b></td>
+        <td style="color:var(--buy)">${row.dung||0}</td>
+        <td style="color:var(--sell)">${row.sai||0}</td>
+        <td class="muted">${row.het_han||0}</td>
+        <td class="muted">${row.pending||0}</td></tr>`;
     }).join('');
-    const headCells=horizons.map(hk=>`<th>${hLabel[hk]||hk}</th>`).join('');
     const stEl=document.getElementById('etStatsTable');
     if(stEl) stEl.innerHTML = rows ?
-      `<table><thead><tr><th>Loại tín hiệu</th><th>Hướng</th>${headCells}</tr></thead><tbody>${rows}</tbody></table>`
+      `<table><thead><tr><th>Loại tín hiệu</th><th>Hướng</th><th>Tỷ lệ đúng</th><th>Đúng</th><th>Sai</th><th>Hết hạn</th><th>Đang chờ</th></tr></thead><tbody>${rows}</tbody></table>`
       : '<div class="empty">Chưa có tín hiệu nào.</div>';
-
-    function overallAcc(hk){
-      let dung=0, sai=0;
-      (et.by_kind_direction||[]).forEach(row=>{ const h=row.horizons[hk]||{}; dung+=h.dung||0; sai+=h.sai||0; });
-      const total=dung+sai;
-      return total? Math.round(dung/total*100) : null;
-    }
-    const accH4=overallAcc('h4'), accD1=overallAcc('d1');
-    const eH4=document.getElementById('etAccH4'); if(eH4) eH4.textContent = accH4!==null? accH4+'%':'—';
-    const eD1=document.getElementById('etAccD1'); if(eD1) eD1.textContent = accD1!==null? accD1+'%':'—';
 
     const recent=et.recent||[];
     const rc=document.getElementById('etRecentCount'); if(rc) rc.textContent = recent.length+' gần nhất';
     const resultBadge=(res)=>{
       if(res==='dung') return '<span class="badge WIN">Đúng</span>';
       if(res==='sai') return '<span class="badge LOSS">Sai</span>';
-      if(res==='chua_ro') return '<span class="badge OPEN">Chưa rõ</span>';
+      if(res==='het_han') return '<span class="badge OPEN">Hết hạn</span>';
       return '<span class="muted">Đang chờ</span>';
     };
     const recentRows=recent.map(r=>{
-      const e=r.eval||{};
       return `<tr>
         <td>${r.signal_time||''}</td>
         <td class="sym">${r.symbol||''} ${r.timeframe||''}</td>
         <td>${kindLabel(r.kind)}</td>
         <td style="color:${r.direction==='up'?'var(--buy)':'var(--sell)'}">${dirLabel(r.direction)}</td>
         <td>${r.signal_price!=null?Number(r.signal_price).toFixed(2):'—'}</td>
-        <td>${resultBadge((e.h1||{}).result)}</td>
-        <td>${resultBadge((e.h4||{}).result)}</td>
-        <td>${resultBadge((e.d1||{}).result)}</td>
+        <td class="muted" style="font-size:11px">SL ${r.sl!=null?Number(r.sl).toFixed(2):'—'} / TP ${r.tp!=null?Number(r.tp).toFixed(2):'—'}</td>
+        <td>${resultBadge(r.result)}</td>
       </tr>`;
     }).join('');
     const rtEl=document.getElementById('etRecentTable');
     if(rtEl) rtEl.innerHTML = recentRows ?
-      `<table><thead><tr><th>Thời điểm</th><th>Cặp</th><th>Loại</th><th>Hướng</th><th>Giá lúc báo</th><th>1h</th><th>4h</th><th>1 ngày</th></tr></thead><tbody>${recentRows}</tbody></table>`
+      `<table><thead><tr><th>Thời điểm</th><th>Cặp</th><th>Loại</th><th>Hướng</th><th>Giá lúc báo</th><th>SL/TP ảo</th><th>Kết quả</th></tr></thead><tbody>${recentRows}</tbody></table>`
       : '<div class="empty">Chưa có tín hiệu nào.</div>';
   }
 
