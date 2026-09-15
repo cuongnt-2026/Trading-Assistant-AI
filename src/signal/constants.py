@@ -137,3 +137,8 @@ EMATREND_RESET_ATR = float(os.getenv("EMATREND_RESET_ATR", "0.6"))
 # xac nhan thu tu xep hang cuoi cung (mac dinh 3 nen, dung y "3 nen vua cat qua").
 EMATREND_TRIPLE_NEAR_ATR = float(os.getenv("EMATREND_TRIPLE_NEAR_ATR", "0.3"))
 EMATREND_TRIPLE_CONFIRM_BARS = int(os.getenv("EMATREND_TRIPLE_CONFIRM_BARS", "3"))
+# Nguong (boi so ATR luc ban tin hieu) de cham 1 tin hieu EMA Trend Watch la "dung" hay
+# "sai" sau do - xem src/signal/ema_trend_tracker.py. Gia phai di THEO dung huong du
+# doan >= nguong nay moi tinh "dung"; nguoc lai >= nguong (theo huong sai) moi tinh
+# "sai"; con lai (trong khoang nhieu) tinh "chua_ro", khong cong vao ca 2 phia.
+EMATREND_EVAL_ATR_MULT = float(os.getenv("EMATREND_EVAL_ATR_MULT", "0.3"))

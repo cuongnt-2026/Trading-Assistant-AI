@@ -115,6 +115,7 @@
       <a data-tab="signals"><span class="ic">🔔</span> Tín hiệu</a>
       <a data-tab="symbols"><span class="ic">💹</span> Cặp tiền</a>
       <a data-tab="stats"><span class="ic">📈</span> Thống kê</a>
+      <a data-tab="ematrend"><span class="ic">🧭</span> EMA Trend Watch</a>
     </nav>
     <div class="disclaimer">
       Dữ liệu đọc từ <code>data.js</code> (bot ghi khi chạy).<br>
@@ -228,6 +229,30 @@
       <div class="panel">
         <h3>Chỉ số nhanh</h3>
         <div id="statTable"></div>
+      </div>
+    </section>
+
+    <!-- ===== EMA TREND WATCH ===== -->
+    <section class="tabpage" data-page="ematrend">
+      <div class="grid">
+        <div class="card"><div class="k">📶 Tổng tín hiệu</div><div class="v" id="etTotal">0</div></div>
+        <div class="card"><div class="k">✅ Đúng sau 4 giờ</div><div class="v buy" id="etAccH4">—</div></div>
+        <div class="card"><div class="k">✅ Đúng sau 1 ngày</div><div class="v buy" id="etAccD1">—</div></div>
+      </div>
+      <div class="panel">
+        <h3>Tỷ lệ đúng/sai theo loại &amp; hướng
+          <span class="sub">"đúng" = giá đi đúng hướng dự đoán ≥ <span id="etThresh">0.3</span>×ATR lúc báo tín hiệu</span>
+        </h3>
+        <div id="etStatsTable"></div>
+      </div>
+      <div class="panel">
+        <h3>Tín hiệu gần đây <span class="sub" id="etRecentCount"></span></h3>
+        <div id="etRecentTable"></div>
+        <div class="muted" style="font-size:11.5px;margin-top:8px">
+          Tín hiệu EMA Trend Watch chỉ là cảnh báo tham khảo (không có Entry/SL/TP tự động) —
+          bảng này CHỈ để xem sau đó giá có thật sự đi đúng hướng dự đoán hay không, KHÔNG phải
+          kết quả giao dịch thật (khác với Win/Loss/R ở các tab khác).
+        </div>
       </div>
     </section>
 
@@ -469,6 +494,81 @@
     }).join('');
     el.innerHTML=`<table><thead><tr><th>Chiến lược</th><th>Tổng</th><th>Win</th><th>Loss</th><th>Open</th><th>Winrate</th><th>Tổng R</th></tr></thead><tbody>${body}</tbody></table>`;
   }
+  // ---- EMA Trend Watch: thong ke "dung/sai" (xem src/signal/ema_trend_tracker.py) ----
+  function renderEmaTrend(){
+    const et = D.ematrend;
+    const totalEl=document.getElementById('etTotal');
+    if(!et || !et.total_records){
+      if(totalEl) totalEl.textContent='0';
+      const st=document.getElementById('etStatsTable');
+      if(st) st.innerHTML='<div class="empty">Chưa có tín hiệu EMA Trend Watch nào được ghi nhận.</div>';
+      const rt=document.getElementById('etRecentTable');
+      if(rt) rt.innerHTML='<div class="empty">—</div>';
+      return;
+    }
+    if(totalEl) totalEl.textContent = et.total_records;
+    const threshEl=document.getElementById('etThresh');
+    if(threshEl) threshEl.textContent = et.eval_atr_mult;
+
+    const kindLabel=(k)=> k==='triple' ? '3 EMA hội tụ' : 'EMA20/50 cắt';
+    const dirLabel=(d)=> d==='up' ? 'BUY' : 'SELL';
+    const horizons=(et.horizons||[]).map(h=>h.key);
+    const hLabel={h1:'1 giờ',h4:'4 giờ',d1:'1 ngày'};
+
+    const rows=(et.by_kind_direction||[]).map(row=>{
+      const cells=horizons.map(hk=>{
+        const h=row.horizons[hk]||{};
+        const acc=h.accuracy_pct;
+        const color=(acc===null||acc===undefined)?'var(--muted)':(acc>=55?'var(--buy)':(acc<45?'var(--sell)':'var(--neutral)'));
+        const detail=`${h.dung||0}Đ / ${h.sai||0}S / ${h.chua_ro||0}chưa rõ`;
+        return `<td><b style="color:${color}">${(acc!==null&&acc!==undefined)?acc+'%':'—'}</b><br><span class="muted" style="font-size:10.5px">${detail}</span></td>`;
+      }).join('');
+      return `<tr><td class="sym">${kindLabel(row.kind)}</td>
+        <td style="color:${row.direction==='up'?'var(--buy)':'var(--sell)'}">${dirLabel(row.direction)}</td>${cells}</tr>`;
+    }).join('');
+    const headCells=horizons.map(hk=>`<th>${hLabel[hk]||hk}</th>`).join('');
+    const stEl=document.getElementById('etStatsTable');
+    if(stEl) stEl.innerHTML = rows ?
+      `<table><thead><tr><th>Loại tín hiệu</th><th>Hướng</th>${headCells}</tr></thead><tbody>${rows}</tbody></table>`
+      : '<div class="empty">Chưa có tín hiệu nào.</div>';
+
+    function overallAcc(hk){
+      let dung=0, sai=0;
+      (et.by_kind_direction||[]).forEach(row=>{ const h=row.horizons[hk]||{}; dung+=h.dung||0; sai+=h.sai||0; });
+      const total=dung+sai;
+      return total? Math.round(dung/total*100) : null;
+    }
+    const accH4=overallAcc('h4'), accD1=overallAcc('d1');
+    const eH4=document.getElementById('etAccH4'); if(eH4) eH4.textContent = accH4!==null? accH4+'%':'—';
+    const eD1=document.getElementById('etAccD1'); if(eD1) eD1.textContent = accD1!==null? accD1+'%':'—';
+
+    const recent=et.recent||[];
+    const rc=document.getElementById('etRecentCount'); if(rc) rc.textContent = recent.length+' gần nhất';
+    const resultBadge=(res)=>{
+      if(res==='dung') return '<span class="badge WIN">Đúng</span>';
+      if(res==='sai') return '<span class="badge LOSS">Sai</span>';
+      if(res==='chua_ro') return '<span class="badge OPEN">Chưa rõ</span>';
+      return '<span class="muted">Đang chờ</span>';
+    };
+    const recentRows=recent.map(r=>{
+      const e=r.eval||{};
+      return `<tr>
+        <td>${r.signal_time||''}</td>
+        <td class="sym">${r.symbol||''} ${r.timeframe||''}</td>
+        <td>${kindLabel(r.kind)}</td>
+        <td style="color:${r.direction==='up'?'var(--buy)':'var(--sell)'}">${dirLabel(r.direction)}</td>
+        <td>${r.signal_price!=null?Number(r.signal_price).toFixed(2):'—'}</td>
+        <td>${resultBadge((e.h1||{}).result)}</td>
+        <td>${resultBadge((e.h4||{}).result)}</td>
+        <td>${resultBadge((e.d1||{}).result)}</td>
+      </tr>`;
+    }).join('');
+    const rtEl=document.getElementById('etRecentTable');
+    if(rtEl) rtEl.innerHTML = recentRows ?
+      `<table><thead><tr><th>Thời điểm</th><th>Cặp</th><th>Loại</th><th>Hướng</th><th>Giá lúc báo</th><th>1h</th><th>4h</th><th>1 ngày</th></tr></thead><tbody>${recentRows}</tbody></table>`
+      : '<div class="empty">Chưa có tín hiệu nào.</div>';
+  }
+
   function initManualIO(){
     const ex=document.getElementById('mExport'), im=document.getElementById('mImport'), f=document.getElementById('mFile');
     if(ex) ex.onclick=function(){
@@ -512,6 +612,7 @@
   initManualIO();
   renderManualStats();
   renderStrategyStats();
+  renderEmaTrend();
 
   // ---- Symbols tab: summary ----
   const syms=[...new Set(S.map(s=>s.symbol))].filter(Boolean);

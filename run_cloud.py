@@ -22,6 +22,8 @@ from src.notifier.messages import (build_signal_email, build_supertrend_email,
 from src.signal.supertrend import supertrend
 from src.signal.ema_cross_watcher import EmaCrossWatcher
 from src.signal.ema_trend_watcher import EmaTrendWatcher
+from src.signal.ema_trend_tracker import record_event, evaluate_pending, compute_stats
+from src.indicators.indicator_service import IndicatorService
 from src.trade.outcome import OutcomeEvaluator, OPEN
 
 STATE_PATH = "cloud_state.json"
@@ -50,6 +52,23 @@ def load_signals():
 
 def save_signals(sig):
     json.dump(sig, open(SIGNALS_PATH, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
+
+
+# Lich su + thong ke "dung/sai" cho tin hieu EMA Trend Watch (rieng, KHONG dung chung
+# voi cloud_signals.json vi day khong phai lenh co Entry/SL/TP - xem
+# src/signal/ema_trend_tracker.py).
+EMATREND_HISTORY_PATH = "ematrend_history.json"
+
+
+def load_ematrend_history():
+    try:
+        return json.load(open(EMATREND_HISTORY_PATH, encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def save_ematrend_history(h):
+    json.dump(h, open(EMATREND_HISTORY_PATH, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
 
 
 def _parse_ct(ts):
@@ -132,8 +151,10 @@ def _send_test_mail(cfg, notifier):
     print("MAIL THU (EMA Trend Watch - triple) -> {}".format("DA GUI OK" if ok4 else "THAT BAI/khong co notifier"))
 
 
-def write_dashboard(snapshot, signals_log, path="dashboard/data.js"):
-    """Ghi dashboard/data.js: trang thai hien tai + lich su lenh (Win/Loss + ke hoach)."""
+def write_dashboard(snapshot, signals_log, path="dashboard/data.js", ematrend_stats=None):
+    """Ghi dashboard/data.js: trang thai hien tai + lich su lenh (Win/Loss + ke hoach)
+    + thong ke "dung/sai" cho EMA Trend Watch (ematrend_stats, xem
+    src/signal/ema_trend_tracker.py) neu co."""
     hist = []
     for r in signals_log:
         rr = r.get("rr")
@@ -159,6 +180,7 @@ def write_dashboard(snapshot, signals_log, path="dashboard/data.js"):
         "updated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
         "symbol": snapshot[0]["symbol"] if snapshot else "XAUUSD",
         "signals": snapshot + hist,
+        "ematrend": ematrend_stats,
     }
     try:
         os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
@@ -366,10 +388,15 @@ def _scan_ema_cross(sym, tf, cfg, state, notifier, cache):
     return 0
 
 
-def _scan_ema_trend(sym, tf, cfg, state, notifier, cache):
+def _scan_ema_trend(sym, tf, cfg, state, notifier, cache, ematrend_history):
     """EMA Trend Watch: thay the EMA Cross Watch cu, dua tren EMA20/50/200 loc theo
     che do EMA200 (xem src/signal/ema_trend_watcher.py). Quet DOC LAP, dung chung
-    cache nen voi cac khu vuc khac trong lan chay nay."""
+    cache nen voi cac khu vuc khac trong lan chay nay.
+
+    Ngoai gui mail, con: (1) cham diem "dung/sai" cho cac tin hieu CU da ban truoc
+    do (evaluate_pending - dung lai candles vua fetch, khong ton them request), va
+    (2) ghi lai tin hieu MOI vua ban vao ematrend_history (record_event) de sau nay
+    cham diem - xem src/signal/ema_trend_tracker.py va thong ke tren dashboard."""
     try:
         candles = _fetch_cached(cache, sym, tf, cfg)
     except Exception as e:
@@ -379,6 +406,19 @@ def _scan_ema_trend(sym, tf, cfg, state, notifier, cache):
         print("[WARN] {} {} [ematrend] khong du nen ({})".format(
             sym, tf, len(candles) if candles else 0))
         return 0
+
+    # Cham diem cac tin hieu cu (khong ton request - dung lai candles vua fetch)
+    try:
+        n_eval = evaluate_pending(ematrend_history, candles, sym, tf)
+        if n_eval:
+            print("  {} {} [ematrend] da cham diem {} moc tin hieu cu".format(sym, tf, n_eval))
+    except Exception as e:
+        print("[WARN] {} {} [ematrend] evaluate_pending loi: {}".format(sym, tf, e))
+
+    try:
+        atr = IndicatorService.atr(candles)
+    except Exception:
+        atr = None
 
     sent = 0
     key_triple = "EMATREND-TRIPLE {} {}".format(sym, tf)
@@ -390,12 +430,14 @@ def _scan_ema_trend(sym, tf, cfg, state, notifier, cache):
         print("[WARN] {} {} [ematrend-triple] check loi: {}".format(sym, tf, e))
         ev = None
     if ev:
+        ev["atr"] = atr
         subject, body = build_ema_trend_email(sym, tf, ev)
         subject = "[CLOUD][EMA-TREND] " + subject
         ok = notifier.send(subject, body) if notifier else False
         print("  {} {} [ematrend-triple] {} -> GUI MAIL: {}".format(
             sym, tf, ev["direction"], "OK" if ok else "FAIL"))
         if ok:
+            record_event(ematrend_history, sym, tf, ev)
             sent += 1
 
     try:
@@ -404,6 +446,7 @@ def _scan_ema_trend(sym, tf, cfg, state, notifier, cache):
         print("[WARN] {} {} [ematrend-cross] check loi: {}".format(sym, tf, e))
         ev = None
     if ev:
+        ev["atr"] = atr
         subject, body = build_ema_trend_email(sym, tf, ev)
         subject = "[CLOUD][EMA-TREND] " + subject
         ok = notifier.send(subject, body) if notifier else False
@@ -416,6 +459,7 @@ def _scan_ema_trend(sym, tf, cfg, state, notifier, cache):
                 st["about_ts"] = None
             else:
                 st["about_ts"] = ev["_ts"]
+            record_event(ematrend_history, sym, tf, ev)
             sent += 1
 
     return sent
@@ -426,12 +470,14 @@ def main():
     notifier = create_notifier(cfg)
     state = load_state()
     signals_log = load_signals()
+    ematrend_history = load_ematrend_history()
 
     # Reset 1 lan (do chinh cloud thuc hien -> khong bi race/merge de len):
     # neu co file RESET_SIGNALS.flag -> xoa sach lich su + trang thai, roi xoa co.
     if os.path.exists("RESET_SIGNALS.flag"):
         signals_log = []
         state = {}
+        ematrend_history = {}
         try:
             os.remove("RESET_SIGNALS.flag")
         except Exception:
@@ -624,17 +670,23 @@ def main():
     if cfg.ematrend_enabled:
         for sym, tf in cfg.ematrend_pairs:
             try:
-                sent += _scan_ema_trend(sym, tf, cfg, state, notifier, cache)
+                sent += _scan_ema_trend(sym, tf, cfg, state, notifier, cache, ematrend_history)
             except Exception as e:
                 print("[WARN] ematrend {} {}: {}".format(sym, tf, e))
 
     try:
         save_state(state)
         save_signals(signals_log)
+        save_ematrend_history(ematrend_history)
     except Exception as e:
         print("[WARN] luu state/signals loi:", e)
+    ematrend_stats = None
     try:
-        write_dashboard(snapshot, signals_log, cfg.dashboard_data)
+        ematrend_stats = compute_stats(ematrend_history)
+    except Exception as e:
+        print("[WARN] tinh thong ke ematrend loi:", e)
+    try:
+        write_dashboard(snapshot, signals_log, cfg.dashboard_data, ematrend_stats=ematrend_stats)
     except Exception as e:
         print("[WARN] ghi dashboard loi:", e)
     print("Xong. Da gui {} tin hieu.".format(sent))
