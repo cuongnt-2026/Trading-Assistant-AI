@@ -26,7 +26,13 @@ ema_trend_watcher.py). Lich su thay doi cach cham diem (theo phan hoi CuongNT):
                 EMATREND_EVAL_TP_LOOKBACK nen truoc tin hieu, NEU muc do cho ty
                 le R:R >= EMATREND_EVAL_RR; neu khong (cau truc qua gan hoac
                 khong ro) -> ep TP_ao = risk x EMATREND_EVAL_RR (san R:R toi
-                thieu, giong yeu cau "dung phai kho hon sai" cua CuongNT).
+                thieu).
+
+  v4 (2026-09-16): EMATREND_EVAL_RR (san R:R toi thieu de tinh "dung") doi tu 2.0
+      -> 1.0 -> 1.2 theo phan hoi CuongNT: luc dau muon "dung phai kho hon sai"
+      (RR>=2), sau do doi lai chi can thang la tinh dung (RR=1.0), roi chot lai
+      RR=1.2 de bu spread/phi giao dich (hoa von that ngoai doi can TP xa hon SL
+      mot chut). SL/TP van tinh theo cau truc y het v3, chi doi con so nguong RR.
 
 Sau do quet cac nen KE TIEP (dung high/low tung nen, giong het OutcomeEvaluator
 dung cho lenh that o src/trade/outcome.py - de nhat quan quy uoc trong toan bo

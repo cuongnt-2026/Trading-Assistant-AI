@@ -138,12 +138,11 @@ EMATREND_RESET_ATR = float(os.getenv("EMATREND_RESET_ATR", "0.6"))
 EMATREND_TRIPLE_NEAR_ATR = float(os.getenv("EMATREND_TRIPLE_NEAR_ATR", "0.3"))
 EMATREND_TRIPLE_CONFIRM_BARS = int(os.getenv("EMATREND_TRIPLE_CONFIRM_BARS", "3"))
 # Cham "dung/sai" cho tin hieu EMA Trend Watch (xem src/signal/ema_trend_tracker.py)
-# theo kieu R:R that (giong 1 lenh co SL/TP ao), KHONG doi xung 1:1 va KHONG dung
-# 1 boi so ATR co dinh cho SL - theo phan hoi CuongNT (2026-09-16, cap nhat lan 2):
-# (1) "dung" phai kho hon "sai" (R:R that); (2) SL/TP phai tinh theo CAU TRUC gia +
-# nen gan nhat (swing high/low), KHONG phai mot con so ATR co dinh moi lan - dung
-# LAI dung logic RiskManager.dynamic_levels() dang dung cho lenh THAT (xem
-# src/trade/risk_manager.py) de nhat quan trong toan bo du an:
+# theo kieu "lenh ao" co SL/TP tinh theo CAU TRUC gia + nen gan nhat (swing high/
+# low), KHONG dung 1 boi so ATR co dinh cho SL - theo phan hoi CuongNT (2026-09-16,
+# cap nhat lan 2): SL/TP phai tinh theo cau truc, dung LAI dung logic
+# RiskManager.dynamic_levels() dang dung cho lenh THAT (xem src/trade/risk_manager.py)
+# de nhat quan trong toan bo du an:
 #   SL_ao = swing high/low gan nhat (EMATREND_EVAL_SWING_LOOKBACK nen) +/- dem ATR
 #           (EMATREND_EVAL_SL_ATR_BUFFER), nhung KHONG duoc gan hon
 #           EMATREND_EVAL_MIN_RISK_ATR x ATR (san rui ro toi thieu, tranh SL qua sat
@@ -151,11 +150,17 @@ EMATREND_TRIPLE_CONFIRM_BARS = int(os.getenv("EMATREND_TRIPLE_CONFIRM_BARS", "3"
 #   TP_ao = khang cu/ho tro doi dien gan nhat (EMATREND_EVAL_TP_LOOKBACK nen) NEU no
 #           cho RR >= EMATREND_EVAL_RR; neu khong (cau truc qua gan hoac khong co) ->
 #           ep TP_ao = risk x EMATREND_EVAL_RR (san R:R toi thieu).
+# EMATREND_EVAL_RR: luc dau CuongNT muon >= 2 ("dung phai kho hon sai"), sau do
+# (2026-09-16, cap nhat lan 3) doi lai ve 1.0 (thang la tinh "dung", khong doi hoi
+# "an" nhieu hon "thua" nua), roi CHINH LAI lan cuoi thanh 1.2 (2026-09-16, cap
+# nhat lan 4) de bu spread/phi giao dich - "hoa von that" trong thuc te can TP_ao
+# xa hon SL_ao mot chut, khong phai dung 1:1, moi tinh la "thang that". SL/TP van
+# tinh theo cau truc nhu tren, chi doi muc R:R toi thieu.
 EMATREND_EVAL_SWING_LOOKBACK = int(os.getenv("EMATREND_EVAL_SWING_LOOKBACK", "5"))
 EMATREND_EVAL_SL_ATR_BUFFER = float(os.getenv("EMATREND_EVAL_SL_ATR_BUFFER", "0.5"))
 EMATREND_EVAL_MIN_RISK_ATR = float(os.getenv("EMATREND_EVAL_MIN_RISK_ATR", "1.0"))
 EMATREND_EVAL_TP_LOOKBACK = int(os.getenv("EMATREND_EVAL_TP_LOOKBACK", "40"))
-EMATREND_EVAL_RR = float(os.getenv("EMATREND_EVAL_RR", "2.0"))
+EMATREND_EVAL_RR = float(os.getenv("EMATREND_EVAL_RR", "1.2"))
 # Qua so nen nay (tren M15) ma van chua cham SL_ao/TP_ao nao -> tinh "het_han" (khong
 # ket luan duoc, khong tinh vao ty le dung/sai). Mac dinh 96 nen ~ 1 ngay.
 EMATREND_EVAL_MAX_BARS = int(os.getenv("EMATREND_EVAL_MAX_BARS", "96"))

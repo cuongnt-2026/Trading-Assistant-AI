@@ -247,9 +247,11 @@
           cách đặt SL/TP cho lệnh thật trong hệ thống (RiskManager): <b>SL ảo</b> = đỉnh/đáy gần
           nhất (swing) trước đó, cộng đệm ATR chống quét râu nến, nhưng không được gần hơn 1
           mức rủi ro tối thiểu; <b>TP ảo</b> = kháng cự/hỗ trợ đối diện gần nhất nếu đủ tỷ lệ
-          R:R tối thiểu <b>1 : <span id="etRR">2.0</span></b>, nếu cấu trúc quá gần thì lấy đúng
-          mốc R:R đó làm TP. Vì vậy SL/TP ảo của mỗi tín hiệu <b>khác nhau</b>, tùy theo hình
-          dạng nến/thị trường lúc đó — không cố định.
+          R:R tối thiểu <b>1 : <span id="etRR">1.2</span></b> (chỉ cần thắng là tính "Đúng", số
+          1.2 chỉ để chừa thêm 1 chút bù spread/phí giao dịch chứ không đòi hỏi "ăn" nhiều hơn
+          "thua" như trước), nếu cấu trúc quá gần thì lấy đúng mốc R:R đó làm TP. Vì vậy SL/TP
+          ảo của mỗi tín hiệu <b>khác nhau</b>, tùy theo hình dạng nến/thị trường lúc đó — không
+          cố định.
           Nến nào chạm TP ảo trước → <b style="color:var(--buy)">Đúng</b>; chạm SL ảo trước (hoặc chạm cả 2 cùng 1 nến) →
           <b style="color:var(--sell)">Sai</b>; quá <b id="etMaxBars">96</b> nến (~1 ngày) chưa chạm gì → <span class="muted">Hết hạn</span> (không tính vào tỷ lệ).
           R:R thực tế trung bình đạt được: <b id="etAvgRR">—</b>.
