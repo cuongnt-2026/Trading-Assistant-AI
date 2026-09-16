@@ -1398,7 +1398,7 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 49.1,
-    "outcome": "OPEN"
+    "outcome": "LOSS"
   },
   {
     "time": "2026-09-14 16:45 UTC",
@@ -1430,7 +1430,7 @@
     "rr": 3.0,
     "risk_reward": "1 : 3",
     "confidence": null,
-    "outcome": "OPEN"
+    "outcome": "LOSS"
   },
   {
     "time": "2026-09-15 08:00 UTC",
@@ -1467,5 +1467,41 @@
     "expected_profit": null,
     "confidence": 17.5,
     "outcome": "WIN"
+  },
+  {
+    "time": "2026-09-16 05:31 UTC",
+    "candle_time": "2026-09-16 05:15:00",
+    "symbol": "EURUSD",
+    "timeframe": "M15",
+    "action": "SELL",
+    "strategy": "bollinger",
+    "entry": 1.15469,
+    "sl": 1.155,
+    "tp": 1.15408,
+    "rr": 1.97,
+    "risk_reward": "1 : 1.97",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 21.2,
+    "outcome": "LOSS"
+  },
+  {
+    "time": "2026-09-16 11:16 UTC",
+    "candle_time": "2026-09-16 11:00:00",
+    "symbol": "EURUSD",
+    "timeframe": "M15",
+    "action": "BUY",
+    "strategy": "bollinger",
+    "entry": 1.1532,
+    "sl": 1.1529,
+    "tp": 1.1542,
+    "rr": 3.33,
+    "risk_reward": "1 : 3.33",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 12.3,
+    "outcome": "OPEN"
   }
 ]
