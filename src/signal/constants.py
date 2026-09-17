@@ -179,3 +179,18 @@ EMAPULLBACK_PULLBACK_ATR = float(os.getenv("EMAPULLBACK_PULLBACK_ATR", "0.3"))
 # So nen M15 gan nhat (tinh ca nen hien tai) duoc xet la "vua hoi ve" EMA - tranh bo
 # lo neu gia cham EMA 1-2 nen truoc roi nen xac nhan moi toi.
 EMAPULLBACK_PULLBACK_LOOKBACK = int(os.getenv("EMAPULLBACK_PULLBACK_LOOKBACK", "3"))
+
+# EMA50 Close (chien luoc CHI 1 duong EMA50, y tuong CuongNT 2026-09-17, dung
+# de BACKTEST xem gia co "chay dung xu huong thi truong" theo 1 EMA don gian
+# hay khong - xem src/signal/ema50_close_engine.py):
+#   Luat goc: dong cua DUT KHOAT tren EMA50 => BUY; DUT KHOAT duoi EMA50 => SELL.
+# EMA50CLOSE_BUFFER_ATR: gia phai vuot EMA50 xa hon (boi so ATR14) khoang nay
+# moi tinh la "dut khoat" - dat "0" de test dung 100% luat goc (chi so sanh
+# gia dong cua thuan tuy, khong doi hoi khoang cach toi thieu).
+EMA50CLOSE_BUFFER_ATR = float(os.getenv("EMA50CLOSE_BUFFER_ATR", "0.15"))
+# EMA50CLOSE_REQUIRE_FULL_BODY: "1" = doi hoi CA than nen (open VA close) nam
+# gon 1 phia EMA50 (dung tinh than "than nen dong cua tren/duoi EMA50" CuongNT
+# noi), khong chi rieng gia dong cua - tranh nhan 1 nen do du (mo cua duoi EMA,
+# dong cua nhinh hon EMA50 mot chut) la "dut khoat". Dat "0" de chi xet gia
+# dong cua nhu luat goc.
+EMA50CLOSE_REQUIRE_FULL_BODY = os.getenv("EMA50CLOSE_REQUIRE_FULL_BODY", "1").strip() not in ("0", "false", "")

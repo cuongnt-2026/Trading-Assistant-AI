@@ -9,6 +9,7 @@ from src.signal.bollinger_engine import BollingerEngine
 from src.signal.london_engine import LondonEngine
 from src.signal.rsi_divergence_engine import RSIDivergenceEngine
 from src.signal.bollinger_squeeze_engine import BollingerSqueezeEngine
+from src.signal.ema50_close_engine import Ema50CloseEngine
 
 
 class SignalService:
@@ -41,5 +42,9 @@ class SignalService:
             return RSIDivergenceEngine.analyze(candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)
         if strategy == "squeeze":
             return BollingerSqueezeEngine.analyze(candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)
+        if strategy == "ema50_close":
+            # Chi 1 duong EMA50 (khong dung htf_trend/ADX/RSI loc - xem
+            # docstring src/signal/ema50_close_engine.py).
+            return Ema50CloseEngine.analyze(candles, ema50, adx, atr, rsi)
         return SignalEngine.analyze(
             candles, ema20, ema50, ema200, adx, atr, rsi, htf_trend=htf_trend)
