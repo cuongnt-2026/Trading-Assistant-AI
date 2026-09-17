@@ -24,7 +24,7 @@ from src.signal.ema_cross_watcher import EmaCrossWatcher
 from src.signal.ema_trend_watcher import EmaTrendWatcher
 from src.signal.ema_trend_tracker import record_event, evaluate_pending, compute_stats
 from src.indicators.indicator_service import IndicatorService
-from src.trade.outcome import OutcomeEvaluator, OPEN
+from src.trade.outcome import OutcomeEvaluator, OPEN, WIN, LOSS
 
 STATE_PATH = "cloud_state.json"
 
@@ -38,6 +38,28 @@ def load_state():
 
 def save_state(s):
     json.dump(s, open(STATE_PATH, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
+
+
+def _fill_r_result(r, res):
+    """Ghi r_result khi 1 lenh vua duoc cham WIN/LOSS qua OutcomeEvaluator (cham
+    theo gia SL/TP that, dung cho breakout/bollinger/london va phan supertrend
+    dong som truoc khi lat huong). TRUOC BAN VA (2026-09-17): cac cho goi
+    OutcomeEvaluator.evaluate() chi set outcome ma KHONG set r_result, khien
+    r_result = null cho 100% lenh breakout/bollinger/london da dong va ~28%
+    lenh supertrend da dong - dashboard JS (`realR()` trong dashboard/index.html)
+    dang phai TU DOAN lai bang WIN=rr cau hinh/LOSS=-1 (dung nhung khong luu vao
+    du lieu goc). Ham nay ghi truc tiep vao du lieu goc, dung DUNG quy uoc ma
+    dashboard dang gia dinh: WIN -> dung "rr" (R:R muc tieu da luu luc tao lenh,
+    vi WIN nghia la da cham TP = entry +/- rr*risk); LOSS -> -1.0 (SL da chan).
+    KHONG ghi de neu r_result da co san (vd supertrend dong qua lat huong da tu
+    tinh r_result rieng, chinh xac hon vi dung gia dao chieu that)."""
+    if r.get("r_result") is not None:
+        return
+    if res == WIN:
+        rr_val = r.get("rr")
+        r["r_result"] = round(rr_val, 3) if isinstance(rr_val, (int, float)) else None
+    elif res == LOSS:
+        r["r_result"] = -1.0
 
 
 SIGNALS_PATH = "cloud_signals.json"
@@ -271,6 +293,7 @@ def _scan_discrete(sym, tf, strategy, cfg, state, signals_log, snapshot, notifie
                     res = OutcomeEvaluator.evaluate(r["action"], r.get("sl"), r.get("tp"), fut)
                     if res != OPEN:
                         r["outcome"] = res
+                        _fill_r_result(r, res)
             except Exception as e:
                 print("[WARN] cham outcome {} {} [{}] loi: {}".format(sym, tf, strategy, e))
 
@@ -520,6 +543,7 @@ def main():
                         res = OutcomeEvaluator.evaluate(r["action"], r.get("sl"), r.get("tp"), fut)
                         if res != OPEN:
                             r["outcome"] = res
+                            _fill_r_result(r, res)
                 except Exception as e:
                     print("[WARN] cham outcome {} {} loi: {}".format(sym, tf, e))
 
