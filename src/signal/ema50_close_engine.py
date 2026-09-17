@@ -4,42 +4,40 @@ EMA50 Close Engine - chien luoc CHI 1 duong EMA50, theo y tuong CuongNT
 (2026-09-17), dung truoc tien de BACKTEST xem gia co "chay dung xu huong
 thi truong" theo 1 EMA don gian hay khong, truoc khi ban co vao lenh that.
 
-Luat goc CuongNT:
-  Gia dong cua DUT KHOAT tren EMA50 (than nen dong cua o tren EMA50 tro
-  len) => BUY.
-  Gia dong cua DUT KHOAT duoi EMA50 (than nen dong cua o duoi EMA50 tro
-  xuong) => SELL.
+Luat CuongNT (cap nhat lan 2, 2026-09-17 - CHI TINH LUC VUA CAT QUA, khong
+phai cu dang o tren/duoi la tinh):
+  Nen tu DUOI EMA50 CAT LEN TREN EMA50 (nen truoc dong cua duoi EMA50, nen
+  nay cat dut khoat, than nen dong cua tren EMA50) => BUY.
+  Nen tu TREN EMA50 CAT XUONG DUOI EMA50 (nen truoc dong cua tren EMA50,
+  nen nay cat dut khoat, than nen dong cua duoi EMA50) => SELL.
+(Ban dau CuongNT mo ta la "dong cua dut khoat tren/duoi EMA50 => BUY/SELL",
+tuc la CU DANG o 1 phia la tinh - nhung sau khi test thay PF thap deu ca 3
+khung (nhieu tin hieu lien tuc lien tiep khi gia duy tri 1 phia), CuongNT
+doi lai chi tinh o candle VUA CAT QUA - moi nen tiep theo van dang o cung
+phia se KHONG con tinh la tin hieu moi nua, tranh lap/spam tin hieu cung
+1 huong nhieu lan lien tiep khi thi truong dang trending on dinh.)
 
-Bo sung cua Claude (bat/tat duoc qua EMA50CLOSE_* trong constants.py, dat
-ve "0" het la quay lai dung 100% luat goc, khong bo loc gi them):
+Da THU bo loc ADX (theo yeu cau CuongNT) - khong con dung ADX de loc nua,
+quay lai dung 2 bo sung ban dau:
   1) "Dut khoat" duoc hieu la CA THAN NEN (open VA close) nam gon 1 phia
      EMA50 - khong chi rieng gia dong cua (EMA50CLOSE_REQUIRE_FULL_BODY).
-     Ly do: 1 nen mo cua duoi EMA50 nhung dong cua nhinh hon EMA50 vai
-     tick la nen do du (indecision), chua phai la 1 cai "dut khoat" dung
-     tinh than tu ban dung.
   2) Them 1 khoang dem nho theo ATR (EMA50CLOSE_BUFFER_ATR, mac dinh
-     0.15x ATR14) - gia phai vuot EMA50 xa hon khoang dem nay. Ly do: 1
-     duong EMA don le rat de bi "nhieu" (whipsaw) o thi truong sideway,
-     dac biet khi khong co bo loc xu huong nao khac di kem.
+     0.15x ATR14) - gia phai vuot EMA50 xa hon khoang dem nay.
+Ca 2 ap dung cho CA nen hien tai (xac nhan cat dut khoat) LAN nen truoc do
+(xac nhan nen truoc THUC SU dang o phia doi dien, khong phai cung dang
+"lung lung" gan EMA50).
 
-KHONG dung bo loc xu huong khung lon (htf_trend) - dung dung y "chi 1
-duong EMA50" CuongNT yeu cau cho phan xac dinh huong.
-
-Bo sung 3) - SAU KHI backtest mau lon (20000 nen) cho thay ca 3 khung deu
-chi PF ~1.0-1.13 (qua thap, nhieu whipsaw luc sideway vi khong co gi xac
-nhan thi truong dang trending): them dieu kien ADX14 >= EMA50CLOSE_ADX_MIN
-(mac dinh 20, giong ADX_MIN chung cua he thong) - CHI nhan tin hieu khi
-thi truong dang THUC SU co xu huong, bo qua het tin hieu luc ADX yeu (gia
-di ngang, cat qua EMA50 lien tuc 2 chieu ma khong di dau ve dau). Dat
-EMA50CLOSE_ADX_MIN=0 de tat han bo loc nay, quay lai dung ban dau.
+KHONG dung bo loc xu huong khung lon (htf_trend), KHONG dung ADX/RSI - dung
+dung y "chi 1 duong EMA50" CuongNT yeu cau.
 
 SL/TP: dung RiskManager.dynamic_levels() mac dinh (giong ema_pullback) qua
 nhanh else cua TradeService.create(), vi day cung se la lenh that neu sau
 nay quyet dinh bat len (sau khi qua backtest).
 """
+from src.indicators.indicator_service import IndicatorService
 from src.signal.constants import (
     BUY, SELL, NO_TRADE, UPTREND, DOWNTREND, SIDEWAYS, STRONG, WEAK,
-    EMA50CLOSE_BUFFER_ATR, EMA50CLOSE_REQUIRE_FULL_BODY, EMA50CLOSE_ADX_MIN,
+    EMA50CLOSE_BUFFER_ATR, EMA50CLOSE_REQUIRE_FULL_BODY,
 )
 from src.signal.signal import Signal
 
@@ -59,6 +57,18 @@ class Ema50CloseEngine:
                       pattern="EMA50Close" if action in (BUY, SELL) else "")
 
     @staticmethod
+    def _decisive_side(close, open_, ema, buf):
+        """Tra ve 'above' neu nen (theo dung nghia 'dut khoat' - xem module
+        docstring) nam gon tren ema, 'below' neu nam gon duoi, None neu con
+        lung lung/khong du dut khoat."""
+        body_lo, body_hi = (open_, close) if open_ <= close else (close, open_)
+        if close >= ema + buf and (not EMA50CLOSE_REQUIRE_FULL_BODY or body_lo > ema):
+            return "above"
+        if close <= ema - buf and (not EMA50CLOSE_REQUIRE_FULL_BODY or body_hi < ema):
+            return "below"
+        return None
+
+    @staticmethod
     def analyze(candles, ema50, adx=0.0, atr=0.0, rsi=0.0):
         last = candles[-1]
         close = last.close
@@ -67,28 +77,35 @@ class Ema50CloseEngine:
             atr = abs(close) * 0.001
         buf = EMA50CLOSE_BUFFER_ATR * atr
 
-        body_lo, body_hi = (open_, close) if open_ <= close else (close, open_)
-
-        buy_ok = close >= ema50 + buf
-        sell_ok = close <= ema50 - buf
-        if EMA50CLOSE_REQUIRE_FULL_BODY:
-            buy_ok = buy_ok and body_lo > ema50
-            sell_ok = sell_ok and body_hi < ema50
-
-        if (buy_ok or sell_ok) and adx < EMA50CLOSE_ADX_MIN:
+        if len(candles) < 51:
             return Ema50CloseEngine._mk(
-                NO_TRADE, "Da dut khoat qua EMA50 nhung ADX {:.1f} < {:g} (thi truong "
-                "chua du trending, de nhieu/whipsaw)".format(adx, EMA50CLOSE_ADX_MIN),
+                NO_TRADE, "Chua du nen de xac dinh EMA50 nen truoc do (can >= 51 nen)",
                 ema50, adx, atr, rsi)
 
-        if buy_ok:
+        prev = candles[-2]
+        prev_ema50 = IndicatorService.ema(candles[:-1], 50)
+
+        cur_side = Ema50CloseEngine._decisive_side(close, open_, ema50, buf)
+        prev_side = Ema50CloseEngine._decisive_side(prev.close, prev.open, prev_ema50, buf)
+
+        if cur_side == "above" and prev_side != "above":
             return Ema50CloseEngine._mk(
-                BUY, "Dong cua {:.5g} dut khoat TREN EMA50 {:.5g} (dem {:.5g}, ADX {:.1f})".format(
-                    close, ema50, buf, adx), ema50, adx, atr, rsi)
-        if sell_ok:
+                BUY, "Nen truoc chua o han tren EMA50 ({:.5g}), nen nay dut khoat "
+                     "CAT LEN TREN EMA50 {:.5g} (dong cua {:.5g})".format(
+                         prev_ema50, ema50, close),
+                ema50, adx, atr, rsi)
+        if cur_side == "below" and prev_side != "below":
             return Ema50CloseEngine._mk(
-                SELL, "Dong cua {:.5g} dut khoat DUOI EMA50 {:.5g} (dem {:.5g}, ADX {:.1f})".format(
-                    close, ema50, buf, adx), ema50, adx, atr, rsi)
+                SELL, "Nen truoc chua o han duoi EMA50 ({:.5g}), nen nay dut khoat "
+                      "CAT XUONG DUOI EMA50 {:.5g} (dong cua {:.5g})".format(
+                          prev_ema50, ema50, close),
+                ema50, adx, atr, rsi)
+        if cur_side is not None:
+            return Ema50CloseEngine._mk(
+                NO_TRADE, "Van dang o han {} EMA50 nhung KHONG phai lan cat moi (nen "
+                          "truoc da o cung phia roi) - bo qua de tranh lap tin hieu".format(
+                              "tren" if cur_side == "above" else "duoi"),
+                ema50, adx, atr, rsi)
         return Ema50CloseEngine._mk(
             NO_TRADE, "Gia {:.5g} con qua sat/xen ke EMA50 {:.5g}, chua dut khoat".format(
                 close, ema50), ema50, adx, atr, rsi)
