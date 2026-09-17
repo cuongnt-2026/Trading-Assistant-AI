@@ -109,7 +109,11 @@ class Config:
         self.entry_wait_bars = int(os.getenv("ENTRY_WAIT_BARS", "6"))
 
         # ----- Supertrend (he dao chieu; sau backtest: chi XAU M30, TP 3R) -----
-        self.supertrend_enabled = os.getenv("SUPERTREND_ENABLED", "1").strip() not in ("0", "false", "")
+        # Mac dinh TAT ("0") - theo yeu cau CuongNT (2026-09-17): nhieu lenh
+        # (36 lenh) nhung Tong R = -0.21 (hoa von/hoi lo), da tat gui mail/mo
+        # lenh moi VA an het khoi dashboard (xem dashboard/index.html, bien S)
+        # - du lieu cu van con trong cloud_signals.json de tham khao neu can.
+        self.supertrend_enabled = os.getenv("SUPERTREND_ENABLED", "0").strip() not in ("0", "false", "")
         self.supertrend_symbols = _split(os.getenv("SUPERTREND_SYMBOLS", "XAUUSD"))
         self.supertrend_tfs = _split(os.getenv("SUPERTREND_TFS", "M30"))
         self.supertrend_period = int(os.getenv("SUPERTREND_PERIOD", "10"))

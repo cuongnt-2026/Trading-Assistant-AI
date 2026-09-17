@@ -223,7 +223,7 @@
         </div>
       </div>
       <div class="panel">
-        <h3>Thống kê theo chiến lược <span class="sub">breakout / trend / supertrend / bollinger / london / ema_pullback — chỉ lệnh đã gửi</span></h3>
+        <h3>Thống kê theo chiến lược <span class="sub">breakout / bollinger / london / ema_pullback — chỉ lệnh đã gửi (đã ẩn trend, supertrend)</span></h3>
         <div id="stratTable"></div>
       </div>
       <div class="panel">
@@ -283,7 +283,9 @@
 (function(){
   const D = (window.TA_DATA)||{signals:[],updated:"—"};
   // Da tat Trend -> an het du lieu Trend khoi moi thong ke/bang/bieu do cho gon.
-  const S = (D.signals||[]).filter(s=>s.strategy!=='trend').slice();
+  // Da tat Supertrend (2026-09-17, CuongNT): 36 lenh nhung Tong R = -0.21
+  // (hoa von/hoi lo) -> an het du lieu Supertrend cho gon, giong Trend o tren.
+  const S = (D.signals||[]).filter(s=>s.strategy!=='trend'&&s.strategy!=='supertrend').slice();
 
   const num=(x,d=2)=> (x===null||x===undefined||isNaN(x))?"—":Number(x).toFixed(d);
   const g=(o,k,def="—")=> (o && o[k]!==undefined && o[k]!==null)?o[k]:def;

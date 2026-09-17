@@ -38,6 +38,9 @@ jobs:
       SYMBOLS_FOREX: ""
       MIN_CONFIDENCE: "60"
       TREND_ENABLED: "0"
+      # TAT theo yeu cau CuongNT (2026-09-17): 36 lenh nhung Tong R = -0.21
+      # (hoa von/hoi lo) - da an het khoi dashboard (xem dashboard/index.html).
+      SUPERTREND_ENABLED: "0"
       SUPERTREND_TFS: "M30"
       SUPERTREND_RR: "3"
       ENTRY_MODE: limit
