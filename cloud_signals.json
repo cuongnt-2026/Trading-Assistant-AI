@@ -1503,5 +1503,23 @@
     "expected_profit": null,
     "confidence": 12.3,
     "outcome": "WIN"
+  },
+  {
+    "time": "2026-09-17 06:01 UTC",
+    "candle_time": "2026-09-17 05:00:00",
+    "symbol": "EURUSD",
+    "timeframe": "H4",
+    "action": "BUY",
+    "strategy": "bollinger",
+    "entry": 1.14668,
+    "sl": 1.14542,
+    "tp": 1.15609,
+    "rr": 7.47,
+    "risk_reward": "1 : 7.47",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 30.0,
+    "outcome": "OPEN"
   }
 ]
