@@ -6,7 +6,7 @@ if exist ".venv\Scripts\python.exe" (set "PY=.venv\Scripts\python.exe") else (se
 
 echo ============================================================
 echo   BACKTEST HEDGE tai khang cu manh - XAUUSD
-echo   - Uptrend (day sau cao hon) + khang cu cham >=4 lan
+echo   - Uptrend (day sau cao hon) + khang cu cham ^>=4 lan
 echo   - Mo dong thoi BUY (TP+20/SL-20) va SELL (TP+10/SL-20)
 echo ============================================================
 echo LUU Y: mo MT5 va dang nhap truoc.

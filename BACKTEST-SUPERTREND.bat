@@ -26,7 +26,7 @@ if "%GRP%"=="2" set "SYMS=EURUSD,GBPUSD,USDJPY,USDCHF,AUDUSD,USDCAD,NZDUSD"
 if "%GRP%"=="1" echo (Nhom 1 = dung y Supertrend dang chay that tren cloud: chi XAUUSD)
 
 echo.
-echo Server MT5 cua ban lech UTC bao nhieu gio? (vd broker UTC+3 -> nhap 3)
+echo Server MT5 cua ban lech UTC bao nhieu gio? (vd broker UTC+3 -^> nhap 3)
 echo Enter = 0 (coi server = UTC luon, cot Gio/Phien co the lech thuc te vai gio)
 set "OFFSET=0"
 set /p OFFSET=Lech gio server so voi UTC, Enter=0:

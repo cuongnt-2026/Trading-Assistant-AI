@@ -194,3 +194,9 @@ EMA50CLOSE_BUFFER_ATR = float(os.getenv("EMA50CLOSE_BUFFER_ATR", "0.15"))
 # dong cua nhinh hon EMA50 mot chut) la "dut khoat". Dat "0" de chi xet gia
 # dong cua nhu luat goc.
 EMA50CLOSE_REQUIRE_FULL_BODY = os.getenv("EMA50CLOSE_REQUIRE_FULL_BODY", "1").strip() not in ("0", "false", "")
+# EMA50CLOSE_ADX_MIN: chi nhan tin hieu khi ADX14 >= muc nay (thi truong dang
+# THUC SU trending, khong phai sideway) - bo sung SAU KHI backtest mau lon
+# (20000 nen) cho thay ca 3 khung deu PF ~1.0-1.13 (qua thap, nhieu whipsaw
+# luc sideway). Dat "0" de tat han bo loc nay (giu dung ban dau, khong loc
+# ADX). Muc 20 giong ADX_MIN chung cua he thong (xem SignalEngine).
+EMA50CLOSE_ADX_MIN = float(os.getenv("EMA50CLOSE_ADX_MIN", "20"))

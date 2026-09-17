@@ -22,10 +22,16 @@ ve "0" het la quay lai dung 100% luat goc, khong bo loc gi them):
      duong EMA don le rat de bi "nhieu" (whipsaw) o thi truong sideway,
      dac biet khi khong co bo loc xu huong nao khac di kem.
 
-KHONG dung bo loc xu huong khung lon (htf_trend), KHONG dung ADX/RSI de loc
-- dung dung y "chi 1 duong EMA50" CuongNT yeu cau. Neu backtest cho thay
-qua nhieu nhieu (whipsaw) o thi truong sideway, co the can bo sung bo loc
-ADX (xac nhan dang trending) o buoc sau - CHUA lam trong ban dau nay.
+KHONG dung bo loc xu huong khung lon (htf_trend) - dung dung y "chi 1
+duong EMA50" CuongNT yeu cau cho phan xac dinh huong.
+
+Bo sung 3) - SAU KHI backtest mau lon (20000 nen) cho thay ca 3 khung deu
+chi PF ~1.0-1.13 (qua thap, nhieu whipsaw luc sideway vi khong co gi xac
+nhan thi truong dang trending): them dieu kien ADX14 >= EMA50CLOSE_ADX_MIN
+(mac dinh 20, giong ADX_MIN chung cua he thong) - CHI nhan tin hieu khi
+thi truong dang THUC SU co xu huong, bo qua het tin hieu luc ADX yeu (gia
+di ngang, cat qua EMA50 lien tuc 2 chieu ma khong di dau ve dau). Dat
+EMA50CLOSE_ADX_MIN=0 de tat han bo loc nay, quay lai dung ban dau.
 
 SL/TP: dung RiskManager.dynamic_levels() mac dinh (giong ema_pullback) qua
 nhanh else cua TradeService.create(), vi day cung se la lenh that neu sau
@@ -33,7 +39,7 @@ nay quyet dinh bat len (sau khi qua backtest).
 """
 from src.signal.constants import (
     BUY, SELL, NO_TRADE, UPTREND, DOWNTREND, SIDEWAYS, STRONG, WEAK,
-    EMA50CLOSE_BUFFER_ATR, EMA50CLOSE_REQUIRE_FULL_BODY,
+    EMA50CLOSE_BUFFER_ATR, EMA50CLOSE_REQUIRE_FULL_BODY, EMA50CLOSE_ADX_MIN,
 )
 from src.signal.signal import Signal
 
@@ -69,14 +75,20 @@ class Ema50CloseEngine:
             buy_ok = buy_ok and body_lo > ema50
             sell_ok = sell_ok and body_hi < ema50
 
+        if (buy_ok or sell_ok) and adx < EMA50CLOSE_ADX_MIN:
+            return Ema50CloseEngine._mk(
+                NO_TRADE, "Da dut khoat qua EMA50 nhung ADX {:.1f} < {:g} (thi truong "
+                "chua du trending, de nhieu/whipsaw)".format(adx, EMA50CLOSE_ADX_MIN),
+                ema50, adx, atr, rsi)
+
         if buy_ok:
             return Ema50CloseEngine._mk(
-                BUY, "Dong cua {:.5g} dut khoat TREN EMA50 {:.5g} (dem {:.5g})".format(
-                    close, ema50, buf), ema50, adx, atr, rsi)
+                BUY, "Dong cua {:.5g} dut khoat TREN EMA50 {:.5g} (dem {:.5g}, ADX {:.1f})".format(
+                    close, ema50, buf, adx), ema50, adx, atr, rsi)
         if sell_ok:
             return Ema50CloseEngine._mk(
-                SELL, "Dong cua {:.5g} dut khoat DUOI EMA50 {:.5g} (dem {:.5g})".format(
-                    close, ema50, buf), ema50, adx, atr, rsi)
+                SELL, "Dong cua {:.5g} dut khoat DUOI EMA50 {:.5g} (dem {:.5g}, ADX {:.1f})".format(
+                    close, ema50, buf, adx), ema50, adx, atr, rsi)
         return Ema50CloseEngine._mk(
             NO_TRADE, "Gia {:.5g} con qua sat/xen ke EMA50 {:.5g}, chua dut khoat".format(
                 close, ema50), ema50, adx, atr, rsi)
