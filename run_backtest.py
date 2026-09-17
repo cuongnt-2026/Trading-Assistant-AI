@@ -117,6 +117,7 @@ def main():
         for symbol, tf in scan_list:
             if only_symbol and only_symbol not in symbol.upper():
                 continue
+            strategy_used = strategy_override or strategy_for(symbol)
             try:
                 candles = DataService.get_candles(symbol=symbol, timeframe=tf, count=bars)
             except Exception as e:
@@ -126,13 +127,31 @@ def main():
                 print("{:<10} {:<5} khong du du lieu".format(symbol, tf))
                 continue
 
+            # EMA Pullback can THEM khung H1 that (xu huong) - khong the dung
+            # htf_trend (1 gia tri huong don gian) nhu cac chien luoc mtf khac,
+            # vi EmaPullbackEngine.h1_trend() can toan bo nen H1 de tinh thu tu
+            # 4 EMA + doc EMA20 + khoang cach EMA20-EMA50 (xem backtester.py).
+            htf_candles = None
+            if strategy_used == "ema_pullback":
+                htf_bars = max(3000, bars // 3 + 300)
+                try:
+                    htf_candles = DataService.get_candles(symbol=symbol, timeframe="H1", count=htf_bars)
+                except Exception as e:
+                    print("{:<10} {:<5} loi lay du lieu H1 (ema_pullback can H1 lam xu huong): {}".format(
+                        symbol, tf, e))
+                    continue
+                if not htf_candles or len(htf_candles) < 210:
+                    print("{:<10} {:<5} khong du du lieu H1 cho ema_pullback".format(symbol, tf))
+                    continue
+
             res = Backtester.run(candles, symbol=symbol, balance=balance,
                                  risk_min=config.risk_min_percent,
                                  risk_max=config.risk_max_percent,
                                  min_confidence=config.min_confidence,
-                                 strategy=(strategy_override or strategy_for(symbol)),
+                                 strategy=strategy_used,
                                  entry_mode=config.entry_mode,
-                                 entry_wait=config.entry_wait_bars)
+                                 entry_wait=config.entry_wait_bars,
+                                 htf_candles=htf_candles)
             s = res["stats"]
             print("{:<10} {:<5} {:>6} {:>6} {:>6} {:>7}% {:>7} {:>7} {:>8}% {:>8}%".format(
                 symbol, tf, s["trades"], s["wins"], s["losses"], s["win_rate"],

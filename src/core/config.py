@@ -167,8 +167,14 @@ class Config:
         # chi canh BUY, H1 giam thi chi canh SELL). SL/TP dung chung RiskManager.
         # dynamic_levels() (swing + cau truc, xem src/trade/risk_manager.py) vi day la
         # chien luoc vao lenh THAT giong breakout/bollinger/london, khong can rieng.
-        # Xem src/signal/ema_pullback_engine.py. -----
-        self.emapullback_enabled = os.getenv("EMAPULLBACK_ENABLED", "1").strip() not in ("0", "false", "")
+        # Xem src/signal/ema_pullback_engine.py.
+        # Mac dinh TAT ("0"): chien luoc nay MOI chi qua unit test tong hop
+        # (kiem tra logic dung), CHUA chay backtest tren du lieu that lan nao -
+        # khac voi bollinger/london la da "chot qua backtest" truoc khi bat
+        # len that. Chi doi lai "1" SAU KHI chay BACKTEST-EMA-PULLBACK.bat
+        # (can mo MT5 tren may) va thay AvgR > 0, PF > 1.2-1.3 voi it nhat vai
+        # chuc lenh, giong quy uoc da ap dung cho bollinger_pairs/london_pairs. -----
+        self.emapullback_enabled = os.getenv("EMAPULLBACK_ENABLED", "0").strip() not in ("0", "false", "")
         self.emapullback_pairs = _parse_pairs(os.getenv("EMAPULLBACK_PAIRS", "XAUUSD:M15"))
 
         # ----- Duong dan output -----

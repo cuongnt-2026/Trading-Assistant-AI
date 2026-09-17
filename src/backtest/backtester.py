@@ -5,10 +5,21 @@ Backtester (Sprint 10) - chay lai chien luoc tren du lieu lich su.
   Chi tinh la vao lenh neu gia cham limit trong entry_wait nen; neu khong -> bo keo.
 - Meanrev / market: vao ngay tai gia dong nen tin hieu.
 Sau khi vao: cham TP truoc=WIN, SL truoc=LOSS, het lookahead=dong theo gia.
+
+- htf_candles (tuy chon): du lieu KHUNG LON that (VD H4/D1) de tinh htf_trend
+  dung THOI DIEM cho cac chien luoc da khung (VD "mtf_structure"). Dung bisect
+  de CHI lay cac nen khung lon da dong HOAN TOAN truoc thoi diem nen hien tai
+  (khong de lo du lieu tuong lai). Cac chien luoc khac khong truyen tham so
+  nay -> hanh vi khong doi (htf_trend luon None nhu truoc).
 """
+
+import bisect
 
 from src.signal.constants import BUY, SELL, NO_TRADE
 from src.signal.signal_service import SignalService
+from src.signal.trend import TrendService
+from src.indicators.indicator_service import IndicatorService
+from src.signal.ema_pullback_engine import EmaPullbackEngine
 from src.ai_review.recommender import Recommender
 from src.trade.trade_service import TradeService
 
@@ -23,20 +34,56 @@ class Backtester:
     def run(candles, symbol="", balance=10000.0,
             risk_min=0.5, risk_max=1.5, min_confidence=0.0, strategy="trend",
             entry_mode="market", entry_wait=6,
-            lookahead=250, window=320, warmup=210):
+            lookahead=250, window=320, warmup=210, htf_candles=None):
         n = len(candles)
         trades = []
+        htf_times = [c.time for c in htf_candles] if htf_candles else None
         i = warmup
         while i < n - 1:
             w = candles[max(0, i - window): i + 1]
             if len(w) < warmup:
                 i += 1
                 continue
-            try:
-                signal = SignalService.analyze(w, strategy=strategy)
-            except Exception:
-                i += 1
-                continue
+            htf_trend_val = None
+            htf_win = None
+            if htf_times:
+                cur_time = candles[i].time
+                idx = bisect.bisect_left(htf_times, cur_time) - 1
+                if idx >= 0:
+                    # Cua so nen khung lon (H1...) DA DONG HOAN TOAN truoc thoi
+                    # diem nen hien tai - dung chung cho ca TrendService.direction()
+                    # (cac chien luoc mtf_trend cu) lan EmaPullbackEngine.h1_trend()
+                    # (can toi thieu ~203 nen H1, tu xu ly SIDEWAYS neu thieu).
+                    htf_win = htf_candles[max(0, idx - 260):idx + 1]
+                if idx >= 60:
+                    htf_trend_val = TrendService.direction(htf_win)
+
+            # ----- EMA Pullback: can CA hai khung (M15 = w, H1 = htf_win that,
+            # khong phai chi 1 gia tri huong nhu htf_trend_val) - bypass
+            # SignalService.analyze() vi engine nay doc lap, khong nam trong
+            # dispatch cua SignalService (xem src/signal/ema_pullback_engine.py). -----
+            if strategy == "ema_pullback":
+                if not htf_win:
+                    i += 1
+                    continue
+                try:
+                    ema20 = IndicatorService.ema(w, 20)
+                    ema50 = IndicatorService.ema(w, 50)
+                    ema200 = IndicatorService.ema(w, 200)
+                    adx_w = IndicatorService.adx(w)
+                    atr_w = IndicatorService.atr(w)
+                    rsi_w = IndicatorService.rsi(w)
+                    signal = EmaPullbackEngine.analyze(
+                        w, htf_win, ema20, ema50, ema200, adx_w, atr_w, rsi_w)
+                except Exception:
+                    i += 1
+                    continue
+            else:
+                try:
+                    signal = SignalService.analyze(w, strategy=strategy, htf_trend=htf_trend_val)
+                except Exception:
+                    i += 1
+                    continue
             if signal.action not in (BUY, SELL):
                 i += 1
                 continue
