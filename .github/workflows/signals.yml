@@ -71,6 +71,13 @@ jobs:
       # loc theo che do EMA200 (xem src/signal/ema_trend_watcher.py).
       EMATREND_ENABLED: "1"
       EMATREND_PAIRS: "XAUUSD:M15"
+      # EMA Pullback: chien luoc VAO LENH THAT (Entry/SL/TP that, khac EMA Trend Watch/
+      # EMA Cross Watch o tren la canh bao khong vao lenh) - y tuong CuongNT (2026-09-17):
+      # H1 xu huong (thu tu chat 20>50>100>200 + loc doc + loc khoang cach EMA20-50),
+      # M15 diem vao (hoi ve EMA20/50/100 + xac nhan nen dao chieu). Xem
+      # src/signal/ema_pullback_engine.py.
+      EMAPULLBACK_ENABLED: "1"
+      EMAPULLBACK_PAIRS: "XAUUSD:M15"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

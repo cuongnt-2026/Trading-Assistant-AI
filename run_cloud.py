@@ -23,6 +23,7 @@ from src.notifier.messages import (build_signal_email, build_supertrend_email,
 from src.signal.supertrend import supertrend
 from src.signal.ema_cross_watcher import EmaCrossWatcher
 from src.signal.ema_trend_watcher import EmaTrendWatcher
+from src.signal.ema_pullback_engine import EmaPullbackEngine
 from src.signal.ema_trend_tracker import record_event, evaluate_pending, compute_stats
 from src.indicators.indicator_service import IndicatorService
 from src.trade.outcome import OutcomeEvaluator, OPEN, WIN, LOSS
@@ -399,6 +400,109 @@ def _scan_discrete(sym, tf, strategy, cfg, state, signals_log, snapshot, notifie
     return 0
 
 
+STRATEGY_EMAPULLBACK = "ema_pullback"
+
+
+def _scan_ema_pullback(sym, tf, cfg, state, signals_log, notifier, cache):
+    """EMA Pullback: chien luoc VAO LENH THAT (khac EMA Trend Watch/EMA Cross Watch
+    o duoi la canh bao khong vao lenh) - xem docstring src/signal/ema_pullback_engine.py.
+    Quet DOC LAP nhu Bollinger/London, nhung can CA 2 khung: `tf` (vd M15, diem vao) va
+    khung H1 (xu huong, lay qua higher_tf(tf)) - dung chung cache nen voi watchlist
+    chinh nen KHONG ton them request API (XAUUSD H1 da duoc quet san cho breakout)."""
+    strategy = STRATEGY_EMAPULLBACK
+    try:
+        candles = _fetch_cached(cache, sym, tf, cfg)
+        h1_candles = _fetch_cached(cache, sym, higher_tf(tf), cfg)
+    except Exception as e:
+        print("[WARN] {} {} [{}] fetch loi: {}".format(sym, tf, strategy, e))
+        return 0
+    if not candles or len(candles) < 200:
+        print("[WARN] {} {} [{}] khong du nen M15 ({})".format(
+            sym, tf, strategy, len(candles) if candles else 0))
+        return 0
+
+    # Cham WIN/LOSS cho tin hieu OPEN cua chinh strategy + cap-khung nay
+    for r in signals_log:
+        if (r.get("outcome") == "OPEN" and r.get("symbol") == sym
+                and r.get("timeframe") == tf and r.get("strategy") == strategy):
+            try:
+                st = _parse_ct(r.get("candle_time", ""))
+                fut = [c for c in candles if st and c.time > st]
+                if fut:
+                    res = OutcomeEvaluator.evaluate(r["action"], r.get("sl"), r.get("tp"), fut)
+                    if res != OPEN:
+                        r["outcome"] = res
+                        _fill_r_result(r, res)
+            except Exception as e:
+                print("[WARN] cham outcome {} {} [{}] loi: {}".format(sym, tf, strategy, e))
+
+    try:
+        ema20 = IndicatorService.ema(candles, 20)
+        ema50 = IndicatorService.ema(candles, 50)
+        ema200 = IndicatorService.ema(candles, 200)
+        adx = IndicatorService.adx(candles)
+        atr = IndicatorService.atr(candles)
+        rsi = IndicatorService.rsi(candles)
+        signal = EmaPullbackEngine.analyze(candles, h1_candles, ema20, ema50, ema200, adx, atr, rsi)
+    except Exception as e:
+        print("[WARN] {} {} [{}] analyze loi: {}".format(sym, tf, strategy, e))
+        return 0
+    last = candles[-1]
+    ts = str(last.time)
+    print("  {} {} [{}] | {} | close={:.5g} | {}".format(
+        sym, tf, strategy, signal.action, last.close, signal.reason))
+
+    if signal.action not in (BUY, SELL):
+        return 0
+
+    skey = "{} {} {}".format(strategy, sym, tf)
+    if state.get(skey) == ts:
+        print("     -> [{}] da bao cho nen nay -> bo qua".format(strategy))
+        return 0
+
+    # Chong ban trung: da co lenh CUNG CHIEU dang mo o cap-khung-strategy nay -> bo qua
+    if any(r.get("outcome") == "OPEN" and r.get("symbol") == sym
+           and r.get("timeframe") == tf and r.get("strategy") == strategy
+           and r.get("action") == signal.action for r in signals_log):
+        print("     -> [{}] da co lenh {} dang mo o {} {} -> bo qua (chong ban trung)".format(
+            strategy, signal.action, sym, tf))
+        return 0
+
+    try:
+        rec = Recommender.evaluate(signal, candles)
+    except Exception as e:
+        print("[WARN] {} {} [{}] recommender loi: {}".format(sym, tf, strategy, e))
+        return 0
+
+    try:
+        plan = TradeService.create(
+            signal, candles, symbol=sym, balance=cfg.account_balance or None,
+            confidence=rec.confidence, risk_min=cfg.risk_min_percent,
+            risk_max=cfg.risk_max_percent, strategy=strategy, entry_mode=cfg.entry_mode)
+        subject, body = build_signal_email(signal, sym, tf, last,
+                                           recommendation=rec, trade_plan=plan)
+        subject = "[CLOUD][{}] ".format(strategy.upper()) + subject
+        ok = notifier.send(subject, body) if notifier else False
+        print("     -> [{}] GUI MAIL: {} (conf {:.0f})".format(
+            strategy, "OK" if ok else "FAIL/none", rec.confidence))
+        if ok:
+            state[skey] = ts
+            signals_log.append({
+                "time": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+                "candle_time": ts, "symbol": sym, "timeframe": tf,
+                "action": signal.action, "strategy": strategy,
+                "entry": plan.entry_price, "sl": plan.stop_loss, "tp": plan.take_profit,
+                "rr": plan.rr_ratio, "risk_reward": plan.risk_reward,
+                "risk_percent": plan.risk_percent, "lot_size": plan.lot_size,
+                "expected_profit": plan.expected_profit,
+                "confidence": round(rec.confidence, 1), "outcome": "OPEN",
+            })
+            return 1
+    except Exception as e:
+        print("[WARN] {} {} [{}] tao/gui lenh loi: {}".format(sym, tf, strategy, e))
+    return 0
+
+
 def _scan_ema_cross(sym, tf, cfg, state, notifier, cache):
     """EMA Cross Watch: CANH BAO rieng (KHONG phai chien luoc vao lenh) khi EMA nhanh/cham
     (mac dinh 20/100) SAP hoac VUA cat cheo nhau. Quet DOC LAP, dung chung cache nen voi
@@ -539,10 +643,11 @@ def main():
         return
 
     min_conf = cfg.min_confidence
-    print("Cloud run {} | watchlist={} | +bollinger={} +london={} +emacross={} | MIN_CONF={}".format(
+    print("Cloud run {} | watchlist={} | +bollinger={} +london={} +ema_pullback={} +emacross={} | MIN_CONF={}".format(
         datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"), len(cfg.watchlist),
         len(cfg.bollinger_pairs) if cfg.bollinger_enabled else 0,
         len(cfg.london_pairs) if cfg.london_enabled else 0,
+        len(cfg.emapullback_pairs) if cfg.emapullback_enabled else 0,
         len(cfg.emacross_pairs) if cfg.emacross_enabled else 0, min_conf))
 
     cache = {}       # (symbol, tf) -> candles, dung chung ca lan chay de do goi API trung
@@ -699,6 +804,16 @@ def main():
                 sent += _scan_discrete(sym, tf, "london", cfg, state, signals_log, snapshot, notifier, cache)
             except Exception as e:
                 print("[WARN] london {} {}: {}".format(sym, tf, e))
+
+    # ----- EMA Pullback: chien luoc VAO LENH THAT (H1 xu huong + M15 hoi ve EMA20/50/100
+    # + xac nhan nen dao chieu) - xem docstring src/signal/ema_pullback_engine.py. Quet
+    # DOC LAP nhu Bollinger/London, dung chung cache nen (khong ton them request API). -----
+    if cfg.emapullback_enabled:
+        for sym, tf in cfg.emapullback_pairs:
+            try:
+                sent += _scan_ema_pullback(sym, tf, cfg, state, signals_log, notifier, cache)
+            except Exception as e:
+                print("[WARN] ema_pullback {} {}: {}".format(sym, tf, e))
 
     # ----- EMA Cross Watch: CANH BAO rieng (khong phai chien luoc vao lenh), quet DOC LAP.
     # Symbol trong emacross_slow_symbols (vd EURUSD/GBPUSD/USDJPY) CHI duoc quet khi phut

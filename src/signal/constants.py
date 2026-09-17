@@ -164,3 +164,18 @@ EMATREND_EVAL_RR = float(os.getenv("EMATREND_EVAL_RR", "1.2"))
 # Qua so nen nay (tren M15) ma van chua cham SL_ao/TP_ao nao -> tinh "het_han" (khong
 # ket luan duoc, khong tinh vao ty le dung/sai). Mac dinh 96 nen ~ 1 ngay.
 EMATREND_EVAL_MAX_BARS = int(os.getenv("EMATREND_EVAL_MAX_BARS", "96"))
+
+# EMA Pullback (chien luoc vao lenh THAT - xem src/signal/ema_pullback_engine.py va
+# docstring EMAPULLBACK_ trong src/core/config.py):
+#   H1 (xu huong): so nen "doc" EMA20 dung sau bao nhieu nen (vd tang thi EMA20 hien
+#   tai phai > EMA20 cach day EMAPULLBACK_SLOPE_LOOKBACK nen).
+EMAPULLBACK_SLOPE_LOOKBACK = int(os.getenv("EMAPULLBACK_SLOPE_LOOKBACK", "3"))
+# Khoang cach toi thieu giua EMA20-EMA50 tren H1 (boi so ATR14 H1) - EMA dinh sat
+# nhau du dung thu tu van la dau hieu sap sideway/dao chieu, nen dung ngoai.
+EMAPULLBACK_SPACING_ATR_MULT = float(os.getenv("EMAPULLBACK_SPACING_ATR_MULT", "1.0"))
+# M15 (diem vao): gia (low cho BUY / high cho SELL) duoc tinh la "da hoi ve" 1 trong
+# EMA20/50/100 M15 neu cach EMA do <= boi so ATR14 M15 nay.
+EMAPULLBACK_PULLBACK_ATR = float(os.getenv("EMAPULLBACK_PULLBACK_ATR", "0.3"))
+# So nen M15 gan nhat (tinh ca nen hien tai) duoc xet la "vua hoi ve" EMA - tranh bo
+# lo neu gia cham EMA 1-2 nen truoc roi nen xac nhan moi toi.
+EMAPULLBACK_PULLBACK_LOOKBACK = int(os.getenv("EMAPULLBACK_PULLBACK_LOOKBACK", "3"))

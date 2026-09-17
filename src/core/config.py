@@ -158,6 +158,19 @@ class Config:
         self.ematrend_enabled = os.getenv("EMATREND_ENABLED", "1").strip() not in ("0", "false", "")
         self.ematrend_pairs = _parse_pairs(os.getenv("EMATREND_PAIRS", "XAUUSD:M15"))
 
+        # ----- EMA Pullback (chien luoc VAO LENH THAT, co Entry/SL/TP - khac EMA Trend
+        # Watch/EMA Cross Watch o tren la CANH BAO khong vao lenh). Y tuong CuongNT
+        # (2026-09-17): H1 xac dinh xu huong bang thu tu chat 4 EMA (20>50>100>200 tang,
+        # nguoc lai giam) + loc doc EMA20 + loc khoang cach EMA20-EMA50 (tranh sap
+        # sideway); M15 cho gia HOI VE 1 trong 3 EMA20/50/100 roi xac nhan bang nen dao
+        # chieu (engulfing/pin bar) truoc khi vao - CHI danh THEO chieu H1 (H1 tang thi
+        # chi canh BUY, H1 giam thi chi canh SELL). SL/TP dung chung RiskManager.
+        # dynamic_levels() (swing + cau truc, xem src/trade/risk_manager.py) vi day la
+        # chien luoc vao lenh THAT giong breakout/bollinger/london, khong can rieng.
+        # Xem src/signal/ema_pullback_engine.py. -----
+        self.emapullback_enabled = os.getenv("EMAPULLBACK_ENABLED", "1").strip() not in ("0", "false", "")
+        self.emapullback_pairs = _parse_pairs(os.getenv("EMAPULLBACK_PAIRS", "XAUUSD:M15"))
+
         # ----- Duong dan output -----
         self.reports_dir = os.getenv("REPORTS_DIR", "reports")
         self.dashboard_data = os.getenv("DASHBOARD_DATA", "dashboard/data.js")
