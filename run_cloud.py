@@ -5,6 +5,7 @@ Lay gia tu Twelve Data -> chay dung chien luoc theo symbol
 (XAU=breakout, FX=trend pullback) -> gui mail. Chong gui trung bang cloud_state.json.
 """
 import os
+import re
 import json
 from datetime import datetime
 
@@ -40,6 +41,32 @@ def save_state(s):
     json.dump(s, open(STATE_PATH, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
 
 
+def _rr_of(r):
+    """Uoc luong R:R muc tieu cua 1 lenh da luu. Dung Y HET thu tu uu tien cua
+    ham rrOf() ben dashboard/index.html (JS) de 2 phia LUON cho cung 1 ket qua,
+    khong lech nhau: (1) field "rr" (so) neu co; (2) khong thi doc so cuoi
+    chuoi "risk_reward" (vd "1 : 2.5" -> 2.5); (3) khong thi tu tinh tu
+    entry/sl/tp. Tra ve None neu khong co du du lieu nao trong 3 cach tren."""
+    rr = r.get("rr")
+    if isinstance(rr, (int, float)):
+        return rr
+    rr_txt = r.get("risk_reward")
+    if isinstance(rr_txt, str):
+        m = re.search(r"([\d.]+)\s*$", rr_txt)
+        if m:
+            try:
+                return float(m.group(1))
+            except ValueError:
+                pass
+    try:
+        entry, sl, tp = float(r.get("entry")), float(r.get("sl")), float(r.get("tp"))
+        if abs(entry - sl) > 0:
+            return abs(tp - entry) / abs(entry - sl)
+    except (TypeError, ValueError):
+        pass
+    return None
+
+
 def _fill_r_result(r, res):
     """Ghi r_result khi 1 lenh vua duoc cham WIN/LOSS qua OutcomeEvaluator (cham
     theo gia SL/TP that, dung cho breakout/bollinger/london va phan supertrend
@@ -49,14 +76,14 @@ def _fill_r_result(r, res):
     lenh supertrend da dong - dashboard JS (`realR()` trong dashboard/index.html)
     dang phai TU DOAN lai bang WIN=rr cau hinh/LOSS=-1 (dung nhung khong luu vao
     du lieu goc). Ham nay ghi truc tiep vao du lieu goc, dung DUNG quy uoc ma
-    dashboard dang gia dinh: WIN -> dung "rr" (R:R muc tieu da luu luc tao lenh,
-    vi WIN nghia la da cham TP = entry +/- rr*risk); LOSS -> -1.0 (SL da chan).
-    KHONG ghi de neu r_result da co san (vd supertrend dong qua lat huong da tu
-    tinh r_result rieng, chinh xac hon vi dung gia dao chieu that)."""
+    dashboard dang gia dinh: WIN -> _rr_of(r) (R:R muc tieu, vi WIN nghia la da
+    cham TP = entry +/- rr*risk); LOSS -> -1.0 (SL da chan). KHONG ghi de neu
+    r_result da co san (vd supertrend dong qua lat huong da tu tinh r_result
+    rieng, chinh xac hon vi dung gia dao chieu that)."""
     if r.get("r_result") is not None:
         return
     if res == WIN:
-        rr_val = r.get("rr")
+        rr_val = _rr_of(r)
         r["r_result"] = round(rr_val, 3) if isinstance(rr_val, (int, float)) else None
     elif res == LOSS:
         r["r_result"] = -1.0
