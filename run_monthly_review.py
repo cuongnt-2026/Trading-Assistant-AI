@@ -6,15 +6,15 @@ run_monthly_review.py - chay tren GitHub Actions, 1 lan vao ngay 1 hang thang
 update hay khong hay giu nguyen".
 
 Chi lam 1 viec: doc cloud_signals.json (nhat ky MOI lenh da gui that tu
-truoc den nay) -> tinh thong ke thang vua qua + tong the -> goi THAT Claude
-API de viet nhan xet/khuyen nghi -> luu vao dashboard/ai_reviews.js (dashboard
-doc de hien tab "AI Tong ket") -> gui 1 email tong ket.
+truoc den nay) -> tinh thong ke thang vua qua + tong the -> CHAM DIEM THEO
+NGUONG CO DINH (mien phi, khong goi API nao - xem
+src/ai_review/monthly_report.py de biet ly do doi tu phuong an goi Claude
+API sang phuong an nay) de viet nhan xet/khuyen nghi -> luu vao
+dashboard/ai_reviews.js (dashboard doc de hien tab "AI Tong ket") -> gui 1
+email tong ket.
 
 Co the chay tay de test: python run_monthly_review.py
-(doc ANTHROPIC_API_KEY/GMAIL_* tu .env neu co, giong run_cloud.py).
 """
-import sys
-
 from src.core.config import Config
 from src.notifier.factory import create_notifier
 from src.notifier.messages import build_monthly_review_email
@@ -25,24 +25,13 @@ def main():
     cfg = Config()
 
     print("=" * 60)
-    print("  TRADING ASSISTANT AI - AI MONTHLY REVIEW")
+    print("  TRADING ASSISTANT AI - MONTHLY REVIEW (mien phi, khong goi API)")
     print("=" * 60)
 
-    if not cfg.anthropic_api_key:
-        print("[LOI] Thieu ANTHROPIC_API_KEY (.env hoac GitHub Secrets).")
-        print("      Vao Settings > Secrets and variables > Actions cua repo")
-        print("      GitHub de them secret ANTHROPIC_API_KEY roi chay lai.")
-        sys.exit(1)
-
-    try:
-        report = run_monthly_report(api_key=cfg.anthropic_api_key,
-                                     model=cfg.anthropic_model)
-    except Exception as e:
-        print("[LOI] Khong tao duoc bao cao AI:", e)
-        sys.exit(1)
+    report = run_monthly_report()
 
     print("Thang tong ket :", report["month_label"])
-    print("Khuyen nghi AI :", report["tag"])
+    print("Khuyen nghi    :", report["tag"])
     print("Da luu vao     : dashboard/ai_reviews.js")
 
     notifier = create_notifier(cfg)

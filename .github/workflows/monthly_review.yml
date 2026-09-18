@@ -1,4 +1,4 @@
-name: AI Monthly Review
+name: Monthly Review
 
 on:
   schedule:
@@ -19,9 +19,9 @@ jobs:
   review:
     runs-on: ubuntu-latest
     env:
-      # Secret RIENG cho tinh nang nay - KHONG dung chung voi Gmail/Twelve Data.
-      # Them tai: Settings > Secrets and variables > Actions > New repository secret.
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      # Cham diem theo nguong co dinh (mien phi, khong goi API nao) - xem
+      # src/ai_review/monthly_report.py. Chi can secret Gmail de gui mail
+      # tong ket, KHONG can them secret rieng nao khac cho tinh nang nay.
       GMAIL_USER: ${{ secrets.GMAIL_USER }}
       GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
       MAIL_TO: ${{ secrets.MAIL_TO }}
@@ -33,7 +33,7 @@ jobs:
           python-version: "3.11"
       - name: Cai thu vien
         run: pip install -r requirements-cloud.txt
-      - name: Tong ket thang + goi AI phan tich + gui mail
+      - name: Tong ket thang + cham diem + gui mail
         run: python run_monthly_review.py
       - name: Luu bao cao vao dashboard
         run: |
@@ -41,6 +41,6 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add dashboard/ai_reviews.js || true
           if git diff --staged --quiet; then echo "Khong co bao cao moi de luu"; exit 0; fi
-          git commit -m "AI monthly review: cap nhat dashboard/ai_reviews.js [skip ci]"
+          git commit -m "Monthly review: cap nhat dashboard/ai_reviews.js [skip ci]"
           git pull --rebase -X ours origin main || true
           git push && echo "PUSH OK" || echo "PUSH FAIL - vao Settings > Actions > General > Workflow permissions = Read and write"

@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-Monthly AI Review (theo yeu cau CuongNT, 2026-09-18): moi thang, he thong tu
+Monthly Review (theo yeu cau CuongNT, 2026-09-18): moi thang, he thong tu
 tong hop lai TOAN BO lenh da gui (cloud_signals.json) cua thang vua qua VA
-tu truoc den nay, roi GOI THAT Claude API (khong phai cham diem theo luat co
-dinh nhu src/ai_review/recommender.py) de doc so lieu va viet nhan xet +
-khuyen nghi bang van tu nhien: nen GIU NGUYEN he thong, hay CAN CAI THIEN
-mot vai cho, hay NEN CAP NHAT/xem lai gap.
+tu truoc den nay, roi TU DONG CHAM DIEM THEO LUAT CO DINH (giong cach
+src/ai_review/recommender.py cham diem tin cay tung tin hieu) de viet nhan
+xet + khuyen nghi: nen GIU NGUYEN he thong, hay CAN CAI THIEN mot vai cho,
+hay NEN CAP NHAT/xem lai gap.
+
+(Ban dau ban nay GOI THAT Claude API - sau khi trao doi voi CuongNT ve chi
+phi (can nap tien truoc vao tai khoan Anthropic de co API key, du moi thang
+chi ton vai xu), CuongNT chon phuong an MIEN PHI HOAN TOAN nay thay the -
+khong can API key, khong can nap tien, khong goi mang ra ngoai.)
 
 Luong chay (xem run_monthly_review.py o thu muc goc):
   1) Doc cloud_signals.json (nhat ky MOI lenh da THUC SU gui mail - khong
@@ -13,35 +18,33 @@ Luong chay (xem run_monthly_review.py o thu muc goc):
      truoc den nay.
   2) Tinh thong ke theo tung chien luoc (so lenh, win/loss/open, winrate,
      Profit Factor theo R, tong R, R trung binh, do tin cay trung binh).
-  3) Dung so lieu do de dung 1 prompt tieng Viet, goi that Claude API
-     (Anthropic Messages API, qua urllib - khong can them thu vien ngoai).
+  3) Cham diem theo NGUONG CO DINH (giong quy uoc da dung xuyen suot du an:
+     PF >= 1.3 voi >= 20 lenh la "tot", PF < 1.0 voi >= 20 lenh la "kem",
+     duoi 20 lenh la "chua du du lieu de ket luan") -> sinh van ban nhan
+     xet + khuyen nghi bang tieng Viet, CUNG DINH DANG (TAG/NHAN XET/DANH
+     GIA/KHUYEN NGHI) nhu ban goi AI truoc day, de dashboard/email khong
+     can sua gi them.
   4) Luu ket qua vao dashboard/ai_reviews.js (dashboard doc de hien tab
      "AI Tong ket") + gui 1 email tong ket (xem
      src/notifier/messages.py::build_monthly_review_email).
-
-CAN bien moi truong ANTHROPIC_API_KEY (secret rieng, xem
-.github/workflows/monthly_review.yml) - neu thieu, script se dung lai va
-bao loi ro rang thay vi tu bia mot ban "AI gia" khong dung y muon that su
-dung AI (CuongNT da chon phuong an "goi AI that" thay vi cham diem luat
-co dinh).
 """
 
 import json
 import os
-import urllib.error
-import urllib.request
 from datetime import datetime
 
-ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages"
-DEFAULT_MODEL = "claude-sonnet-4-5"
-
 # Cac chien luoc HIEN DA TAT (hidden khoi dashboard) tinh den 2026-09-18 -
-# dua vao prompt de AI khong khuyen nghi lai nhung gi da quyet dinh roi.
-DISABLED_STRATEGIES_NOTE = (
-    "trend (TREND_ENABLED=0, da bo han watchlist), "
-    "supertrend (SUPERTREND_ENABLED=0, da an khoi dashboard tu 2026-09 vi "
-    "nhieu lenh nhung khong loi nhuan ro ret)"
-)
+# bo qua khi dua ra khuyen nghi (khong khuyen nghi lai nhung gi da quyet
+# dinh roi), nhung van hien so lieu de doi chieu xu huong chung.
+DISABLED_STRATEGIES = {"trend", "supertrend"}
+
+# Nguong cham diem (dung lai dung quy uoc da ap dung xuyen suot du an: chi
+# bat 1 chien luoc that khi PF > 1.2-1.3 voi it nhat vai chuc lenh - xem
+# comment o src/core/config.py::bollinger_pairs/london_pairs/emapullback_*).
+MIN_SAMPLE = 20        # duoi nguong nay: chua du du lieu de ket luan chac chan
+PF_GOOD = 1.3          # >= muc nay: dang hoat dong tot, giu nguyen
+PF_OK = 1.0            # >= muc nay (nhung < PF_GOOD): hoa von/trung binh
+PF_BAD_URGENT = 0.8    # < muc nay (VA du mau) -> can xem lai/tam dung gap
 
 MONTH_VN = [
     "", "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
@@ -159,81 +162,137 @@ def _fmt_stats_block(stats):
     return "\n".join(lines)
 
 
-def build_prompt(m_label, month_stats, alltime_stats, alltime_range_txt):
-    return (
-        "Ban la co van rui ro/dinh luong cho mot he thong GUI TIN HIEU giao dich "
-        "tu dong (Trading Assistant AI) cua toi, chay tren GitHub Actions, gui "
-        "tin hieu BUY/SELL qua email theo nhieu \"chien luoc\" khac nhau (moi "
-        "chien luoc = 1 bo luat ky thuat rieng, da qua backtest truoc khi bat "
-        "len that). Moi thang toi muon ban DOC LAI so lieu that va NHAN XET + "
-        "KHUYEN NGHI giup toi, giong nhu mot chuyen gia dang review hieu suat "
-        "thuc te cua he thong.\n\n"
-        "Boi canh: cac chien luoc {} da bi TAT/an di roi (khong con chay nua) "
-        "vi hieu suat kem trong qua khu - KHONG can khuyen nghi ve 2 chien "
-        "luoc nay nua, chi de ban doi chieu xu huong chung.\n\n"
-        "===== SO LIEU THANG VUA QUA ({}) =====\n{}\n\n"
-        "===== SO LIEU TU TRUOC DEN NAY ({}) =====\n{}\n\n"
-        "Hay tra loi bang TIENG VIET, theo dung cau truc sau (giu nguyen tieu "
-        "de cac dong, khong dung markdown/bang bieu phuc tap):\n\n"
-        "TAG: <chon dung 1 trong 3: GIU_NGUYEN | CAI_THIEN | CAP_NHAT_NGAY>\n\n"
-        "NHAN XET THANG NAY:\n<2-4 cau, chien luoc nao tot/xau, co gi bat "
-        "thuong khong>\n\n"
-        "DANH GIA TONG THE TU TRUOC DEN NAY:\n<3-5 cau, he thong dang on dinh, "
-        "tien bo hay xau di, chien luoc nao dang la tru cot, chien luoc nao "
-        "dang keo tut hieu suat chung>\n\n"
-        "KHUYEN NGHI CU THE:\n<liet ke gach dau dong cac hanh dong cu the toi "
-        "nen lam - vi du: tat/giam risk 1 chien luoc cu the, backtest them "
-        "mot bien the, giu nguyen khong doi gi vi so lieu con qua it, v.v. "
-        "Neu so lenh cua 1 chien luoc con qua it (duoi ~20-30 lenh) de ket "
-        "luan chac chan, hay noi ro la CAN CHO THEM DU LIEU thay vi vo doan.>\n"
-    ).format(DISABLED_STRATEGIES_NOTE, m_label,
-             _fmt_stats_block(month_stats), alltime_range_txt,
-             _fmt_stats_block(alltime_stats))
+def _judge(s):
+    """Xep loai 1 bucket thong ke (tong the hoac 1 chien luoc) theo nguong
+    co dinh. Tra ve 1 trong: 'THIEU_DU_LIEU', 'TOT', 'TRUNG_BINH', 'KEM'."""
+    if s["total"] < MIN_SAMPLE:
+        return "THIEU_DU_LIEU"
+    pf = s["profit_factor"]
+    if isinstance(pf, str):  # "vo cuc (chua thua lenh nao)" -> toan thang
+        return "TOT"
+    if pf is None:  # chua co lenh nao thang/thua (toan OPEN) du >= MIN_SAMPLE
+        return "THIEU_DU_LIEU"
+    if pf >= PF_GOOD:
+        return "TOT"
+    if pf >= PF_OK:
+        return "TRUNG_BINH"
+    return "KEM"
 
 
-def call_claude(prompt, api_key, model=None, max_tokens=2000, timeout=90):
-    """Goi that Anthropic Messages API bang urllib (khong can them thu vien
-    ngoai vao requirements-cloud.txt). Nem loi ro rang neu that bai - KHONG
-    tu bia noi dung thay the, vi CuongNT chon ro la muon AI THAT phan tich."""
-    if not api_key:
-        raise RuntimeError(
-            "Thieu ANTHROPIC_API_KEY - vao Settings > Secrets and variables > "
-            "Actions cua repo GitHub de them secret nay truoc khi chay lai.")
-    model = model or os.getenv("ANTHROPIC_MODEL", DEFAULT_MODEL)
-    body = json.dumps({
-        "model": model,
-        "max_tokens": max_tokens,
-        "messages": [{"role": "user", "content": prompt}],
-    }).encode("utf-8")
-    req = urllib.request.Request(
-        ANTHROPIC_API_URL, data=body, method="POST",
-        headers={
-            "Content-Type": "application/json",
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-        })
-    try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        detail = e.read().decode("utf-8", errors="replace")
-        raise RuntimeError(
-            "Anthropic API tra loi loi HTTP {} (model='{}'): {}\n"
-            "-> Neu loi 'not_found_error'/model khong ton tai, kiem tra model "
-            "hien hanh tai https://docs.claude.com/en/docs/about-claude/models "
-            "roi dat secret/bien ANTHROPIC_MODEL cho dung.".format(
-                e.code, model, detail))
-    except urllib.error.URLError as e:
-        raise RuntimeError("Khong ket noi duoc toi Anthropic API: {}".format(e))
-    parts = data.get("content", [])
-    text = "".join(p.get("text", "") for p in parts if p.get("type") == "text")
-    return text.strip()
+def decide_tag(alltime_stats):
+    """Quyet dinh khuyen nghi tong the dua tren so lieu TU TRUOC DEN NAY
+    (khong dung so lieu 1 thang le - de tranh ket luan voi theo 1 thang xau
+    ngau nhien). Chi xet cac chien luoc DANG BAT (bo qua trend/supertrend
+    da tat)."""
+    by = {k: s for k, s in alltime_stats["by_strategy"].items()
+          if k not in DISABLED_STRATEGIES}
+    urgent = [k for k, s in by.items()
+              if s["total"] >= MIN_SAMPLE and isinstance(s["profit_factor"], (int, float))
+              and s["profit_factor"] < PF_BAD_URGENT]
+    weak = [k for k, s in by.items()
+            if s["total"] >= MIN_SAMPLE and isinstance(s["profit_factor"], (int, float))
+            and s["profit_factor"] < PF_OK]
+    overall_pf = alltime_stats["overall"]["profit_factor"]
+    overall_n = alltime_stats["overall"]["total"]
+    overall_urgent = (overall_n >= MIN_SAMPLE and isinstance(overall_pf, (int, float))
+                       and overall_pf < PF_BAD_URGENT)
+    overall_weak = (overall_n >= MIN_SAMPLE and isinstance(overall_pf, (int, float))
+                     and overall_pf < PF_OK)
+    if urgent or overall_urgent:
+        return "CAP_NHAT_NGAY"
+    if weak or overall_weak:
+        return "CAI_THIEN"
+    return "GIU_NGUYEN"
 
 
-def parse_tag(ai_text):
+def _strategy_comment(name, s):
+    j = _judge(s)
+    pf_txt = s["profit_factor"] if s["profit_factor"] is not None else "—"
+    if j == "THIEU_DU_LIEU":
+        return "{}: mới {} lệnh (dưới ngưỡng {} lệnh để kết luận chắc chắn), cần theo dõi thêm".format(
+            name, s["total"], MIN_SAMPLE)
+    if j == "TOT":
+        return "{}: đang hoạt động TỐT - {} lệnh, PF {}, winrate {}%, tổng {} R".format(
+            name, s["total"], pf_txt, s["winrate_pct"], s["total_r"])
+    if j == "TRUNG_BINH":
+        return "{}: ở mức TRUNG BÌNH - {} lệnh, PF {}, winrate {}%, tổng {} R (chưa lỗ nhưng chưa đạt ngưỡng {})".format(
+            name, s["total"], pf_txt, s["winrate_pct"], s["total_r"], PF_GOOD)
+    return "{}: đang KÉM - {} lệnh, PF {}, winrate {}%, tổng {} R (dưới ngưỡng hòa vốn {})".format(
+        name, s["total"], pf_txt, s["winrate_pct"], s["total_r"], PF_OK)
+
+
+def _recommendation_lines(alltime_stats):
+    by = {k: s for k, s in alltime_stats["by_strategy"].items()
+          if k not in DISABLED_STRATEGIES}
+    lines = []
+    for name, s in sorted(by.items()):
+        j = _judge(s)
+        if j == "KEM":
+            lines.append("- Nên xem lại/cân nhắc tạm dừng {}: PF {} trên {} lệnh, đang dưới "
+                          "ngưỡng hòa vốn {}.".format(name, s["profit_factor"], s["total"], PF_OK))
+        elif j == "TRUNG_BINH":
+            lines.append("- Theo dõi thêm {}: PF {} trên {} lệnh, chưa lỗ nhưng chưa đạt "
+                          "ngưỡng {} để yên tâm.".format(name, s["profit_factor"], s["total"], PF_GOOD))
+        elif j == "THIEU_DU_LIEU":
+            lines.append("- {} mới có {} lệnh, cần thêm dữ liệu (ít nhất {} lệnh) trước khi "
+                          "kết luận, chưa nên vội thay đổi.".format(name, s["total"], MIN_SAMPLE))
+        else:
+            lines.append("- Giữ nguyên {}, đang hoạt động tốt (PF {}, {} lệnh).".format(
+                name, s["profit_factor"], s["total"]))
+    if not lines:
+        lines.append("- Chưa có chiến lược nào đang bật có đủ dữ liệu để đánh giá.")
+    return lines
+
+
+def generate_review_text(month_stats, alltime_stats):
+    """Sinh van ban nhan xet + khuyen nghi THEO NGUONG CO DINH (khong goi
+    API/AI nao), CUNG dinh dang voi ban goi Claude truoc day (TAG/NHAN
+    XET/DANH GIA/KHUYEN NGHI) de parse_tag() va dashboard/email khong doi."""
+    tag = decide_tag(alltime_stats)
+
+    month_by = {k: s for k, s in month_stats["by_strategy"].items()
+                if k not in DISABLED_STRATEGIES}
+    nhan_xet = ([_strategy_comment(stratlabel, s) for stratlabel, s in sorted(month_by.items())]
+                or ["Tháng này chưa có lệnh nào ở các chiến lược đang bật."])
+
+    o_m, o_a = month_stats["overall"], alltime_stats["overall"]
+    xu_huong = ""
+    if isinstance(o_m["profit_factor"], (int, float)) and isinstance(o_a["profit_factor"], (int, float)):
+        if o_m["profit_factor"] > o_a["profit_factor"]:
+            xu_huong = " Tháng này (PF {}) đang TỐT HƠN mặt bằng chung từ trước đến nay (PF {}).".format(
+                o_m["profit_factor"], o_a["profit_factor"])
+        elif o_m["profit_factor"] < o_a["profit_factor"]:
+            xu_huong = " Tháng này (PF {}) đang KÉM HƠN mặt bằng chung từ trước đến nay (PF {}).".format(
+                o_m["profit_factor"], o_a["profit_factor"])
+    danh_gia = (
+        "Tổng thể từ trước đến nay: {} lệnh, winrate {}%, PF {}, tổng {} R.{}".format(
+            o_a["total"], o_a["winrate_pct"], o_a["profit_factor"], o_a["total_r"], xu_huong))
+
+    lines = [
+        "TAG: {}".format(tag),
+        "",
+        "NHAN XET THANG NAY:",
+    ] + nhan_xet + [
+        "",
+        "DANH GIA TONG THE TU TRUOC DEN NAY:",
+        danh_gia,
+        "",
+        "KHUYEN NGHI CU THE:",
+    ] + _recommendation_lines(alltime_stats) + [
+        "",
+        "(Nhan xet nay duoc sinh tu dong theo nguong co dinh - PF >= {} la tot, "
+        "duoi {} la can xem lai, duoi {} lenh la chua du du lieu - khong phai do "
+        "AI doc va viet tu do; ban co the doi lai nguong nay trong "
+        "src/ai_review/monthly_report.py neu thay chua phu hop.)".format(
+            PF_GOOD, PF_OK, MIN_SAMPLE),
+    ]
+    return "\n".join(lines)
+
+
+def parse_tag(review_text):
     """Lay dong 'TAG: ...' o dau van ban de hien badge mau tren dashboard.
-    Tra ve 'KHONG_RO' neu AI tra loi khong dung dinh dang mong doi."""
-    for line in ai_text.splitlines():
+    Tra ve 'KHONG_RO' neu khong dung dinh dang mong doi."""
+    for line in review_text.splitlines():
         line = line.strip()
         if line.upper().startswith("TAG:"):
             val = line.split(":", 1)[1].strip().upper()
@@ -263,11 +322,10 @@ def save_history(history, path="dashboard/ai_reviews.js", keep_last=24):
         f.write("window.TA_REVIEWS = " + json.dumps(history, ensure_ascii=False, indent=2) + ";\n")
 
 
-def run(signals_path="cloud_signals.json", history_path="dashboard/ai_reviews.js",
-        api_key=None, model=None, now=None):
-    """Chay tron 1 chu ky tong ket thang. Tra ve dict report vua tao (da
-    them vao history va ghi file) de run_monthly_review.py dung gui mail."""
-    api_key = api_key if api_key is not None else os.getenv("ANTHROPIC_API_KEY", "").strip()
+def run(signals_path="cloud_signals.json", history_path="dashboard/ai_reviews.js", now=None):
+    """Chay tron 1 chu ky tong ket thang (mien phi, khong goi API nao). Tra
+    ve dict report vua tao (da them vao history va ghi file) de
+    run_monthly_review.py dung gui mail."""
     signals = load_signals(signals_path)
     y, m = previous_month(now)
     m_label = month_label(y, m)
@@ -280,9 +338,8 @@ def run(signals_path="cloud_signals.json", history_path="dashboard/ai_reviews.js
         "{} -> {}".format(min(times).strftime("%d/%m/%Y"), max(times).strftime("%d/%m/%Y"))
         if times else "chua co du lieu")
 
-    prompt = build_prompt(m_label, month_stats, alltime_stats, alltime_range_txt)
-    ai_text = call_claude(prompt, api_key, model=model)
-    tag = parse_tag(ai_text)
+    review_text = generate_review_text(month_stats, alltime_stats)
+    tag = parse_tag(review_text)
 
     report = {
         "month_label": m_label,
@@ -291,7 +348,7 @@ def run(signals_path="cloud_signals.json", history_path="dashboard/ai_reviews.js
         "month_stats": month_stats,
         "alltime_stats": alltime_stats,
         "alltime_range": alltime_range_txt,
-        "ai_text": ai_text,
+        "ai_text": review_text,
     }
 
     history = load_history(history_path)

@@ -235,7 +235,7 @@ def build_monthly_review_email(report):
 
     body_lines += [
         "",
-        "---------- NHAN XET & KHUYEN NGHI CUA AI (Claude) ----------",
+        "---------- NHAN XET & KHUYEN NGHI (cham diem tu dong) ----------",
         report["ai_text"],
         "",
         "========================================",
