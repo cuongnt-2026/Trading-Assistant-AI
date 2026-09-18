@@ -185,6 +185,15 @@ class Config:
         self.reports_dir = os.getenv("REPORTS_DIR", "reports")
         self.dashboard_data = os.getenv("DASHBOARD_DATA", "dashboard/data.js")
 
+        # ----- AI Monthly Review (theo yeu cau CuongNT 2026-09-18): goi THAT
+        # Claude API 1 lan/thang de doc so lieu lenh da gui va viet nhan xet +
+        # khuyen nghi (giu nguyen/can cai thien/nen cap nhat). Xem
+        # src/ai_review/monthly_report.py + run_monthly_review.py. Can secret
+        # rieng ANTHROPIC_API_KEY (KHONG dung chung voi cac secret Gmail o
+        # tren) trong GitHub Settings > Secrets and variables > Actions. -----
+        self.anthropic_api_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
+        self.anthropic_model = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-5").strip()
+
     def validate_email(self) -> list:
         missing = []
         if not self.gmail_user:

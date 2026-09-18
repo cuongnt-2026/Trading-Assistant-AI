@@ -1,0 +1,46 @@
+name: AI Monthly Review
+
+on:
+  schedule:
+    # 00:20 UTC ngay 1 hang thang (= 07:20 gio VN) - tong ket THANG VUA KET
+    # THUC (vd chay 01/09 se tong ket ca thang 08). Gio le (:20) de chay sau
+    # workflow signals.yml mot chut, tranh dung do commit dashboard/data.js.
+    - cron: "20 0 1 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: trading-ai-monthly-review
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    env:
+      # Secret RIENG cho tinh nang nay - KHONG dung chung voi Gmail/Twelve Data.
+      # Them tai: Settings > Secrets and variables > Actions > New repository secret.
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      GMAIL_USER: ${{ secrets.GMAIL_USER }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      MAIL_TO: ${{ secrets.MAIL_TO }}
+      NOTIFIER_CHANNEL: email
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cai thu vien
+        run: pip install -r requirements-cloud.txt
+      - name: Tong ket thang + goi AI phan tich + gui mail
+        run: python run_monthly_review.py
+      - name: Luu bao cao vao dashboard
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dashboard/ai_reviews.js || true
+          if git diff --staged --quiet; then echo "Khong co bao cao moi de luu"; exit 0; fi
+          git commit -m "AI monthly review: cap nhat dashboard/ai_reviews.js [skip ci]"
+          git pull --rebase -X ours origin main || true
+          git push && echo "PUSH OK" || echo "PUSH FAIL - vao Settings > Actions > General > Workflow permissions = Read and write"

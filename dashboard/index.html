@@ -106,6 +106,28 @@
   .colf:hover{border-color:var(--accent);color:var(--txt);}
   td.slcell{color:var(--sell);font-weight:600;} td.tpcell{color:var(--buy);font-weight:600;}
 
+  /* AI Monthly Review (tab "AI Tong ket") */
+  .reviewCard{background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:16px 18px;margin-bottom:16px;}
+  .reviewCard .rHead{display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+  .reviewCard .rHead h4{font-size:16px;font-weight:800;}
+  .reviewCard .rMeta{color:var(--muted);font-size:12px;margin-bottom:12px;}
+  .tagBadge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;white-space:nowrap;}
+  .tagBadge.GIU_NGUYEN{background:rgba(34,197,94,.15);color:var(--buy);}
+  .tagBadge.CAI_THIEN{background:rgba(234,179,8,.15);color:var(--neutral);}
+  .tagBadge.CAP_NHAT_NGAY{background:rgba(239,68,68,.15);color:var(--sell);}
+  .tagBadge.KHONG_RO{background:rgba(139,152,173,.15);color:var(--muted);}
+  .reviewCard .rStats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px;}
+  @media(max-width:900px){.reviewCard .rStats{grid-template-columns:1fr;}}
+  .reviewCard .rStats .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;
+    letter-spacing:.4px;margin-bottom:6px;}
+  .reviewCard .rStats table{font-size:12px;}
+  .reviewCard .rStats th,.reviewCard .rStats td{padding:5px 7px;white-space:nowrap;}
+  .reviewCard .rAi{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;white-space:pre-wrap;font-size:13px;line-height:1.7;}
+  .reviewCard .rAi b.sect{color:var(--accent);}
+
   /* Fix: bang co nhieu cot (dac biet cot "Nhap tay (what-if)") de bi tran rong hon
      khung .main, lam ca trang cuon ngang va vo bo cuc (sidebar/khung trai van dung
      yen, phan noi dung/nut Update o ben phai bi day ra ngoai man hinh). Cho tung
@@ -128,6 +150,7 @@
       <a data-tab="symbols"><span class="ic">💹</span> Cặp tiền</a>
       <a data-tab="stats"><span class="ic">📈</span> Thống kê</a>
       <a data-tab="ematrend"><span class="ic">🧭</span> EMA Trend Watch</a>
+      <a data-tab="aireview"><span class="ic">🧠</span> AI Tổng kết</a>
     </nav>
     <div class="disclaimer">
       Dữ liệu đọc từ <code>data.js</code> (bot ghi khi chạy).<br>
@@ -284,6 +307,21 @@
       </div>
     </section>
 
+    <!-- ===== AI MONTHLY REVIEW ===== -->
+    <section class="tabpage" data-page="aireview">
+      <div class="panel">
+        <h3>Tổng kết &amp; khuyến nghị của AI <span class="sub">tự động chạy 1 lần/tháng (ngày 1), gọi Claude API đọc số liệu lệnh đã gửi</span></h3>
+        <div class="muted" style="font-size:12px;line-height:1.7">
+          Mỗi tháng, hệ thống tự tổng hợp lại toàn bộ lệnh đã gửi trong tháng vừa qua
+          <b>và</b> từ trước đến nay, rồi nhờ AI (Claude) đọc số liệu thật để nhận xét và
+          đưa ra khuyến nghị: <b>giữ nguyên</b>, <b>cần cải thiện</b> một vài chỗ, hay
+          <b>nên cập nhật/xem lại sớm</b>. Đây là gợi ý tham khảo dựa trên dữ liệu — bạn
+          vẫn là người quyết định cuối cùng có áp dụng thay đổi hay không.
+        </div>
+      </div>
+      <div id="reviewList"></div>
+    </section>
+
     <div class="foot">
       Trading Assistant AI — Dashboard v1.0. Nhấn ⟳ hoặc F5 để làm mới.
     </div>
@@ -291,6 +329,7 @@
 </div>
 
 <script src="data.js"></script>
+<script src="ai_reviews.js"></script>
 <script>
 (function(){
   const D = (window.TA_DATA)||{signals:[],updated:"—"};
@@ -601,6 +640,60 @@
       : '<div class="empty">Chưa có tín hiệu nào.</div>';
   }
 
+  // ---- AI Monthly Review (tab "AI Tong ket") - doc window.TA_REVIEWS,
+  // ghi boi run_monthly_review.py -> src/ai_review/monthly_report.py.
+  // File ai_reviews.js co the CHUA TON TAI (truoc khi chay lan dau) - luon
+  // fallback ve mang rong, khong lam vo trang. ----
+  function tagLabel(tag){
+    return {GIU_NGUYEN:'Giữ nguyên', CAI_THIEN:'Cần cải thiện',
+            CAP_NHAT_NGAY:'Nên cập nhật sớm', KHONG_RO:'Không rõ'}[tag] || (tag||'—');
+  }
+  function reviewStatsTableHtml(stats){
+    if(!stats||!stats.overall) return '<div class="empty">—</div>';
+    const rows=[['TỔNG', stats.overall]].concat(
+      Object.keys(stats.by_strategy||{}).sort().map(k=>[stratLabel(k), stats.by_strategy[k]]));
+    const trs=rows.map(([name,s])=>`<tr><td class="sym">${name}</td><td>${s.total}</td>
+      <td style="color:var(--buy)">${s.wins}</td><td style="color:var(--sell)">${s.losses}</td>
+      <td class="muted">${s.open}</td><td>${s.winrate_pct!=null?s.winrate_pct+'%':'—'}</td>
+      <td>${s.profit_factor!=null?s.profit_factor:'—'}</td>
+      <td><b>${s.total_r!=null?s.total_r:'—'}</b></td></tr>`).join('');
+    return `<table><thead><tr><th>Chiến lược</th><th>SL</th><th>Win</th><th>Loss</th>
+      <th>Open</th><th>WR</th><th>PF</th><th>Tổng R</th></tr></thead><tbody>${trs}</tbody></table>`;
+  }
+  function aiTextHtml(text){
+    const esc=(s)=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return esc(text||'').split('\n').map(line=>{
+      const t=line.trim();
+      if(/^TAG\s*:/i.test(t)) return ''; // da hien qua tagBadge roi, khong lap lai tho
+      if(t && t===t.toUpperCase() && /[A-ZÀ-Ỵ]/.test(t) && t.endsWith(':'))
+        return `<b class="sect">${line}</b>`;
+      return line;
+    }).join('\n');
+  }
+  function renderAiReviews(){
+    const el=document.getElementById('reviewList'); if(!el) return;
+    const reviews=(window.TA_REVIEWS||[]).slice().reverse();
+    if(!reviews.length){
+      el.innerHTML='<div class="panel"><div class="empty">Chưa có báo cáo nào. Báo cáo đầu '+
+        'tiên sẽ tự động xuất hiện sau khi workflow "AI Monthly Review" chạy vào ngày 1 hàng '+
+        'tháng (hoặc bấm "Run workflow" tay trong tab Actions trên GitHub để test trước).</div></div>';
+      return;
+    }
+    el.innerHTML=reviews.map(r=>`
+      <div class="reviewCard">
+        <div class="rHead">
+          <h4>${r.month_label||'—'}</h4>
+          <span class="tagBadge ${r.tag||'KHONG_RO'}">${tagLabel(r.tag)}</span>
+        </div>
+        <div class="rMeta">Xuất lúc ${r.generated_at||'—'} (UTC) · Dữ liệu từ trước đến nay: ${r.alltime_range||'—'}</div>
+        <div class="rStats">
+          <div><div class="lbl">Tháng này</div>${reviewStatsTableHtml(r.month_stats)}</div>
+          <div><div class="lbl">Từ trước đến nay</div>${reviewStatsTableHtml(r.alltime_stats)}</div>
+        </div>
+        <div class="rAi">${aiTextHtml(r.ai_text)}</div>
+      </div>`).join('');
+  }
+
   function initManualIO(){
     const ex=document.getElementById('mExport'), im=document.getElementById('mImport'), f=document.getElementById('mFile');
     if(ex) ex.onclick=function(){
@@ -645,6 +738,7 @@
   renderManualStats();
   renderStrategyStats();
   renderEmaTrend();
+  renderAiReviews();
 
   // ---- Symbols tab: summary ----
   const syms=[...new Set(S.map(s=>s.symbol))].filter(Boolean);

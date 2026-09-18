@@ -181,6 +181,71 @@ def build_ema_cross_email(symbol, timeframe, ev):
     return subject, body
 
 
+_TAG_LABEL = {
+    "GIU_NGUYEN": "GIU NGUYEN he thong",
+    "CAI_THIEN": "CAN CAI THIEN mot vai cho",
+    "CAP_NHAT_NGAY": "NEN CAP NHAT/XEM LAI SOM",
+    "KHONG_RO": "(AI khong tra ve tag ro rang - xem noi dung ben duoi)",
+}
+
+
+def _stats_line(name, s):
+    return ("  - {:<12}: {} lenh | Win {} - Loss {} - Open {} | Winrate {} | "
+            "PF {} | Tong R {} | R TB {} | Tin cay TB {}%").format(
+        name, s["total"], s["wins"], s["losses"], s["open"],
+        "{}%".format(s["winrate_pct"]) if s["winrate_pct"] is not None else "—",
+        s["profit_factor"], s["total_r"],
+        s["avg_r"] if s["avg_r"] is not None else "—", s["avg_confidence"])
+
+
+def build_monthly_review_email(report):
+    """Email tong ket thang + khuyen nghi cua AI (Sprint: AI Monthly Review,
+    2026-09-18, theo yeu cau CuongNT). `report` = dict tra ve tu
+    src/ai_review/monthly_report.run()."""
+    o_m = report["month_stats"]["overall"]
+    o_a = report["alltime_stats"]["overall"]
+    tag_txt = _TAG_LABEL.get(report["tag"], report["tag"])
+
+    subject = "[Trading Assistant AI] Tong ket {} - Khuyen nghi: {}".format(
+        report["month_label"], tag_txt)
+
+    body_lines = [
+        "========================================",
+        "   TRADING ASSISTANT AI - TONG KET THANG",
+        "========================================",
+        "",
+        "Thang tong ket : {}".format(report["month_label"]),
+        "Xuat luc       : {}".format(report["generated_at"]),
+        "Khuyen nghi AI : {}".format(tag_txt),
+        "",
+        "---------- SO LIEU THANG {} ----------".format(report["month_label"]),
+        _stats_line("TONG", o_m),
+    ]
+    for name, s in sorted(report["month_stats"]["by_strategy"].items()):
+        body_lines.append(_stats_line(name, s))
+
+    body_lines += [
+        "",
+        "---------- SO LIEU TU TRUOC DEN NAY ({}) ----------".format(
+            report.get("alltime_range", "—")),
+        _stats_line("TONG", o_a),
+    ]
+    for name, s in sorted(report["alltime_stats"]["by_strategy"].items()):
+        body_lines.append(_stats_line(name, s))
+
+    body_lines += [
+        "",
+        "---------- NHAN XET & KHUYEN NGHI CUA AI (Claude) ----------",
+        report["ai_text"],
+        "",
+        "========================================",
+        "Luu y: day la phan tich tu dong dua tren so lieu lenh da gui, chi de",
+        "tham khao - ban tu quyet dinh co ap dung thay doi gi hay khong.",
+        "-- Trading Assistant AI (Monthly Review)",
+    ]
+    return subject, "\n".join(body_lines)
+
+
 def build_ema_trend_email(symbol, timeframe, ev):
     """Email cho EmaTrendWatcher (EMA20/50/200 loc theo che do EMA200, thay EMA Cross
     Watch cu). `ev` la dict tra ve tu EmaTrendWatcher.check_triple()/check_cross().
