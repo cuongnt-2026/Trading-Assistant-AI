@@ -31,7 +31,7 @@
     border-top:1px solid var(--line);padding-top:14px;}
 
   /* Content */
-  .main{flex:1;padding:28px 34px;max-width:1500px;}
+  .main{flex:1;padding:28px 34px;max-width:1700px;min-width:0;}
   .head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
   .head h1{font-size:26px;font-weight:800;}
   .head p{color:var(--muted);font-size:14px;margin-top:4px;}
@@ -104,6 +104,18 @@
   .colf{background:var(--panel2);border:1px solid var(--line);color:var(--muted);font-size:11px;
     text-transform:uppercase;font-weight:600;letter-spacing:.4px;padding:4px 6px;border-radius:6px;cursor:pointer;max-width:120px;}
   .colf:hover{border-color:var(--accent);color:var(--txt);}
+  td.slcell{color:var(--sell);font-weight:600;} td.tpcell{color:var(--buy);font-weight:600;}
+
+  /* Fix: bang co nhieu cot (dac biet cot "Nhap tay (what-if)") de bi tran rong hon
+     khung .main, lam ca trang cuon ngang va vo bo cuc (sidebar/khung trai van dung
+     yen, phan noi dung/nut Update o ben phai bi day ra ngoai man hinh). Cho tung
+     khung chua bang duoc CUON RIENG theo chieu ngang thay vi day ca trang, va
+     chan cuon ngang o cap trang de bo cuc khong bao gio vo nua. */
+  body{overflow-x:hidden;}
+  #fullTable,#recentTable,#symTable,#statTable,#stratTable,#etStatsTable,#etRecentTable{
+    overflow-x:auto;max-width:100%;}
+  #fullTable table,#recentTable table,#symTable table,#statTable table,
+  #stratTable table,#etStatsTable table,#etRecentTable table{min-width:max-content;}
 </style>
 </head>
 <body>
@@ -289,6 +301,9 @@
 
   const num=(x,d=2)=> (x===null||x===undefined||isNaN(x))?"—":Number(x).toFixed(d);
   const g=(o,k,def="—")=> (o && o[k]!==undefined && o[k]!==null)?o[k]:def;
+  // SL/TP cua 1 tin hieu (chi co khi la lenh BUY/SELL co trade_plan - xem
+  // write_dashboard() trong run_cloud.py, key "stop_loss"/"take_profit").
+  const tpVal=(s,k)=> (s.trade_plan && s.trade_plan[k]!==undefined && s.trade_plan[k]!==null)?s.trade_plan[k]:"—";
   const confColor=(c)=> c>=75?"var(--buy)": c>=55?"var(--neutral)":"var(--muted)";
   const stratLabel=(v)=> v?({breakout:'Breakout',trend:'Trend',supertrend:'Supertrend',ema_pullback:'EMA Pullback'}[v]||v):'—';
   // Lay RR (so) cua 1 lenh: uu tien s.rr, khong thi doc tu trade_plan (chuoi "1 : 2.5" hoac tinh tu entry/sl/tp)
@@ -435,6 +450,8 @@
         <td><span class="badge ${s.action}">${s.action}</span></td>
         <td>${confCell(s)}</td>
         <td>${g(s,'price')}</td>
+        <td class="slcell">${tpVal(s,'stop_loss')}</td>
+        <td class="tpcell">${tpVal(s,'take_profit')}</td>
         ${full?`<td class="tag">${g(s,'trend')}</td>
         <td>${num(s.rsi,0)}</td>
         <td>${num(s.adx,1)}</td>
@@ -445,8 +462,8 @@
         ${full&&s.notified?manualControls(s):(full?'<td class="muted">—</td>':'')}
       </tr>`).join('');
     const head = full
-      ? `<tr><th>Thời gian (VN)</th>${thf('symbol','Symbol')}${thf('timeframe','TF')}${thf('strategy','PP')}${thf('action','Tín hiệu')}<th>Tin cậy</th><th>Giá</th>${thf('trend','Trend')}<th>RSI</th><th>ADX</th><th>ATR</th>${thf('pattern','Nến')}${thf('outcome','KQ')}<th>Mail</th><th>Nhập tay (what-if)</th></tr>`
-      : `<tr><th>Thời gian (VN)</th><th>Symbol</th><th>TF</th><th>PP</th><th>Tín hiệu</th><th>Tin cậy</th><th>Giá</th><th>KQ</th><th>Mail</th></tr>`;
+      ? `<tr><th>Thời gian (VN)</th>${thf('symbol','Symbol')}${thf('timeframe','TF')}${thf('strategy','PP')}${thf('action','Tín hiệu')}<th>Tin cậy</th><th>Giá</th><th>SL</th><th>TP</th>${thf('trend','Trend')}<th>RSI</th><th>ADX</th><th>ATR</th>${thf('pattern','Nến')}${thf('outcome','KQ')}<th>Mail</th><th>Nhập tay (what-if)</th></tr>`
+      : `<tr><th>Thời gian (VN)</th><th>Symbol</th><th>TF</th><th>PP</th><th>Tín hiệu</th><th>Tin cậy</th><th>Giá</th><th>SL</th><th>TP</th><th>KQ</th><th>Mail</th></tr>`;
     return `<table><thead>${head}</thead><tbody>${rows}</tbody></table>`;
   }
   function bindColFilter(){
