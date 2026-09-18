@@ -56,6 +56,7 @@
   @media(max-width:640px){.grid{grid-template-columns:repeat(2,1fr);}}
 
   .row{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-bottom:22px;}
+  .row>.panel{min-width:0;}
   @media(max-width:1050px){.row{grid-template-columns:1fr;}}
 
   .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:22px;}
@@ -120,9 +121,10 @@
   .tagBadge.KHONG_RO{background:rgba(139,152,173,.15);color:var(--muted);}
   .reviewCard .rStats{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px;}
   @media(max-width:900px){.reviewCard .rStats{grid-template-columns:1fr;}}
+  .reviewCard .rStats>div{min-width:0;overflow-x:auto;}
   .reviewCard .rStats .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;
     letter-spacing:.4px;margin-bottom:6px;}
-  .reviewCard .rStats table{font-size:12px;}
+  .reviewCard .rStats table{font-size:12px;min-width:max-content;}
   .reviewCard .rStats th,.reviewCard .rStats td{padding:5px 7px;white-space:nowrap;}
   .reviewCard .rAi{background:var(--panel);border:1px solid var(--line);border-radius:10px;
     padding:14px 16px;white-space:pre-wrap;font-size:13px;line-height:1.7;}
