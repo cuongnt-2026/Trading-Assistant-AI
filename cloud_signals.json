@@ -1654,5 +1654,23 @@
     "expected_profit": null,
     "confidence": 40.0,
     "outcome": "OPEN"
+  },
+  {
+    "time": "2026-09-18 14:16 UTC",
+    "candle_time": "2026-09-18 13:00:00",
+    "symbol": "USDJPY",
+    "timeframe": "H4",
+    "action": "SELL",
+    "strategy": "bollinger",
+    "entry": 157.83,
+    "sl": 158.17,
+    "tp": 155.42,
+    "rr": 7.09,
+    "risk_reward": "1 : 7.09",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 31.5,
+    "outcome": "OPEN"
   }
 ]
