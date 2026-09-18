@@ -1,1 +1,25 @@
-{}
+{
+  "records": [
+    {
+      "id": "XAUUSD-M15-2026-09-18 16:30:00-about",
+      "symbol": "XAUUSD",
+      "timeframe": "M15",
+      "kind": "cross",
+      "event_type": "about",
+      "direction": "up",
+      "signal_time": "2026-09-18 16:30:00",
+      "signal_price": 4378.75895,
+      "atr": 9.818788066915939,
+      "sl": 4343.84279,
+      "tp": 4420.65835,
+      "sl_source": "swing-ATR",
+      "tp_source": "rr1.2",
+      "risk": 34.91616,
+      "rr": 1.2,
+      "result": "pending",
+      "resolved_time": null,
+      "resolved_bars": null,
+      "logged_at": "2026-09-18 16:40:22"
+    }
+  ]
+}
