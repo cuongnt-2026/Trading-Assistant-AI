@@ -46,6 +46,7 @@
   },
   "EMATREND-TRIPLE XAUUSD M15": {},
   "EMATREND-CROSS XAUUSD M15": {
-    "about_ts": "2026-09-22 02:30:00"
+    "about_ts": null,
+    "crossed_ts": "2026-09-22 02:45:00"
   }
 }
