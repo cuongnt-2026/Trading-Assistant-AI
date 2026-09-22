@@ -611,9 +611,18 @@ def _scan_ema_trend(sym, tf, cfg, state, notifier, cache, ematrend_history):
             if ev["type"] == "crossed":
                 st["crossed_ts"] = ev["_ts"]
                 st["about_ts"] = None
+                # Chi ghi vao ematrend_history (de sau nay cham diem dung/sai) khi
+                # DA CAT HAN ("crossed") - theo yeu cau CuongNT (2026-09-22): 1 lan
+                # cat EMA thuc te thuong sinh ra nhieu tin hieu "about" bao som lien
+                # tiep (gap hep dan qua nhieu nen) TRUOC KHI den 1 tin hieu "crossed"
+                # xac nhan - neu ghi ca "about" thi 1 su kien thi truong bi dem thanh
+                # nhieu mau, lam ty le dung/sai mat y nghia thong ke (khong con doc
+                # lap). Mail "about" van gui binh thuong ben tren, chi khong tao
+                # ban ghi cham diem rieng nua. Xem compute_stats() trong
+                # ema_trend_tracker.py (cung loc "about" phong khi con ban ghi cu).
+                record_event(ematrend_history, sym, tf, ev, candles)
             else:
                 st["about_ts"] = ev["_ts"]
-            record_event(ematrend_history, sym, tf, ev, candles)
             sent += 1
 
     return sent

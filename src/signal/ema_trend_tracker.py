@@ -34,6 +34,16 @@ ema_trend_watcher.py). Lich su thay doi cach cham diem (theo phan hoi CuongNT):
       RR=1.2 de bu spread/phi giao dich (hoa von that ngoai doi can TP xa hon SL
       mot chut). SL/TP van tinh theo cau truc y het v3, chi doi con so nguong RR.
 
+  v5 (2026-09-22): CuongNT xem lai 1 dot 5 tin hieu SELL lien tiep trong ~1 gio
+      (01:45 - 02:45), phat hien 4/5 la "about" (bao som - gap EMA hep dan qua
+      nhieu nen lien tiep) cho CUNG 1 lan cat, chi 1 cai la "crossed" xac nhan
+      that su -> ty le "dung/sai" bi "nhan ban" 1 su kien thi truong thanh nhieu
+      mau, khong con la cac lan thu doc lap nua. Tu ban nay: CHI "crossed" (va
+      "triple") duoc GHI vao history de cham diem/thong ke; "about" van gui mail
+      canh bao som binh thuong (xem run_cloud.py) nhung KHONG tao ban ghi cham
+      diem rieng - xem compute_stats() cung loc bo "about" phong con sot du lieu
+      cu ghi truoc ban nay.
+
 Sau do quet cac nen KE TIEP (dung high/low tung nen, giong het OutcomeEvaluator
 dung cho lenh that o src/trade/outcome.py - de nhat quan quy uoc trong toan bo
 du an): nen nao cham TP_ao TRUOC -> "dung"; cham SL_ao TRUOC -> "sai"; 1 nen
@@ -219,8 +229,19 @@ def evaluate_pending(history, candles, symbol, timeframe):
 def compute_stats(history, symbol=None, timeframe=None, recent_limit=20):
     """Tong hop ty le dung/sai theo (kind, direction). `accuracy_pct` = dung /
     (dung+sai) * 100 (bo qua "het_han"/"pending" o mau so, vi 2 loai nay chua co
-    ket luan). Tra ve dict de ghi vao dashboard (data.js)."""
+    ket luan). Tra ve dict de ghi vao dashboard (data.js).
+
+    v5 (2026-09-22, theo yeu cau CuongNT): LOAI tin hieu "about" (bao som, gap
+    EMA dang hep dan nhung CHUA cat han) khoi thong ke/hien thi o day. Ly do:
+    1 lan cat EMA thuc te thuong sinh ra nhieu tin hieu "about" lien tiep (moi
+    nen gap hep them 1 chut) TRUOC KHI den 1 tin hieu "crossed" xac nhan - neu
+    tinh ca "about" thi 1 su kien thi truong duy nhat bi dem thanh nhieu mau
+    (khong con la cac lan thu doc lap), lam ty le dung/sai mat y nghia thong ke.
+    Tu ban nay run_cloud.py (_scan_ema_trend) da ngung ghi ban ghi moi cho
+    "about" (van gui mail canh bao som binh thuong, chi khong tao ban ghi cham
+    diem); dong loc ben duoi de phong con sot ban ghi "about" cu tu truoc do."""
     records = history.get("records", [])
+    records = [r for r in records if r.get("event_type") != "about"]
     if symbol:
         records = [r for r in records if r.get("symbol") == symbol]
     if timeframe:
