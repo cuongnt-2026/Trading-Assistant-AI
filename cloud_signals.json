@@ -1937,5 +1937,41 @@
     "expected_profit": null,
     "confidence": 30.0,
     "outcome": "OPEN"
+  },
+  {
+    "time": "2026-09-25 08:16 UTC",
+    "candle_time": "2026-09-25 08:00:00",
+    "symbol": "EURUSD",
+    "timeframe": "M30",
+    "action": "BUY",
+    "strategy": "london",
+    "entry": 1.13928,
+    "sl": 1.13683,
+    "tp": 1.14263,
+    "rr": 1.37,
+    "risk_reward": "1 : 1.37",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 15.0,
+    "outcome": "OPEN"
+  },
+  {
+    "time": "2026-09-25 08:16 UTC",
+    "candle_time": "2026-09-25 08:00:00",
+    "symbol": "EURUSD",
+    "timeframe": "H1",
+    "action": "BUY",
+    "strategy": "london",
+    "entry": 1.13927,
+    "sl": 1.13683,
+    "tp": 1.14261,
+    "rr": 1.37,
+    "risk_reward": "1 : 1.37",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 35.2,
+    "outcome": "OPEN"
   }
 ]
