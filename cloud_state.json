@@ -45,10 +45,10 @@
     "about_ts": null
   },
   "EMATREND-TRIPLE XAUUSD M15": {
-    "triple_pending_ts": "2026-09-25 16:00:00"
+    "triple_pending_ts": null
   },
   "EMATREND-CROSS XAUUSD M15": {
-    "about_ts": null,
+    "about_ts": "2026-09-25 17:45:00",
     "crossed_ts": "2026-09-25 15:00:00"
   }
 }
