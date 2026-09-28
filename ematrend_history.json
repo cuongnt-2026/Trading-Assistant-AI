@@ -209,6 +209,27 @@
       "resolved_time": "2026-09-25 15:45:00",
       "resolved_bars": 3,
       "logged_at": "2026-09-25 15:16:42"
+    },
+    {
+      "id": "XAUUSD-M15-2026-09-28 01:45:00-triple",
+      "symbol": "XAUUSD",
+      "timeframe": "M15",
+      "kind": "triple",
+      "event_type": "triple",
+      "direction": "down",
+      "signal_time": "2026-09-28 01:45:00",
+      "signal_price": 4217.56512,
+      "atr": 7.2759865648776065,
+      "sl": 4242.72235,
+      "tp": 4187.37644,
+      "sl_source": "swing-ATR",
+      "tp_source": "rr1.2",
+      "risk": 25.15723,
+      "rr": 1.2,
+      "result": "pending",
+      "resolved_time": null,
+      "resolved_bars": null,
+      "logged_at": "2026-09-28 02:01:46"
     }
   ]
 }
