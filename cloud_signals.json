@@ -1995,7 +1995,8 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 29.2,
-    "outcome": "OPEN"
+    "outcome": "WIN",
+    "r_result": 1.38
   },
   {
     "time": "2026-09-28 07:15 UTC",
@@ -2049,6 +2050,24 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 54.0,
+    "outcome": "OPEN"
+  },
+  {
+    "time": "2026-09-28 08:29 UTC",
+    "candle_time": "2026-09-28 08:00:00",
+    "symbol": "USDJPY",
+    "timeframe": "H1",
+    "action": "SELL",
+    "strategy": "london",
+    "entry": 156.74,
+    "sl": 157.85,
+    "tp": 155.87,
+    "rr": 0.78,
+    "risk_reward": "1 : 0.78",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 41.5,
     "outcome": "OPEN"
   }
 ]
