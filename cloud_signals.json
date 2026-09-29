@@ -2089,7 +2089,8 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 53.9,
-    "outcome": "OPEN"
+    "outcome": "WIN",
+    "r_result": 1.41
   },
   {
     "time": "2026-09-28 10:16 UTC",
@@ -2107,6 +2108,25 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 46.7,
+    "outcome": "WIN",
+    "r_result": 1.41
+  },
+  {
+    "time": "2026-09-29 09:16 UTC",
+    "candle_time": "2026-09-29 09:00:00",
+    "symbol": "EURUSD",
+    "timeframe": "H1",
+    "action": "SELL",
+    "strategy": "london",
+    "entry": 1.13387,
+    "sl": 1.13717,
+    "tp": 1.12953,
+    "rr": 1.32,
+    "risk_reward": "1 : 1.32",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 29.9,
     "outcome": "OPEN"
   }
 ]
