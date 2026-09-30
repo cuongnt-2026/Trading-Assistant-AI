@@ -2128,7 +2128,8 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 29.9,
-    "outcome": "OPEN"
+    "outcome": "LOSS",
+    "r_result": -1.0
   },
   {
     "time": "2026-09-29 09:45 UTC",
