@@ -2186,5 +2186,23 @@
     "confidence": 11.4,
     "outcome": "LOSS",
     "r_result": -1.0
+  },
+  {
+    "time": "2026-09-30 10:01 UTC",
+    "candle_time": "2026-09-30 09:30:00",
+    "symbol": "EURUSD",
+    "timeframe": "M30",
+    "action": "BUY",
+    "strategy": "london",
+    "entry": 1.1359,
+    "sl": 1.13289,
+    "tp": 1.14014,
+    "rr": 1.41,
+    "risk_reward": "1 : 1.41",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 27.5,
+    "outcome": "OPEN"
   }
 ]
