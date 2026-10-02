@@ -2246,5 +2246,23 @@
     "expected_profit": null,
     "confidence": 18.5,
     "outcome": "OPEN"
+  },
+  {
+    "time": "2026-10-02 10:31 UTC",
+    "candle_time": "2026-10-02 10:15:00",
+    "symbol": "EURUSD",
+    "timeframe": "M15",
+    "action": "BUY",
+    "strategy": "bollinger",
+    "entry": 1.12371,
+    "sl": 1.12267,
+    "tp": 1.12515,
+    "rr": 1.38,
+    "risk_reward": "1 : 1.38",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 7.7,
+    "outcome": "OPEN"
   }
 ]
