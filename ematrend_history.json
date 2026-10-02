@@ -268,9 +268,9 @@
       "tp_source": "rr1.2",
       "risk": 23.87266,
       "rr": 1.2,
-      "result": "pending",
-      "resolved_time": null,
-      "resolved_bars": null,
+      "result": "sai",
+      "resolved_time": "2026-10-02 01:00:00",
+      "resolved_bars": 56,
       "logged_at": "2026-10-01 11:16:44"
     }
   ]
