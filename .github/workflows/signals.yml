@@ -73,7 +73,8 @@ jobs:
       # EMA Trend Watch (thay the EMA Cross Watch o tren) - chi XAUUSD M15, EMA20/50/200
       # loc theo che do EMA200 (xem src/signal/ema_trend_watcher.py).
       EMATREND_ENABLED: "1"
-      EMATREND_PAIRS: "XAUUSD:M15"
+      EMATREND_PAIRS: "XAUUSD:M30,XAUUSD:H1"
+      EMATREND_MAIL: "0"
       # EMA Pullback: chien luoc VAO LENH THAT (Entry/SL/TP that, khac EMA Trend Watch/
       # EMA Cross Watch o tren la canh bao khong vao lenh) - y tuong CuongNT (2026-09-17):
       # H1 xu huong (thu tu chat 20>50>100>200 + loc doc + loc khoang cach EMA20-50),

@@ -160,7 +160,9 @@ class Config:
         # gian, dung EMA20/50/200 loc theo che do EMA200 de giam nhieu so voi ban cross
         # 20/50 tho truoc day. Xem src/signal/ema_trend_watcher.py.) -----
         self.ematrend_enabled = os.getenv("EMATREND_ENABLED", "1").strip() not in ("0", "false", "")
-        self.ematrend_pairs = _parse_pairs(os.getenv("EMATREND_PAIRS", "XAUUSD:M15"))
+        self.ematrend_pairs = _parse_pairs(os.getenv("EMATREND_PAIRS", "XAUUSD:M30,XAUUSD:H1"))
+        # EMATREND_MAIL=0: KHONG gui mail, chi cap nhat dashboard (de tu mo check). M15 truoc day bao sai nhieu.
+        self.ematrend_mail = os.getenv("EMATREND_MAIL", "1").strip() not in ("0", "false", "")
 
         # ----- EMA Pullback (chien luoc VAO LENH THAT, co Entry/SL/TP - khac EMA Trend
         # Watch/EMA Cross Watch o tren la CANH BAO khong vao lenh). Y tuong CuongNT

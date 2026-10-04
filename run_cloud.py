@@ -587,9 +587,9 @@ def _scan_ema_trend(sym, tf, cfg, state, notifier, cache, ematrend_history):
         ev["atr"] = atr
         subject, body = build_ema_trend_email(sym, tf, ev)
         subject = "[CLOUD][EMA-TREND] " + subject
-        ok = notifier.send(subject, body) if notifier else False
-        print("  {} {} [ematrend-triple] {} -> GUI MAIL: {}".format(
-            sym, tf, ev["direction"], "OK" if ok else "FAIL"))
+        ok = (notifier.send(subject, body) if notifier else False) if cfg.ematrend_mail else True
+        print("  {} {} [ematrend-triple] {} -> {}".format(
+            sym, tf, ev["direction"], ("MAIL OK" if ok else "FAIL") if cfg.ematrend_mail else "DASHBOARD (khong mail)"))
         if ok:
             record_event(ematrend_history, sym, tf, ev, candles)
             sent += 1
@@ -603,9 +603,9 @@ def _scan_ema_trend(sym, tf, cfg, state, notifier, cache, ematrend_history):
         ev["atr"] = atr
         subject, body = build_ema_trend_email(sym, tf, ev)
         subject = "[CLOUD][EMA-TREND] " + subject
-        ok = notifier.send(subject, body) if notifier else False
-        print("  {} {} [ematrend-cross] {} {} -> GUI MAIL: {}".format(
-            sym, tf, ev["type"], ev["direction"], "OK" if ok else "FAIL"))
+        ok = (notifier.send(subject, body) if notifier else False) if cfg.ematrend_mail else True
+        print("  {} {} [ematrend-cross] {} {} -> {}".format(
+            sym, tf, ev["type"], ev["direction"], ("MAIL OK" if ok else "FAIL") if cfg.ematrend_mail else "DASHBOARD (khong mail)"))
         if ok:
             st = state.setdefault(key_cross, {})
             if ev["type"] == "crossed":
