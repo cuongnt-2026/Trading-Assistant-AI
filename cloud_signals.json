@@ -2266,5 +2266,23 @@
     "confidence": 7.7,
     "outcome": "LOSS",
     "r_result": -1.0
+  },
+  {
+    "time": "2026-10-05 03:31 UTC",
+    "candle_time": "2026-10-05 00:00:00",
+    "symbol": "EURUSD",
+    "timeframe": "H4",
+    "action": "BUY",
+    "strategy": "bollinger",
+    "entry": 1.11868,
+    "sl": 1.1151,
+    "tp": 1.13015,
+    "rr": 3.2,
+    "risk_reward": "1 : 3.2",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 30.0,
+    "outcome": "OPEN"
   }
 ]
