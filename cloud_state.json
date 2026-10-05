@@ -51,9 +51,11 @@
     "about_ts": null,
     "crossed_ts": "2026-10-02 04:15:00"
   },
-  "EMATREND-TRIPLE XAUUSD M30": {},
+  "EMATREND-TRIPLE XAUUSD M30": {
+    "triple_pending_ts": "2026-10-05 14:30:00"
+  },
   "EMATREND-CROSS XAUUSD M30": {
-    "about_ts": null
+    "about_ts": "2026-10-05 14:30:00"
   },
   "EMATREND-TRIPLE XAUUSD H1": {},
   "EMATREND-CROSS XAUUSD H1": {
