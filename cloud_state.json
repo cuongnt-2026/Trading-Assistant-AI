@@ -60,7 +60,7 @@
   },
   "EMATREND-TRIPLE XAUUSD H1": {},
   "EMATREND-CROSS XAUUSD H1": {
-    "about_ts": null,
+    "about_ts": "2026-10-06 14:00:00",
     "crossed_ts": "2026-10-05 17:00:00"
   }
 }
