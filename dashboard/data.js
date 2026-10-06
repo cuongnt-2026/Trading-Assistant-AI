@@ -94,7 +94,7 @@ window.TA_DATA = {
       "atr": 0.34595,
       "rsi": 59.91,
       "pattern": "",
-      "reason": "Gia chua cham bien Bollinger (tren 158.52 / duoi 157.01)",
+      "reason": "Gia chua cham bien Bollinger (tren 158.53 / duoi 157.01)",
       "notified": false
     },
     {
