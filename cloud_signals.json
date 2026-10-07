@@ -2360,5 +2360,23 @@
     "confidence": 40.4,
     "outcome": "LOSS",
     "r_result": -1.0
+  },
+  {
+    "time": "2026-10-07 08:16 UTC",
+    "candle_time": "2026-10-07 08:00:00",
+    "symbol": "USDJPY",
+    "timeframe": "H1",
+    "action": "SELL",
+    "strategy": "london",
+    "entry": 157.95,
+    "sl": 158.5,
+    "tp": 157.29,
+    "rr": 1.2,
+    "risk_reward": "1 : 1.2",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 18.7,
+    "outcome": "OPEN"
   }
 ]
