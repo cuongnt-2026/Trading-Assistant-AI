@@ -356,6 +356,27 @@
       "resolved_time": "2026-10-06 11:00:00",
       "resolved_bars": 18,
       "logged_at": "2026-10-05 17:28:07"
+    },
+    {
+      "id": "XAUUSD-H1-2026-10-07 07:00:00-crossed",
+      "symbol": "XAUUSD",
+      "timeframe": "H1",
+      "kind": "cross",
+      "event_type": "crossed",
+      "direction": "down",
+      "signal_time": "2026-10-07 07:00:00",
+      "signal_price": 4132.78155,
+      "atr": 10.05280830547452,
+      "sl": 4153.21837,
+      "tp": 4107.78837,
+      "sl_source": "swing-ATR",
+      "tp_source": "structure",
+      "risk": 20.43682,
+      "rr": 1.22,
+      "result": "pending",
+      "resolved_time": null,
+      "resolved_bars": null,
+      "logged_at": "2026-10-07 07:16:39"
     }
   ]
 }
