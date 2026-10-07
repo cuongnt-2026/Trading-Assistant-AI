@@ -2395,7 +2395,8 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 65.0,
-    "outcome": "OPEN"
+    "outcome": "WIN",
+    "r_result": 2.5
   },
   {
     "time": "2026-10-07 10:15 UTC",
@@ -2413,6 +2414,24 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 46.1,
+    "outcome": "OPEN"
+  },
+  {
+    "time": "2026-10-07 12:30 UTC",
+    "candle_time": "2026-10-07 12:15:00",
+    "symbol": "XAUUSD",
+    "timeframe": "M15",
+    "action": "SELL",
+    "strategy": "breakout",
+    "entry": 4082.09,
+    "sl": 4127.72,
+    "tp": 3968.02,
+    "rr": 2.5,
+    "risk_reward": "1 : 2.5",
+    "risk_percent": 0.58,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 54.0,
     "outcome": "OPEN"
   }
 ]

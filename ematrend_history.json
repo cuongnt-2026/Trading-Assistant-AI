@@ -373,9 +373,9 @@
       "tp_source": "structure",
       "risk": 20.43682,
       "rr": 1.22,
-      "result": "pending",
-      "resolved_time": null,
-      "resolved_bars": null,
+      "result": "dung",
+      "resolved_time": "2026-10-07 12:00:00",
+      "resolved_bars": 5,
       "logged_at": "2026-10-07 07:16:39"
     }
   ]
