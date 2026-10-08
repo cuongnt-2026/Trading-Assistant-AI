@@ -2452,6 +2452,7 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 20.9,
-    "outcome": "OPEN"
+    "outcome": "WIN",
+    "r_result": 2.16
   }
 ]
