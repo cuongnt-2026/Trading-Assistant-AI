@@ -2414,7 +2414,8 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 46.1,
-    "outcome": "OPEN"
+    "outcome": "LOSS",
+    "r_result": -1.0
   },
   {
     "time": "2026-10-07 12:30 UTC",
@@ -2434,5 +2435,23 @@
     "confidence": 54.0,
     "outcome": "LOSS",
     "r_result": -1.0
+  },
+  {
+    "time": "2026-10-08 02:31 UTC",
+    "candle_time": "2026-10-08 02:15:00",
+    "symbol": "EURUSD",
+    "timeframe": "M15",
+    "action": "SELL",
+    "strategy": "bollinger",
+    "entry": 1.121,
+    "sl": 1.12145,
+    "tp": 1.12003,
+    "rr": 2.16,
+    "risk_reward": "1 : 2.16",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 20.9,
+    "outcome": "OPEN"
   }
 ]
