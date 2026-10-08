@@ -415,9 +415,9 @@
       "tp_source": "structure",
       "risk": 16.82787,
       "rr": 3.44,
-      "result": "pending",
-      "resolved_time": null,
-      "resolved_bars": null,
+      "result": "sai",
+      "resolved_time": "2026-10-08 14:00:00",
+      "resolved_bars": 13,
       "logged_at": "2026-10-08 07:46:36"
     },
     {
@@ -436,9 +436,9 @@
       "tp_source": "rr1.2",
       "risk": 24.30779,
       "rr": 1.2,
-      "result": "pending",
-      "resolved_time": null,
-      "resolved_bars": null,
+      "result": "sai",
+      "resolved_time": "2026-10-08 14:00:00",
+      "resolved_bars": 7,
       "logged_at": "2026-10-08 10:46:38"
     },
     {
