@@ -49,7 +49,9 @@ jobs:
       # Bollinger Mean Reversion + London Breakout: tin hieu roi rac, quet doc lap
       # (khong thuoc watchlist tren) - cap/khung da chot qua backtest (PF > 1).
       BOLLINGER_ENABLED: "1"
-      BOLLINGER_PAIRS: "EURUSD:H4,USDJPY:H4,EURUSD:M15"
+      # Bo H4 (EURUSD:H4 1/5, USDJPY:H4 0/3 - thuc te 5/8->9/10) theo yeu cau CuongNT
+      # (2026-10-11): chi giu EURUSD:M15 (18 lenh, +8.5R).
+      BOLLINGER_PAIRS: "EURUSD:M15"
       LONDON_ENABLED: "1"
       LONDON_PAIRS: "EURUSD:M30,EURUSD:H1,USDJPY:H1"
       # EMA Cross Watch: CANH BAO rieng (KHONG phai chien luoc vao lenh, khong SL/TP) -

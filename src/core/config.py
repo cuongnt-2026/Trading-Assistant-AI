@@ -125,7 +125,7 @@ class Config:
         # Danh sach cap/khung da chot qua backtest (PF > 1.8): EURUSD H4, USDJPY H4, EURUSD M15.
         self.bollinger_enabled = os.getenv("BOLLINGER_ENABLED", "1").strip() not in ("0", "false", "")
         self.bollinger_pairs = _parse_pairs(os.getenv(
-            "BOLLINGER_PAIRS", "EURUSD:H4,USDJPY:H4,EURUSD:M15"))
+            "BOLLINGER_PAIRS", "EURUSD:M15"))
 
         # ----- London Breakout (tin hieu roi rac, quet doc lap ngoai watchlist chinh) -----
         # Danh sach cap/khung da chot qua backtest: EURUSD M30+H1, USDJPY H1, NZDUSD M30.
