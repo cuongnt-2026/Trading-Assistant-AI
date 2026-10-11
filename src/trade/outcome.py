@@ -16,10 +16,15 @@ OPEN = "OPEN"
 class OutcomeEvaluator:
 
     @staticmethod
-    def evaluate(action, stop_loss, take_profit, future_candles):
+    def evaluate(action, stop_loss, take_profit, future_candles, spread=0.0):
         """
         future_candles: cac nen SAU khi vao lenh (theo thu tu thoi gian).
         Tra ve WIN / LOSS / OPEN.
+
+        spread: nen la gia Bid -> lenh SELL thoat o gia Ask (= Bid + spread), nen
+        SL cua SELL bi cham SOM hon va TP can gia xuong SAU hon `spread`. Lenh BUY
+        thoat o Bid nen khong doi (chi phi spread cua BUY nam o luc vao, da tinh
+        vao R qua src/trade/costs.py).
         """
         for c in future_candles:
             hit_sl = False
@@ -31,9 +36,9 @@ class OutcomeEvaluator:
                     hit_tp = c.high >= take_profit
             elif action == SELL:
                 if stop_loss is not None:
-                    hit_sl = c.high >= stop_loss
+                    hit_sl = c.high + spread >= stop_loss
                 if take_profit is not None:
-                    hit_tp = c.low <= take_profit
+                    hit_tp = c.low + spread <= take_profit
             else:
                 return OPEN
 

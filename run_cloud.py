@@ -27,6 +27,7 @@ from src.signal.ema_pullback_engine import EmaPullbackEngine
 from src.signal.ema_trend_tracker import record_event, evaluate_pending, compute_stats
 from src.indicators.indicator_service import IndicatorService
 from src.trade.outcome import OutcomeEvaluator, OPEN, WIN, LOSS
+from src.trade.costs import spread_of, spread_r
 
 STATE_PATH = "cloud_state.json"
 
@@ -83,11 +84,57 @@ def _fill_r_result(r, res):
     rieng, chinh xac hon vi dung gia dao chieu that)."""
     if r.get("r_result") is not None:
         return
+    # TU 2026-10-11: R THAT = R tren giay - spread/risk (xem src/trade/costs.py).
+    cost = spread_r(r.get("symbol"), r.get("entry"), r.get("sl"))
     if res == WIN:
         rr_val = _rr_of(r)
-        r["r_result"] = round(rr_val, 3) if isinstance(rr_val, (int, float)) else None
+        r["r_result"] = round(rr_val - cost, 3) if isinstance(rr_val, (int, float)) else None
     elif res == LOSS:
-        r["r_result"] = -1.0
+        r["r_result"] = round(-1.0 - cost, 3)
+    if r.get("r_result") is not None:
+        r["r_net"] = True          # danh dau: r_result DA tru spread
+
+
+def _close_if_done(r, fut):
+    """Cham WIN/LOSS (co tinh spread) cho 1 lenh OPEN; ghi outcome + r_result."""
+    res = OutcomeEvaluator.evaluate(r["action"], r.get("sl"), r.get("tp"), fut,
+                                    spread=spread_of(r.get("symbol")))
+    if res != OPEN:
+        r["outcome"] = res
+        _fill_r_result(r, res)
+
+
+# So lenh "ao" (R = 0) them vao khi tinh edge -> keo edge ve 0 khi con it du lieu,
+# tranh 3-4 lenh thang dau tien da bao "edge rat cao".
+EDGE_PRIOR_N = int(os.getenv("EDGE_PRIOR_N", "10"))
+EDGE_MIN_N = int(os.getenv("EDGE_MIN_N", "10"))
+
+
+def _hist_edge(signals_log, strategy, sym, tf):
+    """Thay "Do tin cay" cu (diem ky thuat EMA/ADX/RSI - thuc te KHONG du bao duoc
+    thang/thua, xem phan tich 2026-10-11) bang KET QUA THAT cua chinh to hop
+    strategy + symbol + khung trong qua khu:
+        n      = so lenh da dong
+        wr     = ty le thang (%)
+        edge_r = Tong R / (n + EDGE_PRIOR_N)  (R ky vong moi lenh, da co lam muot)
+    Tra (n, wr, edge_r, nhan)."""
+    rs = [r.get("r_result") for r in signals_log
+          if r.get("strategy") == strategy and r.get("symbol") == sym
+          and r.get("timeframe") == tf and r.get("outcome") in (WIN, LOSS)
+          and isinstance(r.get("r_result"), (int, float))]
+    n = len(rs)
+    wins = sum(1 for x in rs if x > 0)
+    wr = round(100.0 * wins / n) if n else 0
+    edge = round(sum(rs) / (n + EDGE_PRIOR_N), 2)
+    if n < EDGE_MIN_N:
+        label = "CHUA DU DU LIEU"
+    elif edge >= 0.15:
+        label = "TOT"
+    elif edge > 0:
+        label = "MONG"
+    else:
+        label = "AM"
+    return {"n": n, "wr": wr, "edge_r": edge, "label": label}
 
 
 SIGNALS_PATH = "cloud_signals.json"
@@ -318,10 +365,7 @@ def _scan_discrete(sym, tf, strategy, cfg, state, signals_log, snapshot, notifie
                 st = _parse_ct(r.get("candle_time", ""))
                 fut = [c for c in candles if st and c.time > st]
                 if fut:
-                    res = OutcomeEvaluator.evaluate(r["action"], r.get("sl"), r.get("tp"), fut)
-                    if res != OPEN:
-                        r["outcome"] = res
-                        _fill_r_result(r, res)
+                    _close_if_done(r, fut)
             except Exception as e:
                 print("[WARN] cham outcome {} {} [{}] loi: {}".format(sym, tf, strategy, e))
 
@@ -372,12 +416,16 @@ def _scan_discrete(sym, tf, strategy, cfg, state, signals_log, snapshot, notifie
         return 0
 
     try:
+        # Edge = ket qua THAT cua to hop nay (thay "Do tin cay" cu). Rui ro moi lenh
+        # co dinh = RISK_MIN (confidence=50): diem cu cang cao lai cang thua nhieu, khong
+        # dung de tang lot nua (phan tich 2026-10-11).
+        edge = _hist_edge(signals_log, strategy, sym, tf)
         plan = TradeService.create(
             signal, candles, symbol=sym, balance=cfg.account_balance or None,
-            confidence=rec.confidence, risk_min=cfg.risk_min_percent,
+            confidence=50.0, risk_min=cfg.risk_min_percent,
             risk_max=cfg.risk_max_percent, strategy=strategy, entry_mode=cfg.entry_mode)
         subject, body = build_signal_email(signal, sym, tf, last,
-                                           recommendation=rec, trade_plan=plan)
+                                           recommendation=rec, trade_plan=plan, edge=edge)
         subject = "[CLOUD][{}] ".format(strategy.upper()) + subject
         ok = notifier.send(subject, body) if notifier else False
         print("     -> [{}] GUI MAIL: {} (conf {:.0f})".format(
@@ -393,6 +441,7 @@ def _scan_discrete(sym, tf, strategy, cfg, state, signals_log, snapshot, notifie
                 "risk_percent": plan.risk_percent, "lot_size": plan.lot_size,
                 "expected_profit": plan.expected_profit,
                 "confidence": round(rec.confidence, 1), "outcome": "OPEN",
+                "edge_r": edge["edge_r"], "edge_n": edge["n"],
             })
             return 1
     except Exception as e:
@@ -429,10 +478,7 @@ def _scan_ema_pullback(sym, tf, cfg, state, signals_log, notifier, cache):
                 st = _parse_ct(r.get("candle_time", ""))
                 fut = [c for c in candles if st and c.time > st]
                 if fut:
-                    res = OutcomeEvaluator.evaluate(r["action"], r.get("sl"), r.get("tp"), fut)
-                    if res != OPEN:
-                        r["outcome"] = res
-                        _fill_r_result(r, res)
+                    _close_if_done(r, fut)
             except Exception as e:
                 print("[WARN] cham outcome {} {} [{}] loi: {}".format(sym, tf, strategy, e))
 
@@ -475,12 +521,16 @@ def _scan_ema_pullback(sym, tf, cfg, state, signals_log, notifier, cache):
         return 0
 
     try:
+        # Edge = ket qua THAT cua to hop nay (thay "Do tin cay" cu). Rui ro moi lenh
+        # co dinh = RISK_MIN (confidence=50): diem cu cang cao lai cang thua nhieu, khong
+        # dung de tang lot nua (phan tich 2026-10-11).
+        edge = _hist_edge(signals_log, strategy, sym, tf)
         plan = TradeService.create(
             signal, candles, symbol=sym, balance=cfg.account_balance or None,
-            confidence=rec.confidence, risk_min=cfg.risk_min_percent,
+            confidence=50.0, risk_min=cfg.risk_min_percent,
             risk_max=cfg.risk_max_percent, strategy=strategy, entry_mode=cfg.entry_mode)
         subject, body = build_signal_email(signal, sym, tf, last,
-                                           recommendation=rec, trade_plan=plan)
+                                           recommendation=rec, trade_plan=plan, edge=edge)
         subject = "[CLOUD][{}] ".format(strategy.upper()) + subject
         ok = notifier.send(subject, body) if notifier else False
         print("     -> [{}] GUI MAIL: {} (conf {:.0f})".format(
@@ -496,6 +546,7 @@ def _scan_ema_pullback(sym, tf, cfg, state, signals_log, notifier, cache):
                 "risk_percent": plan.risk_percent, "lot_size": plan.lot_size,
                 "expected_profit": plan.expected_profit,
                 "confidence": round(rec.confidence, 1), "outcome": "OPEN",
+                "edge_r": edge["edge_r"], "edge_n": edge["n"],
             })
             return 1
     except Exception as e:
@@ -681,10 +732,7 @@ def main():
                     st = _parse_ct(r.get("candle_time", ""))
                     fut = [c for c in candles if st and c.time > st]
                     if fut:
-                        res = OutcomeEvaluator.evaluate(r["action"], r.get("sl"), r.get("tp"), fut)
-                        if res != OPEN:
-                            r["outcome"] = res
-                            _fill_r_result(r, res)
+                        _close_if_done(r, fut)
                 except Exception as e:
                     print("[WARN] cham outcome {} {} loi: {}".format(sym, tf, e))
 
@@ -774,12 +822,16 @@ def main():
             continue
 
         try:
+            # Edge = ket qua THAT cua to hop nay (thay "Do tin cay" cu). Rui ro moi lenh
+            # co dinh = RISK_MIN (confidence=50): diem cu cang cao lai cang thua nhieu, khong
+            # dung de tang lot nua (phan tich 2026-10-11).
+            edge = _hist_edge(signals_log, strat, sym, tf)
             plan = TradeService.create(
                 signal, candles, symbol=sym, balance=cfg.account_balance or None,
-                confidence=rec.confidence, risk_min=cfg.risk_min_percent,
+                confidence=50.0, risk_min=cfg.risk_min_percent,
                 risk_max=cfg.risk_max_percent, strategy=strat, entry_mode=cfg.entry_mode)
             subject, body = build_signal_email(signal, sym, tf, last,
-                                               recommendation=rec, trade_plan=plan)
+                                               recommendation=rec, trade_plan=plan, edge=edge)
             subject = "[CLOUD] " + subject
             ok = notifier.send(subject, body) if notifier else False
             print("     -> GUI MAIL: {} (conf {:.0f})".format("OK" if ok else "FAIL/none", rec.confidence))
@@ -795,6 +847,7 @@ def main():
                     "risk_percent": plan.risk_percent, "lot_size": plan.lot_size,
                     "expected_profit": plan.expected_profit,
                     "confidence": round(rec.confidence, 1), "outcome": "OPEN",
+                "edge_r": edge["edge_r"], "edge_n": edge["n"],
                 })
         except Exception as e:
             print("[WARN] {} {} tao/gui lenh loi: {}".format(sym, tf, e))

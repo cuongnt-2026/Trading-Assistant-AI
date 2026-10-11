@@ -15,19 +15,23 @@ def _action_label(action):
 
 
 def build_signal_email(signal, symbol, timeframe, candle,
-                       recommendation=None, trade_plan=None):
+                       recommendation=None, trade_plan=None, edge=None):
     action = _action_label(signal.action)
     price = candle.close
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     act = "BUY" if signal.action == BUY else ("SELL" if signal.action == SELL else signal.action)
-    conf_txt = "{:.0f}%".format(recommendation.confidence) if recommendation is not None else "-"
+    conf_txt = "Tin cay {:.0f}%".format(recommendation.confidence) if recommendation is not None else "Tin cay -"
+    # Tu 2026-10-11: tieu de hien EDGE (ket qua that cua strategy+cap+khung nay) thay
+    # cho "Tin cay" - diem tin cay cu khong du bao duoc thang/thua.
+    if edge is not None:
+        conf_txt = "{:+.2f}R n={} ({})".format(edge["edge_r"], edge["n"], edge["label"])
     if trade_plan is not None and trade_plan.action in (BUY, SELL):
-        subject = "{} {} {} | E:{} SL:{} TP:{} | Tin cay {}".format(
+        subject = "{} {} {} | E:{} SL:{} TP:{} | {}".format(
             symbol, timeframe, act, trade_plan.entry_price,
             trade_plan.stop_loss, trade_plan.take_profit, conf_txt)
     else:
-        subject = "{} {} {} @ {:.2f} | Tin cay {}".format(
+        subject = "{} {} {} @ {:.2f} | {}".format(
             symbol, timeframe, act, price, conf_txt)
 
     body = (
@@ -42,11 +46,19 @@ def build_signal_email(signal, symbol, timeframe, candle,
         "Thoi diem   : {}\n\n"
     ).format(symbol, timeframe, action, signal.trend, price, now)
 
+    if edge is not None:
+        body += (
+            "---------- KET QUA THAT CUA TO HOP NAY ----------\n"
+            "Lenh da dong: {}\n"
+            "Ty le thang : {}%\n"
+            "Edge        : {:+.2f}R / lenh (da tru spread) -> {}\n\n"
+        ).format(edge["n"], edge["wr"], edge["edge_r"], edge["label"])
+
     if recommendation is not None:
         body += (
             "---------- AI RECOMMENDATION ----------\n"
             "Khuyen nghi : {}\n"
-            "Do tin cay  : {:.0f}% ({})\n"
+            "Diem ky thuat: {:.0f}% ({}) - chi tham khao, KHONG du bao thang/thua\n"
             "Ly do       : {}\n\n"
         ).format(recommendation.action, recommendation.confidence,
                  recommendation.label, ", ".join(recommendation.reasons))
