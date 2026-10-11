@@ -180,7 +180,7 @@
         <div class="card"><div class="k"><span class="dot" style="background:var(--buy)"></span> BUY</div><div class="v buy" id="kpiBuy">0</div></div>
         <div class="card"><div class="k"><span class="dot" style="background:var(--sell)"></span> SELL</div><div class="v sell" id="kpiSell">0</div></div>
         <div class="card"><div class="k"><span class="dot" style="background:var(--neutral)"></span> WAIT</div><div class="v neutral" id="kpiWait">0</div></div>
-        <div class="card"><div class="k">🎯 Tin cậy TB</div><div class="v" id="kpiConf">—</div></div>
+        <div class="card"><div class="k">📈 R TB / lệnh (sau spread)</div><div class="v" id="kpiConf">—</div></div>
         <div class="card"><div class="k">✉️ Đã gửi mail</div><div class="v" id="kpiMail">0</div></div>
         <div class="card"><div class="k">🏆 Tỷ lệ thắng</div><div class="v" id="kpiWin">—</div></div>
       </div>
@@ -251,11 +251,11 @@
     <section class="tabpage" data-page="stats">
       <div class="row">
         <div class="panel">
-          <h3>Độ tin cậy theo thời gian <span class="sub">chỉ BUY/SELL</span></h3>
+          <h3>Tổng R cộng dồn <span class="sub">đã trừ spread, lệnh đã đóng</span></h3>
           <canvas id="confLine"></canvas>
         </div>
         <div class="panel">
-          <h3>Phân nhóm độ tin cậy</h3>
+          <h3>Edge theo tổ hợp <span class="sub">R TB / lệnh, làm mượt (n+10), sau spread</span></h3>
           <canvas id="confBar"></canvas>
         </div>
       </div>
@@ -317,7 +317,7 @@
           Mỗi tháng, hệ thống tự tổng hợp lại toàn bộ lệnh đã gửi trong tháng vừa qua
           <b>và</b> từ trước đến nay, tự chấm điểm theo ngưỡng cố định (PF ≥ 1.3 là tốt,
           dưới 1.0 là cần xem lại, dưới 20 lệnh là chưa đủ dữ liệu — giống cách hệ thống
-          đang chấm độ tin cậy cho từng tín hiệu) để đưa ra khuyến nghị:
+          đang chấm Edge cho từng tín hiệu) để đưa ra khuyến nghị:
           <b>giữ nguyên</b>, <b>cần cải thiện</b> một vài chỗ, hay
           <b>nên cập nhật/xem lại sớm</b>. Đây là gợi ý tham khảo dựa trên dữ liệu — bạn
           vẫn là người quyết định cuối cùng có áp dụng thay đổi hay không.
@@ -348,6 +348,12 @@
   // write_dashboard() trong run_cloud.py, key "stop_loss"/"take_profit").
   const tpVal=(s,k)=> (s.trade_plan && s.trade_plan[k]!==undefined && s.trade_plan[k]!==null)?s.trade_plan[k]:"—";
   const confColor=(c)=> c>=75?"var(--buy)": c>=55?"var(--neutral)":"var(--muted)";
+  // EDGE (thay "Do tin cay" tu 2026-10-11): ket qua THAT cua strategy+symbol+khung,
+  // = Tong R (da tru spread) / (n + 10) - cung cong thuc _hist_edge() trong run_cloud.py.
+  const EDGE_PRIOR=10, EDGE_MIN_N=10;
+  const comboKey=(s)=>(s.strategy||'')+'|'+(s.symbol||'')+'|'+(s.timeframe||'');
+  const edgeColor=(e,n)=> n<EDGE_MIN_N?"var(--muted)": e>=0.15?"var(--buy)": e>0?"var(--neutral)":"var(--sell)";
+  const edgeTxt=(e)=> (e>=0?'+':'')+e.toFixed(2)+'R';
   const stratLabel=(v)=> v?({breakout:'Breakout',trend:'Trend',supertrend:'Supertrend',ema_pullback:'EMA Pullback'}[v]||v):'—';
   // Lay RR (so) cua 1 lenh: uu tien s.rr, khong thi doc tu trade_plan (chuoi "1 : 2.5" hoac tinh tu entry/sl/tp)
   function rrOf(s){
@@ -424,14 +430,18 @@
   const cnt=(a)=>S.filter(s=>s.action===a).length;
   const buy=cnt('BUY'), sell=cnt('SELL'), wait=cnt('NO_TRADE');
   const mail=S.filter(s=>s.notified).length;
-  const confs=S.filter(s=>typeof s.confidence==='number'&&(s.action==='BUY'||s.action==='SELL'))
-               .map(s=>s.confidence);
-  const avgConf=confs.length? (confs.reduce((a,b)=>a+b,0)/confs.length):null;
+  const EDGE={};
+  S.filter(s=>s.outcome==='WIN'||s.outcome==='LOSS').forEach(s=>{
+    const k=comboKey(s); (EDGE[k]=EDGE[k]||{n:0,sum:0,w:0}); EDGE[k].n++; EDGE[k].sum+=realR(s); if(realR(s)>0) EDGE[k].w++; });
+  Object.values(EDGE).forEach(o=>{ o.edge=o.sum/(o.n+EDGE_PRIOR); });
+  const edgeOf=(s)=> EDGE[comboKey(s)]||{n:0,sum:0,w:0,edge:0};
+  const _cl=S.filter(s=>s.outcome==='WIN'||s.outcome==='LOSS');
+  const avgConf=_cl.length? _cl.reduce((a,s)=>a+realR(s),0)/_cl.length : null;
   document.getElementById('kpiTotal').textContent=S.length;
   document.getElementById('kpiBuy').textContent=buy;
   document.getElementById('kpiSell').textContent=sell;
   document.getElementById('kpiWait').textContent=wait;
-  document.getElementById('kpiConf').textContent=avgConf!==null? Math.round(avgConf)+"%":"—";
+  document.getElementById('kpiConf').textContent=avgConf!==null? edgeTxt(avgConf):"—";
   document.getElementById('kpiMail').textContent=mail;
 
   // ---- Win/Loss theo thi truong chay ----
@@ -453,7 +463,7 @@
     tpBody.innerHTML='<div class="empty">Chưa có lệnh BUY/SELL nào. Khi có setup, kế hoạch sẽ hiện ở đây.</div>';
   } else {
     const p=actionable.trade_plan;
-    const c=actionable.confidence;
+    const ae=edgeOf(actionable);
     tpMeta.innerHTML=`${actionable.symbol} ${actionable.timeframe} • <span class="badge ${actionable.action}">${actionable.action}</span>`;
     const money = (p.lot_size!==null&&p.lot_size!==undefined)
       ? `<div class="cell"><div class="lbl">Lot (ước tính)</div><div class="val">${num(p.lot_size)}</div></div>
@@ -468,17 +478,17 @@
         <div class="cell"><div class="lbl">R : R</div><div class="val">${g(p,'risk_reward')}</div></div>
         <div class="cell"><div class="lbl">Risk</div><div class="val">${num(p.risk_percent,0)}%</div></div>
         ${money}
-        <div class="cell"><div class="lbl">Độ tin cậy</div>
-          <div class="val" style="color:${confColor(c)}">${c!==undefined?Math.round(c)+'%':'—'}</div></div>
+        <div class="cell"><div class="lbl">Edge (n=${ae.n})</div>
+          <div class="val" style="color:${edgeColor(ae.edge,ae.n)}">${ae.n?edgeTxt(ae.edge):'—'}</div></div>
       </div>`;
   }
 
   // ---- Confidence cell renderer ----
   function confCell(s){
-    if(typeof s.confidence!=='number') return '<span class="muted">—</span>';
-    const c=s.confidence;
-    return `<div class="conf"><div class="track"><div class="fill" style="width:${c}%;background:${confColor(c)}"></div></div>
-            <div class="pct" style="color:${confColor(c)}">${Math.round(c)}%</div></div>`;
+    if(s.action!=='BUY'&&s.action!=='SELL') return '<span class="muted">—</span>';
+    const e=edgeOf(s);
+    if(!e.n) return '<span class="muted" title="Chua co lenh dong">—</span>';
+    return `<span title="${e.n} lenh da dong, thang ${Math.round(100*e.w/e.n)}%${e.n<EDGE_MIN_N?' - chua du du lieu':''}" style="font-weight:700;color:${edgeColor(e.edge,e.n)}">${edgeTxt(e.edge)}</span> <span class="muted" style="font-size:11px">n${e.n}</span>`;
   }
 
   // ---- Table renderer ----
@@ -505,8 +515,8 @@
         ${full&&s.notified?manualControls(s):(full?'<td class="muted">—</td>':'')}
       </tr>`).join('');
     const head = full
-      ? `<tr><th>Thời gian (VN)</th>${thf('symbol','Symbol')}${thf('timeframe','TF')}${thf('strategy','PP')}${thf('action','Tín hiệu')}<th>Tin cậy</th><th>Giá</th><th>SL</th><th>TP</th>${thf('trend','Trend')}<th>RSI</th><th>ADX</th><th>ATR</th>${thf('pattern','Nến')}${thf('outcome','KQ')}<th>Mail</th><th>Nhập tay (what-if)</th></tr>`
-      : `<tr><th>Thời gian (VN)</th><th>Symbol</th><th>TF</th><th>PP</th><th>Tín hiệu</th><th>Tin cậy</th><th>Giá</th><th>SL</th><th>TP</th><th>KQ</th><th>Mail</th></tr>`;
+      ? `<tr><th>Thời gian (VN)</th>${thf('symbol','Symbol')}${thf('timeframe','TF')}${thf('strategy','PP')}${thf('action','Tín hiệu')}<th>Edge</th><th>Giá</th><th>SL</th><th>TP</th>${thf('trend','Trend')}<th>RSI</th><th>ADX</th><th>ATR</th>${thf('pattern','Nến')}${thf('outcome','KQ')}<th>Mail</th><th>Nhập tay (what-if)</th></tr>`
+      : `<tr><th>Thời gian (VN)</th><th>Symbol</th><th>TF</th><th>PP</th><th>Tín hiệu</th><th>Edge</th><th>Giá</th><th>SL</th><th>TP</th><th>KQ</th><th>Mail</th></tr>`;
     return `<table><thead>${head}</thead><tbody>${rows}</tbody></table>`;
   }
   function bindColFilter(){
@@ -757,7 +767,6 @@
     :'<div class="empty">Chưa có dữ liệu.</div>';
 
   // ---- Stats tab ----
-  const strong=confs.filter(c=>c>=75).length, mod=confs.filter(c=>c>=55&&c<75).length, low=confs.filter(c=>c<55).length;
   // Tinh R tong the (dung r_result neu co, khong thi WIN=+rr / LOSS=-1)
   const rOf=realR;
   const closedRows=S.filter(s=>s.outcome==='WIN'||s.outcome==='LOSS');
@@ -770,7 +779,6 @@
   document.getElementById('statTable').innerHTML=`<table><tbody>
     <tr><td class="muted">Tổng tín hiệu</td><td><b>${S.length}</b></td></tr>
     <tr><td class="muted">BUY / SELL / WAIT</td><td><b>${buy} / ${sell} / ${wait}</b></td></tr>
-    <tr><td class="muted">Độ tin cậy trung bình (BUY/SELL)</td><td><b>${avgConf!==null?Math.round(avgConf)+'%':'—'}</b></td></tr>
     <tr><td class="muted">Đã gửi mail</td><td><b>${mail}</b></td></tr>
     <tr><td class="muted">Lệnh đã đóng (Win+Loss)</td><td><b>${closed}</b> (OPEN: ${openCnt})</td></tr>
     <tr><td class="muted">Thắng / Thua</td><td><b style="color:var(--buy)">${wins}</b> / <b style="color:var(--sell)">${losses}</b></td></tr>
@@ -797,18 +805,22 @@
       options:{responsive:true,scales:{x:{stacked:true,grid:{color:gridColor},ticks:{color:tickColor}},
         y:{stacked:true,grid:{color:gridColor},ticks:{color:tickColor}}},plugins:{legend:{labels:{color:tickColor}}}}});
 
-    const cline=S.filter(s=>(s.action==='BUY'||s.action==='SELL')&&typeof s.confidence==='number');
+    const cline=[...closedRows].sort((a,b)=>String(a.time).localeCompare(String(b.time)));
+    let _acc=0; const cumR=cline.map(s=>+( _acc+=realR(s) ).toFixed(2));
     new Chart(document.getElementById('confLine'),{type:'line',
-      data:{labels:cline.map(s=>s.symbol+' '+(s.timeframe||'')),
-        datasets:[{label:'Confidence %',data:cline.map(s=>s.confidence),
-          borderColor:'#4f8cff',backgroundColor:'rgba(79,140,255,.15)',fill:true,tension:.3,pointRadius:3}]},
-      options:{scales:{y:{min:0,max:100,grid:{color:gridColor},ticks:{color:tickColor}},
+      data:{labels:cline.map(s=>(s.time?toVN(s.time).slice(0,10):'')+' '+s.symbol+' '+(s.timeframe||'')),
+        datasets:[{label:'Tổng R cộng dồn',data:cumR,
+          borderColor:'#4f8cff',backgroundColor:'rgba(79,140,255,.15)',fill:true,tension:.2,pointRadius:2}]},
+      options:{scales:{y:{grid:{color:gridColor},ticks:{color:tickColor}},
         x:{grid:{color:gridColor},ticks:{color:tickColor}}},plugins:{legend:{labels:{color:tickColor}}}}});
 
+    const combos=Object.entries(EDGE).sort((a,b)=>b[1].edge-a[1].edge);
+    const cssv=(v)=>getComputedStyle(document.documentElement).getPropertyValue(v.slice(4,-1)).trim()||'#8b98ad';
     new Chart(document.getElementById('confBar'),{type:'bar',
-      data:{labels:['STRONG ≥75','MODERATE 55-74','LOW <55'],datasets:[{label:'Số tín hiệu',
-        data:[strong,mod,low],backgroundColor:['#22c55e','#eab308','#8b98ad']}]},
-      options:{scales:{y:{grid:{color:gridColor},ticks:{color:tickColor}},
+      data:{labels:combos.map(([k,o])=>{const [st,sy,tf]=k.split('|'); return stratLabel(st)+' '+sy+' '+tf+' (n'+o.n+')';}),
+        datasets:[{label:'Edge (R/lệnh)',data:combos.map(([k,o])=>+o.edge.toFixed(2)),
+          backgroundColor:combos.map(([k,o])=>cssv(edgeColor(o.edge,o.n)))}]},
+      options:{indexAxis:'y',scales:{y:{grid:{color:gridColor},ticks:{color:tickColor}},
         x:{grid:{color:gridColor},ticks:{color:tickColor}}},plugins:{legend:{display:false}}}});
   }
 
