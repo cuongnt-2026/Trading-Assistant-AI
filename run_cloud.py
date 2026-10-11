@@ -813,12 +813,16 @@ def main():
             print("     -> da bao cho nen nay -> bo qua")
             continue
 
-        # Chong ban trung: da co lenh CUNG CHIEU dang mo o cap-khung nay -> bo qua
+        # Chong ban trung: da co lenh CUNG CHIEU dang mo o cap nay -> bo qua. Tu 2026-10-11
+        # xet MOI KHUNG (khong chi khung hien tai): 1 cu breakout hay bao cung luc ca
+        # M15/M30/H1 = 3x rui ro cho 1 y tuong (vd 28/9 ca 3 cung thua). Backtest 4 thang
+        # (sau spread): 94 lenh +32.1R MaxDD 12.6R chuoi thua 10 -> 45 lenh +23.4R
+        # MaxDD 3.8R chuoi thua 5, PF 1.57 -> 1.98. Watchlist quet M15 truoc nen M15 duoc uu tien.
         if any(r.get("outcome") == "OPEN" and r.get("symbol") == sym
-               and r.get("timeframe") == tf and r.get("action") == signal.action
+               and r.get("strategy") == strat and r.get("action") == signal.action
                for r in signals_log):
-            print("     -> da co lenh {} dang mo o {} {} -> bo qua (chong ban trung)".format(
-                signal.action, sym, tf))
+            print("     -> da co lenh {} {} dang mo o {} (khung bat ky) -> bo qua (chong ban trung)".format(
+                strat, signal.action, sym))
             continue
 
         try:
