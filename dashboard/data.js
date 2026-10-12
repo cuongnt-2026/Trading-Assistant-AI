@@ -1,174 +1,117 @@
 window.TA_DATA = {
-  "updated": "2026-10-09 21:23 UTC",
+  "updated": "2026-10-12 02:01 UTC",
   "symbol": "XAUUSD",
   "signals": [
     {
-      "time": "2026-10-09 21:21:56",
+      "time": "2026-10-12 02:00:41",
       "symbol": "XAUUSD",
       "timeframe": "M15",
       "action": "NO_TRADE",
       "strategy": "breakout",
       "trend": "SIDEWAYS",
       "strength": "WEAK",
-      "price": 4195.89018,
-      "ema20": 4194.26909,
-      "ema50": 4189.0866,
-      "ema200": 4161.08621,
-      "adx": 15.45,
-      "atr": 4.17302,
-      "rsi": 55.45,
+      "price": 4212.27221,
+      "ema20": 4201.22385,
+      "ema50": 4198.06725,
+      "ema200": 4194.97563,
+      "adx": 44.73,
+      "atr": 6.57987,
+      "rsi": 64.67,
       "pattern": "",
-      "reason": "ADX 15.4 yeu - chua co xu huong de breakout",
+      "reason": "Chua pha vo dinh/day 20 nen",
       "notified": false
     },
     {
-      "time": "2026-10-09 21:22:12",
+      "time": "2026-10-12 02:00:58",
       "symbol": "XAUUSD",
       "timeframe": "M30",
       "action": "NO_TRADE",
       "strategy": "breakout",
       "trend": "SIDEWAYS",
       "strength": "WEAK",
-      "price": 4195.89018,
-      "ema20": 4190.95329,
-      "ema50": 4177.89329,
-      "ema200": 4151.38142,
-      "adx": 29.3,
-      "atr": 7.17368,
-      "rsi": 60.89,
+      "price": 4212.27221,
+      "ema20": 4199.01553,
+      "ema50": 4196.8123,
+      "ema200": 4182.197,
+      "adx": 47.8,
+      "atr": 5.79632,
+      "rsi": 70.22,
       "pattern": "",
       "reason": "Chua pha vo dinh/day 20 nen",
       "notified": false
     },
     {
-      "time": "2026-10-09 21:22:12",
+      "time": "2026-10-12 02:00:58",
       "symbol": "XAUUSD",
       "timeframe": "H1",
       "action": "NO_TRADE",
       "strategy": "breakout",
       "trend": "SIDEWAYS",
       "strength": "WEAK",
-      "price": 4195.89018,
-      "ema20": 4182.91957,
-      "ema50": 4163.1994,
-      "ema200": 4149.61156,
-      "adx": 39.64,
-      "atr": 11.08836,
-      "rsi": 65.74,
+      "price": 4212.27221,
+      "ema20": 4197.06501,
+      "ema50": 4192.23564,
+      "ema200": 4168.85364,
+      "adx": 39.23,
+      "atr": 4.84044,
+      "rsi": 75.67,
       "pattern": "",
       "reason": "Chua pha vo dinh/day 20 nen",
       "notified": false
     },
     {
-      "time": "2026-10-09 21:22:20",
-      "symbol": "EURUSD",
-      "timeframe": "H4",
-      "action": "NO_TRADE",
-      "strategy": "bollinger",
-      "trend": "SIDEWAYS",
-      "strength": "WEAK",
-      "price": 1.12034,
-      "ema20": 1.12112,
-      "ema50": 1.12396,
-      "ema200": 1.13786,
-      "adx": 28.79,
-      "atr": 0.0023,
-      "rsi": 46.68,
-      "pattern": "",
-      "reason": "Gia chua cham bien Bollinger (tren 1.1296 / duoi 1.1183)",
-      "notified": false
-    },
-    {
-      "time": "2026-10-09 21:22:28",
-      "symbol": "USDJPY",
-      "timeframe": "H4",
-      "action": "NO_TRADE",
-      "strategy": "bollinger",
-      "trend": "SIDEWAYS",
-      "strength": "WEAK",
-      "price": 158.28603,
-      "ema20": 158.17555,
-      "ema50": 158.01078,
-      "ema200": 157.55145,
-      "adx": 42.93,
-      "atr": 0.31304,
-      "rsi": 55.19,
-      "pattern": "",
-      "reason": "Gia chua cham bien Bollinger (tren 158.45 / duoi 157.57)",
-      "notified": false
-    },
-    {
-      "time": "2026-10-09 21:22:37",
-      "symbol": "EURUSD",
-      "timeframe": "M15",
-      "action": "NO_TRADE",
-      "strategy": "bollinger",
-      "trend": "SIDEWAYS",
-      "strength": "WEAK",
-      "price": 1.12034,
-      "ema20": 1.12007,
-      "ema50": 1.12033,
-      "ema200": 1.12075,
-      "adx": 18.4,
-      "atr": 0.00039,
-      "rsi": 62.73,
-      "pattern": "",
-      "reason": "Gia chua cham bien Bollinger (tren 1.122 / duoi 1.1186)",
-      "notified": false
-    },
-    {
-      "time": "2026-10-09 21:22:45",
+      "time": "2026-10-12 02:01:06",
       "symbol": "EURUSD",
       "timeframe": "M30",
       "action": "NO_TRADE",
       "strategy": "london",
       "trend": "SIDEWAYS",
       "strength": "WEAK",
-      "price": 1.12034,
-      "ema20": 1.12021,
-      "ema50": 1.12064,
-      "ema200": 1.12147,
-      "adx": 19.62,
-      "atr": 0.00063,
-      "rsi": 49.62,
+      "price": 1.12143,
+      "ema20": 1.12053,
+      "ema50": 1.12041,
+      "ema200": 1.12089,
+      "adx": 30.74,
+      "atr": 0.00079,
+      "rsi": 61.88,
       "pattern": "",
       "reason": "Ngoai khung gio vao lenh (08h-11h)",
       "notified": false
     },
     {
-      "time": "2026-10-09 21:22:53",
+      "time": "2026-10-12 02:01:14",
       "symbol": "EURUSD",
       "timeframe": "H1",
       "action": "NO_TRADE",
       "strategy": "london",
       "trend": "SIDEWAYS",
       "strength": "WEAK",
-      "price": 1.12034,
-      "ema20": 1.12049,
-      "ema50": 1.1208,
-      "ema200": 1.12363,
-      "adx": 18.65,
-      "atr": 0.00095,
-      "rsi": 47.83,
+      "price": 1.12143,
+      "ema20": 1.12039,
+      "ema50": 1.12039,
+      "ema200": 1.12131,
+      "adx": 29.33,
+      "atr": 0.00093,
+      "rsi": 61.16,
       "pattern": "",
       "reason": "Ngoai khung gio vao lenh (08h-11h)",
       "notified": false
     },
     {
-      "time": "2026-10-09 21:23:01",
+      "time": "2026-10-12 02:01:22",
       "symbol": "USDJPY",
       "timeframe": "H1",
       "action": "NO_TRADE",
       "strategy": "london",
       "trend": "SIDEWAYS",
       "strength": "WEAK",
-      "price": 158.28603,
-      "ema20": 158.24571,
-      "ema50": 158.18053,
-      "ema200": 157.98964,
-      "adx": 13.86,
-      "atr": 0.13209,
-      "rsi": 53.48,
+      "price": 158.12033,
+      "ema20": 158.27493,
+      "ema50": 158.28538,
+      "ema200": 158.1683,
+      "adx": 28.98,
+      "atr": 0.127,
+      "rsi": 33.95,
       "pattern": "",
       "reason": "Ngoai khung gio vao lenh (08h-11h)",
       "notified": false
@@ -184,7 +127,7 @@ window.TA_DATA = {
       "confidence": 54.0,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 2.5,
+      "r_result": 2.494,
       "trade_plan": {
         "entry": 4243.82,
         "stop_loss": 4180.25,
@@ -206,7 +149,7 @@ window.TA_DATA = {
       "confidence": 54.0,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 2.5,
+      "r_result": 2.495,
       "trade_plan": {
         "entry": 4243.82,
         "stop_loss": 4175.34,
@@ -228,7 +171,7 @@ window.TA_DATA = {
       "confidence": 54.0,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 2.5,
+      "r_result": 2.497,
       "trade_plan": {
         "entry": 4258.62,
         "stop_loss": 4150.23,
@@ -250,7 +193,7 @@ window.TA_DATA = {
       "confidence": 70.9,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.7,
+      "r_result": 1.55,
       "trade_plan": {
         "entry": 1.15435,
         "stop_loss": 1.15355,
@@ -272,7 +215,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -0.626,
+      "r_result": -0.633,
       "trade_plan": {
         "entry": 4239.12,
         "stop_loss": 4286.29,
@@ -294,7 +237,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 0.093,
+      "r_result": 0.083,
       "trade_plan": {
         "entry": 4268.63,
         "stop_loss": 4235.08,
@@ -316,7 +259,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 2.399,
+      "r_result": 2.388,
       "trade_plan": {
         "entry": 4271.74,
         "stop_loss": 4239.48,
@@ -338,7 +281,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -0.829,
+      "r_result": -0.839,
       "trade_plan": {
         "entry": 4349.12,
         "stop_loss": 4312.75,
@@ -360,7 +303,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 0.378,
+      "r_result": 0.369,
       "trade_plan": {
         "entry": 4349.12,
         "stop_loss": 4311.47,
@@ -382,7 +325,7 @@ window.TA_DATA = {
       "confidence": 79.3,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.158,
       "trade_plan": {
         "entry": 1.15503,
         "stop_loss": 1.15427,
@@ -404,7 +347,7 @@ window.TA_DATA = {
       "confidence": 61.5,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.409,
       "trade_plan": {
         "entry": 0.58912,
         "stop_loss": 0.58868,
@@ -426,7 +369,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.009,
       "trade_plan": {
         "entry": 4318.98,
         "stop_loss": 4356.26,
@@ -448,7 +391,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 0.906,
+      "r_result": 0.897,
       "trade_plan": {
         "entry": 4358.13,
         "stop_loss": 4320.35,
@@ -470,7 +413,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 0.069,
+      "r_result": 0.061,
       "trade_plan": {
         "entry": 4363.37,
         "stop_loss": 4321.23,
@@ -492,7 +435,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -0.083,
+      "r_result": -0.091,
       "trade_plan": {
         "entry": 4392.37,
         "stop_loss": 4437.47,
@@ -514,7 +457,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -0.727,
+      "r_result": -0.733,
       "trade_plan": {
         "entry": 4366.28,
         "stop_loss": 4429.56,
@@ -536,7 +479,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 0.11,
+      "r_result": 0.1,
       "trade_plan": {
         "entry": 4396.11,
         "stop_loss": 4362.51,
@@ -558,7 +501,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -0.695,
+      "r_result": -0.702,
       "trade_plan": {
         "entry": 4412.27,
         "stop_loss": 4360.61,
@@ -580,7 +523,7 @@ window.TA_DATA = {
       "confidence": 63.8,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.115,
       "trade_plan": {
         "entry": 159.16,
         "stop_loss": 159.29,
@@ -602,7 +545,7 @@ window.TA_DATA = {
       "confidence": 60.2,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.182,
       "trade_plan": {
         "entry": 1.15392,
         "stop_loss": 1.15326,
@@ -624,7 +567,7 @@ window.TA_DATA = {
       "confidence": 76.2,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.136,
       "trade_plan": {
         "entry": 159.29,
         "stop_loss": 159.4,
@@ -646,7 +589,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.726,
+      "r_result": 1.714,
       "trade_plan": {
         "entry": 4399.8,
         "stop_loss": 4428.17,
@@ -668,7 +611,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 0.0,
+      "r_result": -0.007,
       "trade_plan": {
         "entry": 4376.35,
         "stop_loss": 4429.61,
@@ -690,7 +633,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 0.164,
+      "r_result": 0.157,
       "trade_plan": {
         "entry": 4376.34,
         "stop_loss": 4426.27,
@@ -712,7 +655,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.033,
+      "r_result": 1.021,
       "trade_plan": {
         "entry": 4350.82,
         "stop_loss": 4322.64,
@@ -734,7 +677,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.437,
+      "r_result": 1.43,
       "trade_plan": {
         "entry": 4368.14,
         "stop_loss": 4316.87,
@@ -756,7 +699,7 @@ window.TA_DATA = {
       "confidence": 62.7,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.125,
       "trade_plan": {
         "entry": 159.11,
         "stop_loss": 159.23,
@@ -778,7 +721,7 @@ window.TA_DATA = {
       "confidence": 70.3,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.125,
       "trade_plan": {
         "entry": 159.38,
         "stop_loss": 159.5,
@@ -800,7 +743,7 @@ window.TA_DATA = {
       "confidence": 79.9,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.179,
       "trade_plan": {
         "entry": 1.15627,
         "stop_loss": 1.1556,
@@ -822,7 +765,7 @@ window.TA_DATA = {
       "confidence": 79.3,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 3.04,
+      "r_result": 2.665,
       "trade_plan": {
         "entry": 0.5884,
         "stop_loss": 0.58792,
@@ -844,7 +787,7 @@ window.TA_DATA = {
       "confidence": 47.4,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.021,
       "trade_plan": {
         "entry": 4405.79,
         "stop_loss": 4388.74,
@@ -866,7 +809,7 @@ window.TA_DATA = {
       "confidence": 73.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.148,
       "trade_plan": {
         "entry": 1.15922,
         "stop_loss": 1.15841,
@@ -888,7 +831,7 @@ window.TA_DATA = {
       "confidence": 73.1,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.383,
       "trade_plan": {
         "entry": 0.59166,
         "stop_loss": 0.59119,
@@ -910,7 +853,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.011,
       "trade_plan": {
         "entry": 4379.93,
         "stop_loss": 4411.74,
@@ -932,7 +875,7 @@ window.TA_DATA = {
       "confidence": 68.7,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.353,
       "trade_plan": {
         "entry": 0.59096,
         "stop_loss": 0.59045,
@@ -954,7 +897,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.011,
       "trade_plan": {
         "entry": 4401.4,
         "stop_loss": 4433.18,
@@ -976,7 +919,7 @@ window.TA_DATA = {
       "confidence": 29.4,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 2.34,
+      "r_result": 1.965,
       "trade_plan": {
         "entry": 1.16624,
         "stop_loss": 1.16592,
@@ -998,7 +941,7 @@ window.TA_DATA = {
       "confidence": 31.8,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.071,
       "trade_plan": {
         "entry": 1.1677,
         "stop_loss": 1.166,
@@ -1020,7 +963,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -0.332,
+      "r_result": -0.341,
       "trade_plan": {
         "entry": 4597.96,
         "stop_loss": 4638.14,
@@ -1042,7 +985,7 @@ window.TA_DATA = {
       "confidence": 46.0,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.41,
+      "r_result": 1.278,
       "trade_plan": {
         "entry": 1.16508,
         "stop_loss": 1.16599,
@@ -1064,7 +1007,7 @@ window.TA_DATA = {
       "confidence": 33.5,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.41,
+      "r_result": 1.278,
       "trade_plan": {
         "entry": 1.16508,
         "stop_loss": 1.16599,
@@ -1086,7 +1029,7 @@ window.TA_DATA = {
       "confidence": 44.3,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.4,
+      "r_result": 1.35,
       "trade_plan": {
         "entry": 159.42,
         "stop_loss": 159.12,
@@ -1108,7 +1051,7 @@ window.TA_DATA = {
       "confidence": 40.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.103,
       "trade_plan": {
         "entry": 0.59377,
         "stop_loss": 0.59551,
@@ -1130,7 +1073,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.007,
       "trade_plan": {
         "entry": 4611.31,
         "stop_loss": 4563.84,
@@ -1152,7 +1095,7 @@ window.TA_DATA = {
       "confidence": 41.2,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.44,
+      "r_result": 1.3,
       "trade_plan": {
         "entry": 0.59533,
         "stop_loss": 0.59662,
@@ -1174,7 +1117,7 @@ window.TA_DATA = {
       "confidence": 47.4,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.43,
+      "r_result": 1.347,
       "trade_plan": {
         "entry": 1.16413,
         "stop_loss": 1.16557,
@@ -1196,7 +1139,7 @@ window.TA_DATA = {
       "confidence": 42.7,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.43,
+      "r_result": 1.347,
       "trade_plan": {
         "entry": 1.16413,
         "stop_loss": 1.16557,
@@ -1218,7 +1161,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -0.738,
+      "r_result": -0.75,
       "trade_plan": {
         "entry": 4441.83,
         "stop_loss": 4470.26,
@@ -1240,7 +1183,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.01,
       "trade_plan": {
         "entry": 4462.81,
         "stop_loss": 4426.01,
@@ -1262,7 +1205,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.008,
       "trade_plan": {
         "entry": 4462.81,
         "stop_loss": 4418.74,
@@ -1284,7 +1227,7 @@ window.TA_DATA = {
       "confidence": 36.9,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.034,
       "trade_plan": {
         "entry": 1.15891,
         "stop_loss": 1.16245,
@@ -1306,7 +1249,7 @@ window.TA_DATA = {
       "confidence": 30.7,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.036,
       "trade_plan": {
         "entry": 160.06,
         "stop_loss": 159.64,
@@ -1328,7 +1271,7 @@ window.TA_DATA = {
       "confidence": 54.0,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 2.5,
+      "r_result": 2.489,
       "trade_plan": {
         "entry": 4360.7,
         "stop_loss": 4391.58,
@@ -1350,7 +1293,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 3.0,
+      "r_result": 2.991,
       "trade_plan": {
         "entry": 4338.77,
         "stop_loss": 4301.16,
@@ -1372,7 +1315,7 @@ window.TA_DATA = {
       "confidence": 54.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.007,
       "trade_plan": {
         "entry": 4466.23,
         "stop_loss": 4414.47,
@@ -1394,7 +1337,7 @@ window.TA_DATA = {
       "confidence": 30.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.021,
       "trade_plan": {
         "entry": 156.06,
         "stop_loss": 155.36,
@@ -1416,7 +1359,7 @@ window.TA_DATA = {
       "confidence": 31.9,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.29,
+      "r_result": 1.204,
       "trade_plan": {
         "entry": 1.16196,
         "stop_loss": 1.16336,
@@ -1438,7 +1381,7 @@ window.TA_DATA = {
       "confidence": 39.9,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.29,
+      "r_result": 1.204,
       "trade_plan": {
         "entry": 1.16196,
         "stop_loss": 1.16336,
@@ -1460,7 +1403,7 @@ window.TA_DATA = {
       "confidence": 46.9,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.012,
       "trade_plan": {
         "entry": 156.55,
         "stop_loss": 155.3,
@@ -1482,7 +1425,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -0.17,
+      "r_result": -0.174,
       "trade_plan": {
         "entry": 4401.14,
         "stop_loss": 4492.38,
@@ -1504,7 +1447,7 @@ window.TA_DATA = {
       "confidence": 29.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.05,
       "trade_plan": {
         "entry": 1.16314,
         "stop_loss": 1.16073,
@@ -1526,7 +1469,7 @@ window.TA_DATA = {
       "confidence": 46.8,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.05,
       "trade_plan": {
         "entry": 1.16314,
         "stop_loss": 1.16073,
@@ -1548,7 +1491,7 @@ window.TA_DATA = {
       "confidence": 47.9,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 0.74,
+      "r_result": 0.73,
       "trade_plan": {
         "entry": 154.8,
         "stop_loss": 156.26,
@@ -1570,7 +1513,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -0.617,
+      "r_result": -0.63,
       "trade_plan": {
         "entry": 4416.68,
         "stop_loss": 4389.96,
@@ -1592,7 +1535,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 0.609,
+      "r_result": 0.601,
       "trade_plan": {
         "entry": 4400.19,
         "stop_loss": 4443.59,
@@ -1614,7 +1557,7 @@ window.TA_DATA = {
       "confidence": 54.5,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.016,
       "trade_plan": {
         "entry": 4391.81,
         "stop_loss": 4413.19,
@@ -1636,7 +1579,7 @@ window.TA_DATA = {
       "confidence": 47.5,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.012,
       "trade_plan": {
         "entry": 154.14,
         "stop_loss": 152.91,
@@ -1658,7 +1601,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 0.44,
+      "r_result": 0.428,
       "trade_plan": {
         "entry": 4373.76,
         "stop_loss": 4344.56,
@@ -1680,7 +1623,7 @@ window.TA_DATA = {
       "confidence": 10.9,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 3.6,
+      "r_result": 3.47,
       "trade_plan": {
         "entry": 1.16522,
         "stop_loss": 1.16614,
@@ -1702,7 +1645,7 @@ window.TA_DATA = {
       "confidence": 47.6,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 2.24,
+      "r_result": 2.05,
       "trade_plan": {
         "entry": 1.16235,
         "stop_loss": 1.16172,
@@ -1724,7 +1667,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.128,
+      "r_result": 1.118,
       "trade_plan": {
         "entry": 4386.62,
         "stop_loss": 4421.54,
@@ -1746,7 +1689,7 @@ window.TA_DATA = {
       "confidence": 15.0,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.0,
+      "r_result": 0.933,
       "trade_plan": {
         "entry": 1.16242,
         "stop_loss": 1.1642,
@@ -1768,7 +1711,7 @@ window.TA_DATA = {
       "confidence": 19.3,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.0,
+      "r_result": 0.933,
       "trade_plan": {
         "entry": 1.16242,
         "stop_loss": 1.1642,
@@ -1790,7 +1733,7 @@ window.TA_DATA = {
       "confidence": 11.5,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 3.42,
+      "r_result": 3.056,
       "trade_plan": {
         "entry": 1.16021,
         "stop_loss": 1.15988,
@@ -1812,7 +1755,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.007,
       "trade_plan": {
         "entry": 4347.23,
         "stop_loss": 4299.3,
@@ -1834,7 +1777,7 @@ window.TA_DATA = {
       "confidence": 53.5,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.39,
+      "r_result": 1.329,
       "trade_plan": {
         "entry": 1.15981,
         "stop_loss": 1.16178,
@@ -1856,7 +1799,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.014,
       "trade_plan": {
         "entry": 4353.4,
         "stop_loss": 4328.69,
@@ -1878,7 +1821,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 0.627,
+      "r_result": 0.616,
       "trade_plan": {
         "entry": 4325.34,
         "stop_loss": 4355.98,
@@ -1900,7 +1843,7 @@ window.TA_DATA = {
       "confidence": 37.0,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.43,
+      "r_result": 1.417,
       "trade_plan": {
         "entry": 154.52,
         "stop_loss": 153.38,
@@ -1922,7 +1865,7 @@ window.TA_DATA = {
       "confidence": 30.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.2,
       "trade_plan": {
         "entry": 1.15382,
         "stop_loss": 1.15322,
@@ -1944,7 +1887,7 @@ window.TA_DATA = {
       "confidence": 65.0,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 2.5,
+      "r_result": 2.482,
       "trade_plan": {
         "entry": 4306.27,
         "stop_loss": 4325.65,
@@ -1966,7 +1909,7 @@ window.TA_DATA = {
       "confidence": 49.1,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.007,
       "trade_plan": {
         "entry": 4271.65,
         "stop_loss": 4324.83,
@@ -1988,7 +1931,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -0.514,
+      "r_result": -0.522,
       "trade_plan": {
         "entry": 4306.12,
         "stop_loss": 4261.71,
@@ -2010,7 +1953,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.011,
       "trade_plan": {
         "entry": 4283.29,
         "stop_loss": 4314.25,
@@ -2032,7 +1975,7 @@ window.TA_DATA = {
       "confidence": 47.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.018,
       "trade_plan": {
         "entry": 4279.6,
         "stop_loss": 4298.54,
@@ -2054,7 +1997,7 @@ window.TA_DATA = {
       "confidence": 17.5,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.64,
+      "r_result": 1.332,
       "trade_plan": {
         "entry": 1.15469,
         "stop_loss": 1.15508,
@@ -2076,7 +2019,7 @@ window.TA_DATA = {
       "confidence": 21.2,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.387,
       "trade_plan": {
         "entry": 1.15469,
         "stop_loss": 1.155,
@@ -2098,7 +2041,7 @@ window.TA_DATA = {
       "confidence": 12.3,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 3.33,
+      "r_result": 2.93,
       "trade_plan": {
         "entry": 1.1532,
         "stop_loss": 1.1529,
@@ -2120,7 +2063,7 @@ window.TA_DATA = {
       "confidence": 30.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.095,
       "trade_plan": {
         "entry": 1.14668,
         "stop_loss": 1.14542,
@@ -2142,7 +2085,7 @@ window.TA_DATA = {
       "confidence": null,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.007,
       "trade_plan": {
         "entry": 4310.27,
         "stop_loss": 4263.4,
@@ -2164,7 +2107,7 @@ window.TA_DATA = {
       "confidence": 24.5,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.044,
       "trade_plan": {
         "entry": 157.07,
         "stop_loss": 157.41,
@@ -2186,7 +2129,7 @@ window.TA_DATA = {
       "confidence": 45.5,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.063,
       "trade_plan": {
         "entry": 1.14731,
         "stop_loss": 1.14921,
@@ -2208,7 +2151,7 @@ window.TA_DATA = {
       "confidence": 40.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.062,
       "trade_plan": {
         "entry": 1.14728,
         "stop_loss": 1.14921,
@@ -2230,7 +2173,7 @@ window.TA_DATA = {
       "confidence": 31.5,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.044,
       "trade_plan": {
         "entry": 157.83,
         "stop_loss": 158.17,
@@ -2252,7 +2195,7 @@ window.TA_DATA = {
       "confidence": 29.0,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.22,
+      "r_result": 1.188,
       "trade_plan": {
         "entry": 1.14406,
         "stop_loss": 1.14785,
@@ -2274,7 +2217,7 @@ window.TA_DATA = {
       "confidence": 23.8,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.023,
       "trade_plan": {
         "entry": 157.11,
         "stop_loss": 157.76,
@@ -2296,7 +2239,7 @@ window.TA_DATA = {
       "confidence": 5.2,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.096,
       "trade_plan": {
         "entry": 1.14407,
         "stop_loss": 1.14282,
@@ -2318,7 +2261,7 @@ window.TA_DATA = {
       "confidence": 7.8,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.5,
       "trade_plan": {
         "entry": 1.14351,
         "stop_loss": 1.14327,
@@ -2340,7 +2283,7 @@ window.TA_DATA = {
       "confidence": 15.2,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.414,
       "trade_plan": {
         "entry": 1.14333,
         "stop_loss": 1.14304,
@@ -2362,7 +2305,7 @@ window.TA_DATA = {
       "confidence": 50.4,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 2.5,
+      "r_result": 2.476,
       "trade_plan": {
         "entry": 4325.63,
         "stop_loss": 4340.19,
@@ -2384,7 +2327,7 @@ window.TA_DATA = {
       "confidence": 30.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.375,
       "trade_plan": {
         "entry": 1.14136,
         "stop_loss": 1.14104,
@@ -2406,7 +2349,7 @@ window.TA_DATA = {
       "confidence": 40.0,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.42,
+      "r_result": 1.387,
       "trade_plan": {
         "entry": 157.88,
         "stop_loss": 157.43,
@@ -2428,7 +2371,7 @@ window.TA_DATA = {
       "confidence": 45.1,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 2.5,
+      "r_result": 2.489,
       "trade_plan": {
         "entry": 4306.82,
         "stop_loss": 4339.65,
@@ -2450,7 +2393,7 @@ window.TA_DATA = {
       "confidence": 48.8,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 2.5,
+      "r_result": 2.49,
       "trade_plan": {
         "entry": 4288.17,
         "stop_loss": 4323.73,
@@ -2472,7 +2415,7 @@ window.TA_DATA = {
       "confidence": 54.0,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 2.5,
+      "r_result": 2.491,
       "trade_plan": {
         "entry": 4279.75,
         "stop_loss": 4316.92,
@@ -2494,7 +2437,7 @@ window.TA_DATA = {
       "confidence": 44.4,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.021,
       "trade_plan": {
         "entry": 158.51,
         "stop_loss": 157.81,
@@ -2516,7 +2459,7 @@ window.TA_DATA = {
       "confidence": 65.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.035,
       "trade_plan": {
         "entry": 1.1364,
         "stop_loss": 1.13983,
@@ -2538,7 +2481,7 @@ window.TA_DATA = {
       "confidence": 30.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.108,
       "trade_plan": {
         "entry": 1.137,
         "stop_loss": 1.13589,
@@ -2560,7 +2503,7 @@ window.TA_DATA = {
       "confidence": 15.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.049,
       "trade_plan": {
         "entry": 1.13928,
         "stop_loss": 1.13683,
@@ -2582,7 +2525,7 @@ window.TA_DATA = {
       "confidence": 35.2,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.049,
       "trade_plan": {
         "entry": 1.13927,
         "stop_loss": 1.13683,
@@ -2604,7 +2547,7 @@ window.TA_DATA = {
       "confidence": 29.2,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.38,
+      "r_result": 1.365,
       "trade_plan": {
         "entry": 157.88,
         "stop_loss": 158.87,
@@ -2626,7 +2569,7 @@ window.TA_DATA = {
       "confidence": 54.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.015,
       "trade_plan": {
         "entry": 4161.46,
         "stop_loss": 4185.56,
@@ -2648,7 +2591,7 @@ window.TA_DATA = {
       "confidence": 54.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.009,
       "trade_plan": {
         "entry": 4161.46,
         "stop_loss": 4202.63,
@@ -2670,7 +2613,7 @@ window.TA_DATA = {
       "confidence": 54.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.008,
       "trade_plan": {
         "entry": 4161.46,
         "stop_loss": 4208.0,
@@ -2692,7 +2635,7 @@ window.TA_DATA = {
       "confidence": 41.5,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.014,
       "trade_plan": {
         "entry": 156.74,
         "stop_loss": 157.85,
@@ -2714,7 +2657,7 @@ window.TA_DATA = {
       "confidence": 53.9,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.41,
+      "r_result": 1.351,
       "trade_plan": {
         "entry": 1.13712,
         "stop_loss": 1.13917,
@@ -2736,7 +2679,7 @@ window.TA_DATA = {
       "confidence": 46.7,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.41,
+      "r_result": 1.351,
       "trade_plan": {
         "entry": 1.13712,
         "stop_loss": 1.13917,
@@ -2758,7 +2701,7 @@ window.TA_DATA = {
       "confidence": 29.9,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.036,
       "trade_plan": {
         "entry": 1.13387,
         "stop_loss": 1.13717,
@@ -2780,7 +2723,7 @@ window.TA_DATA = {
       "confidence": 11.8,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.093,
       "trade_plan": {
         "entry": 1.13361,
         "stop_loss": 1.13232,
@@ -2802,7 +2745,7 @@ window.TA_DATA = {
       "confidence": 30.0,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 4.41,
+      "r_result": 4.165,
       "trade_plan": {
         "entry": 1.13358,
         "stop_loss": 1.13309,
@@ -2824,7 +2767,7 @@ window.TA_DATA = {
       "confidence": 11.4,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.214,
       "trade_plan": {
         "entry": 1.13302,
         "stop_loss": 1.13246,
@@ -2846,7 +2789,7 @@ window.TA_DATA = {
       "confidence": 27.5,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.04,
       "trade_plan": {
         "entry": 1.1359,
         "stop_loss": 1.13289,
@@ -2868,7 +2811,7 @@ window.TA_DATA = {
       "confidence": 31.9,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.44,
+      "r_result": 1.409,
       "trade_plan": {
         "entry": 1.12984,
         "stop_loss": 1.1337,
@@ -2890,7 +2833,7 @@ window.TA_DATA = {
       "confidence": 18.5,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 1.44,
+      "r_result": 1.419,
       "trade_plan": {
         "entry": 157.51,
         "stop_loss": 158.22,
@@ -2912,7 +2855,7 @@ window.TA_DATA = {
       "confidence": 7.7,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.115,
       "trade_plan": {
         "entry": 1.12371,
         "stop_loss": 1.12267,
@@ -2956,7 +2899,7 @@ window.TA_DATA = {
       "confidence": 27.5,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.027,
       "trade_plan": {
         "entry": 1.12463,
         "stop_loss": 1.12023,
@@ -2978,7 +2921,7 @@ window.TA_DATA = {
       "confidence": 15.8,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.027,
       "trade_plan": {
         "entry": 1.12463,
         "stop_loss": 1.12023,
@@ -3000,7 +2943,7 @@ window.TA_DATA = {
       "confidence": 34.3,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.571,
       "trade_plan": {
         "entry": 1.12394,
         "stop_loss": 1.12373,
@@ -3022,7 +2965,7 @@ window.TA_DATA = {
       "confidence": 40.4,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.444,
       "trade_plan": {
         "entry": 1.12357,
         "stop_loss": 1.1233,
@@ -3043,8 +2986,8 @@ window.TA_DATA = {
       "strategy": "london",
       "confidence": 18.7,
       "notified": true,
-      "outcome": "OPEN",
-      "r_result": null,
+      "outcome": "LOSS",
+      "r_result": -1.027,
       "trade_plan": {
         "entry": 157.95,
         "stop_loss": 158.5,
@@ -3066,7 +3009,7 @@ window.TA_DATA = {
       "confidence": 65.0,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 2.5,
+      "r_result": 2.479,
       "trade_plan": {
         "entry": 4123.23,
         "stop_loss": 4140.21,
@@ -3088,7 +3031,7 @@ window.TA_DATA = {
       "confidence": 46.1,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.014,
       "trade_plan": {
         "entry": 4115.16,
         "stop_loss": 4139.97,
@@ -3110,7 +3053,7 @@ window.TA_DATA = {
       "confidence": 54.0,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.008,
       "trade_plan": {
         "entry": 4082.09,
         "stop_loss": 4127.72,
@@ -3132,7 +3075,7 @@ window.TA_DATA = {
       "confidence": 20.9,
       "notified": true,
       "outcome": "WIN",
-      "r_result": 2.16,
+      "r_result": 1.893,
       "trade_plan": {
         "entry": 1.121,
         "stop_loss": 1.12145,
@@ -3154,7 +3097,7 @@ window.TA_DATA = {
       "confidence": 31.2,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.387,
       "trade_plan": {
         "entry": 1.12061,
         "stop_loss": 1.1203,
@@ -3176,7 +3119,7 @@ window.TA_DATA = {
       "confidence": 41.6,
       "notified": true,
       "outcome": "LOSS",
-      "r_result": -1.0,
+      "r_result": -1.364,
       "trade_plan": {
         "entry": 1.11927,
         "stop_loss": 1.11894,
