@@ -2712,8 +2712,30 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 43.2,
-    "outcome": "OPEN",
+    "outcome": "LOSS",
     "edge_r": 0.02,
-    "edge_n": 13
+    "edge_n": 13,
+    "r_result": -1.035,
+    "r_net": true
+  },
+  {
+    "time": "2026-10-13 08:46 UTC",
+    "candle_time": "2026-10-13 08:00:00",
+    "symbol": "USDJPY",
+    "timeframe": "H1",
+    "action": "SELL",
+    "strategy": "london",
+    "entry": 158.01,
+    "sl": 158.54,
+    "tp": 157.38,
+    "rr": 1.19,
+    "risk_reward": "1 : 1.19",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 32.2,
+    "outcome": "OPEN",
+    "edge_r": -0.02,
+    "edge_n": 14
   }
 ]
