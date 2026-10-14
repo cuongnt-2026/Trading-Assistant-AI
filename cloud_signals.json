@@ -2777,5 +2777,25 @@
     "outcome": "OPEN",
     "edge_r": 0.11,
     "edge_n": 17
+  },
+  {
+    "time": "2026-10-14 09:01 UTC",
+    "candle_time": "2026-10-14 08:30:00",
+    "symbol": "XAUUSD",
+    "timeframe": "M30",
+    "action": "SELL",
+    "strategy": "breakout",
+    "entry": 4142.23,
+    "sl": 4161.93,
+    "tp": 4092.99,
+    "rr": 2.5,
+    "risk_reward": "1 : 2.5",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 47.5,
+    "outcome": "OPEN",
+    "edge_r": 0.06,
+    "edge_n": 6
   }
 ]
