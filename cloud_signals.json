@@ -2734,9 +2734,11 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 32.2,
-    "outcome": "OPEN",
+    "outcome": "LOSS",
     "edge_r": -0.02,
-    "edge_n": 14
+    "edge_n": 14,
+    "r_result": -1.028,
+    "r_net": true
   },
   {
     "time": "2026-10-14 08:46 UTC",
@@ -2754,9 +2756,11 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 42.2,
-    "outcome": "OPEN",
+    "outcome": "LOSS",
     "edge_r": 0.1,
-    "edge_n": 11
+    "edge_n": 11,
+    "r_result": -1.085,
+    "r_net": true
   },
   {
     "time": "2026-10-14 08:46 UTC",
@@ -2774,9 +2778,11 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 60.6,
-    "outcome": "OPEN",
+    "outcome": "LOSS",
     "edge_r": 0.11,
-    "edge_n": 17
+    "edge_n": 17,
+    "r_result": -1.085,
+    "r_net": true
   },
   {
     "time": "2026-10-14 09:01 UTC",
@@ -2794,8 +2800,30 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 47.5,
-    "outcome": "OPEN",
+    "outcome": "LOSS",
     "edge_r": 0.06,
-    "edge_n": 6
+    "edge_n": 6,
+    "r_result": -1.018,
+    "r_net": true
+  },
+  {
+    "time": "2026-10-14 12:45 UTC",
+    "candle_time": "2026-10-14 12:00:00",
+    "symbol": "XAUUSD",
+    "timeframe": "H1",
+    "action": "SELL",
+    "strategy": "breakout",
+    "entry": 4088.55,
+    "sl": 4180.58,
+    "tp": 3858.48,
+    "rr": 2.5,
+    "risk_reward": "1 : 2.5",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 48.7,
+    "outcome": "OPEN",
+    "edge_r": 0.21,
+    "edge_n": 4
   }
 ]
