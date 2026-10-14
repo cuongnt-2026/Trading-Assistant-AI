@@ -25,7 +25,7 @@ window.TA_DATA = {
       "time": "2026-10-14 13:00:24",
       "symbol": "XAUUSD",
       "timeframe": "M30",
-      "action": "SELL",
+      "action": "NO_TRADE",
       "strategy": "breakout",
       "trend": "DOWNTREND",
       "strength": "STRONG",
