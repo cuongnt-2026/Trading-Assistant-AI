@@ -566,6 +566,27 @@
       "resolved_time": null,
       "resolved_bars": null,
       "logged_at": "2026-10-19 14:16:21"
+    },
+    {
+      "id": "XAUUSD-H1-2026-10-19 16:00:00-triple",
+      "symbol": "XAUUSD",
+      "timeframe": "H1",
+      "kind": "triple",
+      "event_type": "triple",
+      "direction": "down",
+      "signal_time": "2026-10-19 16:00:00",
+      "signal_price": 4144.74298,
+      "atr": 9.989270675745747,
+      "sl": 4175.31193,
+      "tp": 4108.06025,
+      "sl_source": "swing-ATR",
+      "tp_source": "rr1.2",
+      "risk": 30.56895,
+      "rr": 1.2,
+      "result": "pending",
+      "resolved_time": null,
+      "resolved_bars": null,
+      "logged_at": "2026-10-19 16:16:13"
     }
   ]
 }
