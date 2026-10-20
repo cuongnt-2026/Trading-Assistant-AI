@@ -2866,9 +2866,11 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 27.5,
-    "outcome": "OPEN",
+    "outcome": "LOSS",
     "edge_r": 0.05,
-    "edge_n": 12
+    "edge_n": 12,
+    "r_result": -1.042,
+    "r_net": true
   },
   {
     "time": "2026-10-20 09:16 UTC",
@@ -2886,9 +2888,11 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 34.7,
-    "outcome": "OPEN",
+    "outcome": "LOSS",
     "edge_r": 0.03,
-    "edge_n": 19
+    "edge_n": 19,
+    "r_result": -1.042,
+    "r_net": true
   },
   {
     "time": "2026-10-20 10:00 UTC",
@@ -2906,8 +2910,10 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 45.5,
-    "outcome": "OPEN",
+    "outcome": "LOSS",
     "edge_r": 0.47,
-    "edge_n": 11
+    "edge_n": 11,
+    "r_result": -1.022,
+    "r_net": true
   }
 ]
