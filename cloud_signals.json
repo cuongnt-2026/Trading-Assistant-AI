@@ -2954,9 +2954,11 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 18.9,
-    "outcome": "OPEN",
+    "outcome": "LOSS",
     "edge_r": -0.05,
-    "edge_n": 14
+    "edge_n": 14,
+    "r_result": -1.078,
+    "r_net": true
   },
   {
     "time": "2026-10-21 11:01 UTC",
@@ -2974,8 +2976,10 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 47.3,
-    "outcome": "OPEN",
+    "outcome": "LOSS",
     "edge_r": -0.01,
-    "edge_n": 20
+    "edge_n": 20,
+    "r_result": -1.078,
+    "r_net": true
   }
 ]
