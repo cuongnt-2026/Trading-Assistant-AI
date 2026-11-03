@@ -734,6 +734,27 @@
       "resolved_time": null,
       "resolved_bars": null,
       "logged_at": "2026-11-03 14:16:10"
+    },
+    {
+      "id": "XAUUSD-M30-2026-11-03 14:30:00-triple",
+      "symbol": "XAUUSD",
+      "timeframe": "M30",
+      "kind": "triple",
+      "event_type": "triple",
+      "direction": "up",
+      "signal_time": "2026-11-03 14:30:00",
+      "signal_price": 3946.30563,
+      "atr": 12.067951282617347,
+      "sl": 3905.71692,
+      "tp": 3995.01208,
+      "sl_source": "swing-ATR",
+      "tp_source": "rr1.2",
+      "risk": 40.58871,
+      "rr": 1.2,
+      "result": "pending",
+      "resolved_time": null,
+      "resolved_bars": null,
+      "logged_at": "2026-11-03 14:46:13"
     }
   ]
 }
