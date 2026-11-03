@@ -3258,8 +3258,10 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 51.1,
-    "outcome": "OPEN",
+    "outcome": "WIN",
     "edge_r": -0.08,
-    "edge_n": 18
+    "edge_n": 18,
+    "r_result": 1.285,
+    "r_net": true
   }
 ]
