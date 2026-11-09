@@ -3415,5 +3415,25 @@
     "outcome": "OPEN",
     "edge_r": -0.04,
     "edge_n": 19
+  },
+  {
+    "time": "2026-11-09 12:30 UTC",
+    "candle_time": "2026-11-09 12:15:00",
+    "symbol": "XAUUSD",
+    "timeframe": "M15",
+    "action": "BUY",
+    "strategy": "breakout",
+    "entry": 4114.1,
+    "sl": 4095.91,
+    "tp": 4159.58,
+    "rr": 2.5,
+    "risk_reward": "1 : 2.5",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 45.3,
+    "outcome": "OPEN",
+    "edge_r": 0.45,
+    "edge_n": 16
   }
 ]
