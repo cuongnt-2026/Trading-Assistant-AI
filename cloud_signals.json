@@ -3527,5 +3527,25 @@
     "outcome": "OPEN",
     "edge_r": 0.02,
     "edge_n": 19
+  },
+  {
+    "time": "2026-11-11 08:31 UTC",
+    "candle_time": "2026-11-11 08:00:00",
+    "symbol": "EURUSD",
+    "timeframe": "H1",
+    "action": "SELL",
+    "strategy": "london",
+    "entry": 1.1142,
+    "sl": 1.11703,
+    "tp": 1.11123,
+    "rr": 1.05,
+    "risk_reward": "1 : 1.05",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 54.0,
+    "outcome": "OPEN",
+    "edge_r": 0.11,
+    "edge_n": 27
   }
 ]
