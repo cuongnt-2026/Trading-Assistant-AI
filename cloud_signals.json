@@ -3570,9 +3570,11 @@
     "lot_size": null,
     "expected_profit": null,
     "confidence": 54.0,
-    "outcome": "OPEN",
+    "outcome": "WIN",
     "edge_r": 0.07,
-    "edge_n": 9
+    "edge_n": 9,
+    "r_result": 2.487,
+    "r_net": true
   },
   {
     "time": "2026-11-12 10:46 UTC",
@@ -3593,5 +3595,25 @@
     "outcome": "OPEN",
     "edge_r": 0.13,
     "edge_n": 28
+  },
+  {
+    "time": "2026-11-12 14:01 UTC",
+    "candle_time": "2026-11-12 13:30:00",
+    "symbol": "XAUUSD",
+    "timeframe": "M30",
+    "action": "SELL",
+    "strategy": "breakout",
+    "entry": 3890.58,
+    "sl": 3956.66,
+    "tp": 3725.38,
+    "rr": 2.5,
+    "risk_reward": "1 : 2.5",
+    "risk_percent": 0.5,
+    "lot_size": null,
+    "expected_profit": null,
+    "confidence": 54.0,
+    "outcome": "OPEN",
+    "edge_r": 0.19,
+    "edge_n": 10
   }
 ]
