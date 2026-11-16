@@ -776,6 +776,27 @@
       "resolved_time": "2026-11-04 05:30:00",
       "resolved_bars": 26,
       "logged_at": "2026-11-03 16:46:16"
+    },
+    {
+      "id": "XAUUSD-M30-2026-11-16 04:30:00-crossed",
+      "symbol": "XAUUSD",
+      "timeframe": "M30",
+      "kind": "cross",
+      "event_type": "crossed",
+      "direction": "down",
+      "signal_time": "2026-11-16 04:30:00",
+      "signal_price": 3867.09073,
+      "atr": 8.240158042170608,
+      "sl": 3892.41749,
+      "tp": 3836.69862,
+      "sl_source": "swing-ATR",
+      "tp_source": "rr1.2",
+      "risk": 25.32676,
+      "rr": 1.2,
+      "result": "pending",
+      "resolved_time": null,
+      "resolved_bars": null,
+      "logged_at": "2026-11-16 05:01:27"
     }
   ]
 }
