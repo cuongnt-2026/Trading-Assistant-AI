@@ -85,7 +85,8 @@ def _fill_r_result(r, res):
     if r.get("r_result") is not None:
         return
     # TU 2026-10-11: R THAT = R tren giay - spread/risk (xem src/trade/costs.py).
-    cost = spread_r(r.get("symbol"), r.get("entry"), r.get("sl"))
+    # SELL: spread da nam trong cach cham SL/TP (gia Ask) -> KHONG tru them (2026-11-19).
+    cost = 0.0 if r.get("action") == SELL else spread_r(r.get("symbol"), r.get("entry"), r.get("sl"))
     if res == WIN:
         rr_val = _rr_of(r)
         r["r_result"] = round(rr_val - cost, 3) if isinstance(rr_val, (int, float)) else None
@@ -93,6 +94,7 @@ def _fill_r_result(r, res):
         r["r_result"] = round(-1.0 - cost, 3)
     if r.get("r_result") is not None:
         r["r_net"] = True          # danh dau: r_result DA tru spread
+        r["sell_spread_fixed"] = True   # lenh moi da dung cach tinh dung
 
 
 def _close_if_done(r, fut):
@@ -173,6 +175,44 @@ def _parse_ct(ts):
         return datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
     except Exception:
         return None
+
+
+_TF_MIN = {"M1": 1, "M5": 5, "M15": 15, "M30": 30, "H1": 60, "H2": 120, "H4": 240, "D1": 1440}
+
+
+def _future_candles(r, candles):
+    """Nen dung de cham WIN/LOSS cho 1 lenh.
+
+    Truoc 2026-11-19 chi lay nen SAU nen tin hieu. Nhung phan lon tin hieu ban ra
+    KHI NEN CHUA DONG (vd London 63/74 lenh) -> phan con lai cua nen tin hieu bi bo
+    qua, gia cham SL trong do khong bi tinh -> ket qua dep hon that. Nay: neu tin
+    hieu ban truoc khi nen dong thi tinh CA nen tin hieu (bao thu: phan truoc luc
+    vao lenh cung bi xet, co the bao LOSS som hon thuc te)."""
+    st = _parse_ct(r.get("candle_time", ""))
+    if not st:
+        return []
+    include_signal_candle = False
+    try:
+        sig_t = datetime.strptime((r.get("time") or "")[:16], "%Y-%m-%d %H:%M")
+        mins = _TF_MIN.get(str(r.get("timeframe", "")).upper(), 0)
+        include_signal_candle = mins > 0 and (sig_t - st).total_seconds() < mins * 60
+    except Exception:
+        pass
+    return [c for c in candles if c.time > st or (include_signal_candle and c.time == st)]
+
+
+def _fix_sell_spread_once(signals_log):
+    """Lenh SELL da bi tru spread 2 LAN (1 lan khi cham SL/TP theo gia Ask trong
+    OutcomeEvaluator, 1 lan nua trong r_result). Cong lai 1 lan cho lich su, danh
+    dau `sell_spread_fixed` de khong cong lap lai o lan chay sau."""
+    n = 0
+    for r in signals_log:
+        if (r.get("action") == SELL and r.get("r_net") and not r.get("sell_spread_fixed")
+                and isinstance(r.get("r_result"), (int, float))):
+            r["r_result"] = round(r["r_result"] + spread_r(r.get("symbol"), r.get("entry"), r.get("sl")), 3)
+            r["sell_spread_fixed"] = True
+            n += 1
+    return n
 
 
 def _fetch_cached(cache, sym, tf, cfg):
@@ -363,7 +403,7 @@ def _scan_discrete(sym, tf, strategy, cfg, state, signals_log, snapshot, notifie
                 and r.get("timeframe") == tf and r.get("strategy") == strategy):
             try:
                 st = _parse_ct(r.get("candle_time", ""))
-                fut = [c for c in candles if st and c.time > st]
+                fut = _future_candles(r, candles)
                 if fut:
                     _close_if_done(r, fut)
             except Exception as e:
@@ -476,7 +516,7 @@ def _scan_ema_pullback(sym, tf, cfg, state, signals_log, notifier, cache):
                 and r.get("timeframe") == tf and r.get("strategy") == strategy):
             try:
                 st = _parse_ct(r.get("candle_time", ""))
-                fut = [c for c in candles if st and c.time > st]
+                fut = _future_candles(r, candles)
                 if fut:
                     _close_if_done(r, fut)
             except Exception as e:
@@ -684,6 +724,9 @@ def main():
     notifier = create_notifier(cfg)
     state = load_state()
     signals_log = load_signals()
+    _n_fixed = _fix_sell_spread_once(signals_log)
+    if _n_fixed:
+        print("Da sua R cho {} lenh SELL bi tru spread 2 lan".format(_n_fixed))
     ematrend_history = load_ematrend_history()
 
     # Reset 1 lan (do chinh cloud thuc hien -> khong bi race/merge de len):
@@ -714,7 +757,14 @@ def main():
     htf_cache = {}
     snapshot = []
     sent = 0
+    # Cron chay moi 5 phut (cho khung M5). Khung KHONG nam trong FAST_TFS chi quet o
+    # lan chay roi vao moc 15 phut (phut 0-4, 15-19, ...) de giu quota Twelve Data
+    # (~545 request/ngay thay vi ~1.090 neu quet du moi lan).
+    fast_tfs = {t.strip().upper() for t in os.getenv("FAST_TFS", "").split(",") if t.strip()}
+    slow_tick = (datetime.utcnow().minute % 15) < 5
     for sym, tf in cfg.watchlist:
+        if fast_tfs and tf.upper() not in fast_tfs and not slow_tick:
+            continue
         strat = strategy_for(sym)
         try:
             candles = _fetch_cached(cache, sym, tf, cfg)
@@ -730,7 +780,7 @@ def main():
             if r.get("outcome") == "OPEN" and r.get("symbol") == sym and r.get("timeframe") == tf:
                 try:
                     st = _parse_ct(r.get("candle_time", ""))
-                    fut = [c for c in candles if st and c.time > st]
+                    fut = _future_candles(r, candles)
                     if fut:
                         _close_if_done(r, fut)
                 except Exception as e:

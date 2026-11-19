@@ -200,6 +200,11 @@
           <canvas id="pie"></canvas>
         </div>
       </div>
+
+      <details class="panel" id="archivePanel">
+        <summary><b>Lưu trữ — chiến lược đã tắt</b> <span class="sub">(không tính vào số liệu phía trên, giữ lại để không quên đã thua ở đâu)</span></summary>
+        <div id="archiveTable"></div>
+      </details>
     </section>
 
     <!-- ===== SIGNALS ===== -->
@@ -340,7 +345,12 @@
   // Da tat Trend -> an het du lieu Trend khoi moi thong ke/bang/bieu do cho gon.
   // Da tat Supertrend (2026-09-17, CuongNT): 36 lenh nhung Tong R = -0.21
   // (hoa von/hoi lo) -> an het du lieu Supertrend cho gon, giong Trend o tren.
-  const S = (D.signals||[]).filter(s=>s.strategy!=='trend'&&s.strategy!=='supertrend').slice();
+  // 2026-11-19 (CuongNT): CHI con breakout dang chay. So lieu chinh = chien luoc
+  // dang bat; cac chien luoc da tat dua vao muc "Luu tru" (KHONG xoa ket qua cu).
+  const ACTIVE_STRATS = ['breakout'];
+  const ALL = (D.signals||[]);
+  const S = ALL.filter(s=>ACTIVE_STRATS.includes(s.strategy)).slice();
+  const ARCH = ALL.filter(s=>!ACTIVE_STRATS.includes(s.strategy));
 
   const num=(x,d=2)=> (x===null||x===undefined||isNaN(x))?"—":Number(x).toFixed(d);
   const g=(o,k,def="—")=> (o && o[k]!==undefined && o[k]!==null)?o[k]:def;
@@ -366,6 +376,28 @@
   }
   // R thuc cua 1 lenh da dong: r_result neu co, WIN chua TP=+RR, LOSS=-1
   const realR=(s)=> (typeof s.r_result==='number')?s.r_result:(s.outcome==='WIN'?rrOf(s):(s.outcome==='LOSS'?-1:0));
+
+  // Bang "Luu tru": ket qua tron doi cua cac chien luoc da tat.
+  (function renderArchive(){
+    const el=document.getElementById('archiveTable'); if(!el) return;
+    const groups={};
+    ARCH.filter(s=>s.outcome==='WIN'||s.outcome==='LOSS').forEach(s=>{
+      const k=(s.strategy||'khác')+' '+(s.symbol||'')+' '+(s.timeframe||'');
+      (groups[k]=groups[k]||[]).push(s);
+    });
+    const keys=Object.keys(groups).sort();
+    if(!keys.length){ el.innerHTML='<p class="muted">Chưa có dữ liệu.</p>'; return; }
+    let tw=0,tn=0,tr=0;
+    const rows=keys.map(k=>{
+      const g2=groups[k], w=g2.filter(s=>s.outcome==='WIN').length, r=g2.reduce((a,s)=>a+realR(s),0);
+      tw+=w; tn+=g2.length; tr+=r;
+      const c=r>=0?'var(--buy)':'var(--sell)';
+      return `<tr><td>${k}</td><td>${g2.length}</td><td>${Math.round(w/g2.length*100)}%</td><td style="color:${c}">${(r>=0?'+':'')+r.toFixed(2)}R</td><td style="color:${c}">${(r/g2.length>=0?'+':'')+(r/g2.length).toFixed(2)}R</td></tr>`;
+    }).join('');
+    const tc=tr>=0?'var(--buy)':'var(--sell)';
+    el.innerHTML=`<table><tr><th>Chiến lược</th><th>Lệnh</th><th>Thắng</th><th>Tổng R</th><th>R/lệnh</th></tr>${rows}`+
+      `<tr><td><b>Tổng đã tắt</b></td><td><b>${tn}</b></td><td><b>${tn?Math.round(tw/tn*100):0}%</b></td><td style="color:${tc}"><b>${(tr>=0?'+':'')+tr.toFixed(2)}R</b></td><td></td></tr></table>`;
+  })();
 
   // ---- Loc theo header: bam vao tieu de cot -> xo option -> chon de loc ----
   let colFilters={};
