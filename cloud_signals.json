@@ -92,9 +92,10 @@
     "rr": null,
     "confidence": null,
     "outcome": "LOSS",
-    "r_result": -0.633,
+    "r_result": -0.626,
     "exit": 4268.63,
-    "r_net": true
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-07 05:15 UTC",
@@ -217,8 +218,9 @@
     "rr": null,
     "confidence": null,
     "outcome": "LOSS",
-    "r_result": -1.009,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-10 16:01 UTC",
@@ -267,9 +269,10 @@
     "rr": null,
     "confidence": null,
     "outcome": "LOSS",
-    "r_result": -0.091,
+    "r_result": -0.083,
     "exit": 4396.11,
-    "r_net": true
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-11 06:31 UTC",
@@ -284,9 +287,10 @@
     "rr": null,
     "confidence": null,
     "outcome": "LOSS",
-    "r_result": -0.733,
+    "r_result": -0.727,
     "exit": 4412.27,
-    "r_net": true
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-12 02:01 UTC",
@@ -339,8 +343,9 @@
     "expected_profit": null,
     "confidence": 63.8,
     "outcome": "LOSS",
-    "r_result": -1.115,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-12 15:03 UTC",
@@ -379,8 +384,9 @@
     "expected_profit": null,
     "confidence": 76.2,
     "outcome": "LOSS",
-    "r_result": -1.136,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-13 04:01 UTC",
@@ -395,9 +401,10 @@
     "rr": null,
     "confidence": null,
     "outcome": "WIN",
-    "r_result": 1.714,
+    "r_result": 1.726,
     "exit": 4350.82,
-    "r_net": true
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-13 06:16 UTC",
@@ -412,9 +419,10 @@
     "rr": null,
     "confidence": null,
     "outcome": "WIN",
-    "r_result": -0.007,
+    "r_result": -0.0,
     "exit": 4376.34,
-    "r_net": true
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-13 07:16 UTC",
@@ -429,9 +437,10 @@
     "rr": null,
     "confidence": null,
     "outcome": "WIN",
-    "r_result": 0.157,
+    "r_result": 0.164,
     "exit": 4368.14,
-    "r_net": true
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-14 09:30 UTC",
@@ -484,8 +493,9 @@
     "expected_profit": null,
     "confidence": 62.7,
     "outcome": "LOSS",
-    "r_result": -1.125,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-14 16:35 UTC",
@@ -504,8 +514,9 @@
     "expected_profit": null,
     "confidence": 70.3,
     "outcome": "LOSS",
-    "r_result": -1.125,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-14 17:40 UTC",
@@ -620,8 +631,9 @@
     "rr": null,
     "confidence": null,
     "outcome": "LOSS",
-    "r_result": -1.011,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-17 13:46 UTC",
@@ -656,8 +668,9 @@
     "rr": null,
     "confidence": null,
     "outcome": "LOSS",
-    "r_result": -1.011,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-26 04:58 UTC",
@@ -712,9 +725,10 @@
     "rr": null,
     "confidence": null,
     "outcome": "LOSS",
-    "r_result": -0.341,
+    "r_result": -0.332,
     "exit": 4611.31,
-    "r_net": true
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-27 08:32 UTC",
@@ -733,8 +747,9 @@
     "expected_profit": null,
     "confidence": 46.0,
     "outcome": "WIN",
-    "r_result": 1.278,
-    "r_net": true
+    "r_result": 1.41,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-27 08:32 UTC",
@@ -753,8 +768,9 @@
     "expected_profit": null,
     "confidence": 33.5,
     "outcome": "WIN",
-    "r_result": 1.278,
-    "r_net": true
+    "r_result": 1.41,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-27 09:32 UTC",
@@ -793,8 +809,9 @@
     "expected_profit": null,
     "confidence": 40.0,
     "outcome": "LOSS",
-    "r_result": -1.103,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-28 07:01 UTC",
@@ -829,8 +846,9 @@
     "expected_profit": null,
     "confidence": 41.2,
     "outcome": "WIN",
-    "r_result": 1.3,
-    "r_net": true
+    "r_result": 1.44,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-28 09:47 UTC",
@@ -849,8 +867,9 @@
     "expected_profit": null,
     "confidence": 47.4,
     "outcome": "WIN",
-    "r_result": 1.347,
-    "r_net": true
+    "r_result": 1.43,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-28 09:47 UTC",
@@ -869,8 +888,9 @@
     "expected_profit": null,
     "confidence": 42.7,
     "outcome": "WIN",
-    "r_result": 1.347,
-    "r_net": true
+    "r_result": 1.43,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-31 02:01 UTC",
@@ -885,9 +905,10 @@
     "rr": null,
     "confidence": null,
     "outcome": "LOSS",
-    "r_result": -0.75,
+    "r_result": -0.738,
     "exit": 4462.81,
-    "r_net": true
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-08-31 11:30 UTC",
@@ -938,8 +959,9 @@
     "expected_profit": null,
     "confidence": 36.9,
     "outcome": "LOSS",
-    "r_result": -1.034,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-01 10:03 UTC",
@@ -978,8 +1000,9 @@
     "expected_profit": null,
     "confidence": 54.0,
     "outcome": "WIN",
-    "r_result": 2.489,
-    "r_net": true
+    "r_result": 2.5,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-02 13:15 UTC",
@@ -1055,8 +1078,9 @@
     "expected_profit": null,
     "confidence": 31.9,
     "outcome": "WIN",
-    "r_result": 1.204,
-    "r_net": true
+    "r_result": 1.29,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-04 08:17 UTC",
@@ -1075,8 +1099,9 @@
     "expected_profit": null,
     "confidence": 39.9,
     "outcome": "WIN",
-    "r_result": 1.204,
-    "r_net": true
+    "r_result": 1.29,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-04 09:47 UTC",
@@ -1112,9 +1137,10 @@
     "risk_reward": "1 : 3",
     "confidence": null,
     "outcome": "LOSS",
-    "r_result": -0.174,
+    "r_result": -0.17,
     "exit": 4416.68,
-    "r_net": true
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-07 08:16 UTC",
@@ -1173,8 +1199,9 @@
     "expected_profit": null,
     "confidence": 47.9,
     "outcome": "WIN",
-    "r_result": 0.73,
-    "r_net": true
+    "r_result": 0.74,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-07 16:15 UTC",
@@ -1208,9 +1235,10 @@
     "risk_reward": "1 : 3",
     "confidence": null,
     "outcome": "WIN",
-    "r_result": 0.601,
+    "r_result": 0.609,
     "exit": 4373.76,
-    "r_net": true
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-08 07:45 UTC",
@@ -1229,8 +1257,9 @@
     "expected_profit": null,
     "confidence": 54.5,
     "outcome": "LOSS",
-    "r_result": -1.016,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-08 08:46 UTC",
@@ -1287,8 +1316,9 @@
     "expected_profit": null,
     "confidence": 10.9,
     "outcome": "WIN",
-    "r_result": 3.47,
-    "r_net": true
+    "r_result": 3.6,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-09 15:31 UTC",
@@ -1324,9 +1354,10 @@
     "risk_reward": "1 : 3",
     "confidence": null,
     "outcome": "WIN",
-    "r_result": 1.118,
+    "r_result": 1.128,
     "exit": 4347.23,
-    "r_net": true
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-10 10:46 UTC",
@@ -1345,8 +1376,9 @@
     "expected_profit": null,
     "confidence": 15.0,
     "outcome": "WIN",
-    "r_result": 0.933,
-    "r_net": true
+    "r_result": 1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-10 10:46 UTC",
@@ -1365,8 +1397,9 @@
     "expected_profit": null,
     "confidence": 19.3,
     "outcome": "WIN",
-    "r_result": 0.933,
-    "r_net": true
+    "r_result": 1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-11 03:46 UTC",
@@ -1422,8 +1455,9 @@
     "expected_profit": null,
     "confidence": 53.5,
     "outcome": "WIN",
-    "r_result": 1.329,
-    "r_net": true
+    "r_result": 1.39,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-14 02:01 UTC",
@@ -1456,9 +1490,10 @@
     "risk_reward": "1 : 3",
     "confidence": null,
     "outcome": "WIN",
-    "r_result": 0.616,
+    "r_result": 0.627,
     "exit": 4306.12,
-    "r_net": true
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-14 08:31 UTC",
@@ -1517,8 +1552,9 @@
     "expected_profit": null,
     "confidence": 65.0,
     "outcome": "WIN",
-    "r_result": 2.482,
-    "r_net": true
+    "r_result": 2.5,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-14 13:01 UTC",
@@ -1537,8 +1573,9 @@
     "expected_profit": null,
     "confidence": 49.1,
     "outcome": "LOSS",
-    "r_result": -1.007,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-14 16:45 UTC",
@@ -1572,8 +1609,9 @@
     "risk_reward": "1 : 3",
     "confidence": null,
     "outcome": "LOSS",
-    "r_result": -1.011,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-15 08:00 UTC",
@@ -1592,8 +1630,9 @@
     "expected_profit": null,
     "confidence": 47.0,
     "outcome": "LOSS",
-    "r_result": -1.018,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-15 13:16 UTC",
@@ -1612,8 +1651,9 @@
     "expected_profit": null,
     "confidence": 17.5,
     "outcome": "WIN",
-    "r_result": 1.332,
-    "r_net": true
+    "r_result": 1.64,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-16 05:31 UTC",
@@ -1632,8 +1672,9 @@
     "expected_profit": null,
     "confidence": 21.2,
     "outcome": "LOSS",
-    "r_result": -1.387,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-16 11:16 UTC",
@@ -1709,8 +1750,9 @@
     "expected_profit": null,
     "confidence": 24.5,
     "outcome": "LOSS",
-    "r_result": -1.044,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-18 10:46 UTC",
@@ -1729,8 +1771,9 @@
     "expected_profit": null,
     "confidence": 45.5,
     "outcome": "LOSS",
-    "r_result": -1.063,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-18 11:01 UTC",
@@ -1749,8 +1792,9 @@
     "expected_profit": null,
     "confidence": 40.0,
     "outcome": "LOSS",
-    "r_result": -1.062,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-18 14:16 UTC",
@@ -1769,8 +1813,9 @@
     "expected_profit": null,
     "confidence": 31.5,
     "outcome": "LOSS",
-    "r_result": -1.044,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-22 08:16 UTC",
@@ -1789,8 +1834,9 @@
     "expected_profit": null,
     "confidence": 29.0,
     "outcome": "WIN",
-    "r_result": 1.188,
-    "r_net": true
+    "r_result": 1.22,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-22 08:46 UTC",
@@ -1809,8 +1855,9 @@
     "expected_profit": null,
     "confidence": 23.8,
     "outcome": "LOSS",
-    "r_result": -1.023,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-22 15:31 UTC",
@@ -1889,8 +1936,9 @@
     "expected_profit": null,
     "confidence": 50.4,
     "outcome": "WIN",
-    "r_result": 2.476,
-    "r_net": true
+    "r_result": 2.5,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-23 08:16 UTC",
@@ -1949,8 +1997,9 @@
     "expected_profit": null,
     "confidence": 45.1,
     "outcome": "WIN",
-    "r_result": 2.489,
-    "r_net": true
+    "r_result": 2.5,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-23 13:45 UTC",
@@ -1969,8 +2018,9 @@
     "expected_profit": null,
     "confidence": 48.8,
     "outcome": "WIN",
-    "r_result": 2.49,
-    "r_net": true
+    "r_result": 2.5,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-23 14:30 UTC",
@@ -1989,8 +2039,9 @@
     "expected_profit": null,
     "confidence": 54.0,
     "outcome": "WIN",
-    "r_result": 2.491,
-    "r_net": true
+    "r_result": 2.5,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-24 09:01 UTC",
@@ -2029,8 +2080,9 @@
     "expected_profit": null,
     "confidence": 65.0,
     "outcome": "LOSS",
-    "r_result": -1.035,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-25 03:45 UTC",
@@ -2109,8 +2161,9 @@
     "expected_profit": null,
     "confidence": 29.2,
     "outcome": "WIN",
-    "r_result": 1.365,
-    "r_net": true
+    "r_result": 1.38,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-28 07:15 UTC",
@@ -2129,8 +2182,9 @@
     "expected_profit": null,
     "confidence": 54.0,
     "outcome": "LOSS",
-    "r_result": -1.015,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-28 07:15 UTC",
@@ -2149,8 +2203,9 @@
     "expected_profit": null,
     "confidence": 54.0,
     "outcome": "LOSS",
-    "r_result": -1.009,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-28 07:15 UTC",
@@ -2169,8 +2224,9 @@
     "expected_profit": null,
     "confidence": 54.0,
     "outcome": "LOSS",
-    "r_result": -1.008,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-28 08:29 UTC",
@@ -2189,8 +2245,9 @@
     "expected_profit": null,
     "confidence": 41.5,
     "outcome": "LOSS",
-    "r_result": -1.014,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-28 10:16 UTC",
@@ -2209,8 +2266,9 @@
     "expected_profit": null,
     "confidence": 53.9,
     "outcome": "WIN",
-    "r_result": 1.351,
-    "r_net": true
+    "r_result": 1.41,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-28 10:16 UTC",
@@ -2229,8 +2287,9 @@
     "expected_profit": null,
     "confidence": 46.7,
     "outcome": "WIN",
-    "r_result": 1.351,
-    "r_net": true
+    "r_result": 1.41,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-29 09:16 UTC",
@@ -2249,8 +2308,9 @@
     "expected_profit": null,
     "confidence": 29.9,
     "outcome": "LOSS",
-    "r_result": -1.036,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-09-29 09:45 UTC",
@@ -2349,8 +2409,9 @@
     "expected_profit": null,
     "confidence": 31.9,
     "outcome": "WIN",
-    "r_result": 1.409,
-    "r_net": true
+    "r_result": 1.44,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-02 09:16 UTC",
@@ -2369,8 +2430,9 @@
     "expected_profit": null,
     "confidence": 18.5,
     "outcome": "WIN",
-    "r_result": 1.419,
-    "r_net": true
+    "r_result": 1.44,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-02 10:31 UTC",
@@ -2507,8 +2569,9 @@
     "expected_profit": null,
     "confidence": 18.7,
     "outcome": "LOSS",
-    "r_result": -1.027,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-07 09:00 UTC",
@@ -2527,8 +2590,9 @@
     "expected_profit": null,
     "confidence": 65.0,
     "outcome": "WIN",
-    "r_result": 2.479,
-    "r_net": true
+    "r_result": 2.5,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-07 10:15 UTC",
@@ -2547,8 +2611,9 @@
     "expected_profit": null,
     "confidence": 46.1,
     "outcome": "LOSS",
-    "r_result": -1.014,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-07 12:30 UTC",
@@ -2567,8 +2632,9 @@
     "expected_profit": null,
     "confidence": 54.0,
     "outcome": "LOSS",
-    "r_result": -1.008,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-08 02:31 UTC",
@@ -2587,8 +2653,9 @@
     "expected_profit": null,
     "confidence": 20.9,
     "outcome": "WIN",
-    "r_result": 1.893,
-    "r_net": true
+    "r_result": 2.16,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-09 11:16 UTC",
@@ -2649,8 +2716,9 @@
     "outcome": "LOSS",
     "edge_r": 0.13,
     "edge_n": 5,
-    "r_result": -1.019,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-12 08:15 UTC",
@@ -2671,8 +2739,9 @@
     "outcome": "WIN",
     "edge_r": 0.04,
     "edge_n": 10,
-    "r_result": 1.209,
-    "r_net": true
+    "r_result": 1.26,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-12 08:16 UTC",
@@ -2693,8 +2762,9 @@
     "outcome": "WIN",
     "edge_r": 0.06,
     "edge_n": 16,
-    "r_result": 1.209,
-    "r_net": true
+    "r_result": 1.26,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-12 09:31 UTC",
@@ -2737,8 +2807,9 @@
     "outcome": "LOSS",
     "edge_r": -0.02,
     "edge_n": 14,
-    "r_result": -1.028,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-14 08:46 UTC",
@@ -2759,8 +2830,9 @@
     "outcome": "LOSS",
     "edge_r": 0.1,
     "edge_n": 11,
-    "r_result": -1.085,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-14 08:46 UTC",
@@ -2781,8 +2853,9 @@
     "outcome": "LOSS",
     "edge_r": 0.11,
     "edge_n": 17,
-    "r_result": -1.085,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-14 09:01 UTC",
@@ -2803,8 +2876,9 @@
     "outcome": "LOSS",
     "edge_r": 0.06,
     "edge_n": 6,
-    "r_result": -1.018,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-14 12:45 UTC",
@@ -2825,8 +2899,9 @@
     "outcome": "LOSS",
     "edge_r": 0.21,
     "edge_n": 4,
-    "r_result": -1.004,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-16 09:16 UTC",
@@ -2869,8 +2944,9 @@
     "outcome": "LOSS",
     "edge_r": 0.05,
     "edge_n": 12,
-    "r_result": -1.042,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-20 09:16 UTC",
@@ -2891,8 +2967,9 @@
     "outcome": "LOSS",
     "edge_r": 0.03,
     "edge_n": 19,
-    "r_result": -1.042,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-20 10:00 UTC",
@@ -2913,8 +2990,9 @@
     "outcome": "LOSS",
     "edge_r": 0.47,
     "edge_n": 11,
-    "r_result": -1.022,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-21 09:15 UTC",
@@ -2935,8 +3013,9 @@
     "outcome": "LOSS",
     "edge_r": -0.0,
     "edge_n": 13,
-    "r_result": -1.086,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-21 11:01 UTC",
@@ -3001,8 +3080,9 @@
     "outcome": "WIN",
     "edge_r": -0.09,
     "edge_n": 15,
-    "r_result": 1.155,
-    "r_net": true
+    "r_result": 1.19,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-22 10:01 UTC",
@@ -3023,8 +3103,9 @@
     "outcome": "WIN",
     "edge_r": -0.04,
     "edge_n": 21,
-    "r_result": 1.155,
-    "r_net": true
+    "r_result": 1.19,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-22 11:15 UTC",
@@ -3045,8 +3126,9 @@
     "outcome": "WIN",
     "edge_r": 0.4,
     "edge_n": 12,
-    "r_result": 2.484,
-    "r_net": true
+    "r_result": 2.5,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-23 14:31 UTC",
@@ -3067,8 +3149,9 @@
     "outcome": "LOSS",
     "edge_r": 0.13,
     "edge_n": 5,
-    "r_result": -1.006,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-26 09:01 UTC",
@@ -3111,8 +3194,9 @@
     "outcome": "WIN",
     "edge_r": -0.04,
     "edge_n": 16,
-    "r_result": 1.172,
-    "r_net": true
+    "r_result": 1.21,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-27 09:16 UTC",
@@ -3133,8 +3217,9 @@
     "outcome": "WIN",
     "edge_r": -0.01,
     "edge_n": 22,
-    "r_result": 1.172,
-    "r_net": true
+    "r_result": 1.21,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-28 08:31 UTC",
@@ -3155,8 +3240,9 @@
     "outcome": "LOSS",
     "edge_r": -0.06,
     "edge_n": 15,
-    "r_result": -1.047,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-10-30 12:15 UTC",
@@ -3177,8 +3263,9 @@
     "outcome": "WIN",
     "edge_r": -0.0,
     "edge_n": 7,
-    "r_result": 2.49,
-    "r_net": true
+    "r_result": 2.5,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-11-02 08:16 UTC",
@@ -3221,8 +3308,9 @@
     "outcome": "LOSS",
     "edge_r": -0.05,
     "edge_n": 17,
-    "r_result": -1.041,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-11-03 07:15 UTC",
@@ -3243,8 +3331,9 @@
     "outcome": "LOSS",
     "edge_r": 0.49,
     "edge_n": 13,
-    "r_result": -1.018,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-11-03 09:01 UTC",
@@ -3309,8 +3398,9 @@
     "outcome": "WIN",
     "edge_r": 0.0,
     "edge_n": 17,
-    "r_result": 1.358,
-    "r_net": true
+    "r_result": 1.39,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-11-05 10:01 UTC",
@@ -3331,8 +3421,9 @@
     "outcome": "WIN",
     "edge_r": 0.07,
     "edge_n": 24,
-    "r_result": 1.358,
-    "r_net": true
+    "r_result": 1.39,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-11-06 08:30 UTC",
@@ -3419,8 +3510,9 @@
     "outcome": "LOSS",
     "edge_r": -0.04,
     "edge_n": 19,
-    "r_result": -1.032,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-11-09 12:30 UTC",
@@ -3507,8 +3599,9 @@
     "outcome": "LOSS",
     "edge_r": 0.13,
     "edge_n": 8,
-    "r_result": -1.008,
-    "r_net": true
+    "r_result": -1.0,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-11-11 08:16 UTC",
@@ -3529,8 +3622,9 @@
     "outcome": "WIN",
     "edge_r": 0.02,
     "edge_n": 19,
-    "r_result": 1.372,
-    "r_net": true
+    "r_result": 1.43,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-11-11 08:31 UTC",
@@ -3551,8 +3645,9 @@
     "outcome": "WIN",
     "edge_r": 0.11,
     "edge_n": 27,
-    "r_result": 1.008,
-    "r_net": true
+    "r_result": 1.05,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-11-12 07:15 UTC",
@@ -3573,8 +3668,9 @@
     "outcome": "WIN",
     "edge_r": 0.07,
     "edge_n": 9,
-    "r_result": 2.487,
-    "r_net": true
+    "r_result": 2.5,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-11-12 10:46 UTC",
@@ -3617,8 +3713,9 @@
     "outcome": "WIN",
     "edge_r": 0.19,
     "edge_n": 10,
-    "r_result": 2.495,
-    "r_net": true
+    "r_result": 2.5,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-11-16 09:45 UTC",
@@ -3639,8 +3736,9 @@
     "outcome": "WIN",
     "edge_r": 0.06,
     "edge_n": 20,
-    "r_result": 1.277,
-    "r_net": true
+    "r_result": 1.34,
+    "r_net": true,
+    "sell_spread_fixed": true
   },
   {
     "time": "2026-11-16 09:46 UTC",
@@ -3661,7 +3759,8 @@
     "outcome": "WIN",
     "edge_r": 0.1,
     "edge_n": 29,
-    "r_result": 1.277,
-    "r_net": true
+    "r_result": 1.34,
+    "r_net": true,
+    "sell_spread_fixed": true
   }
 ]
